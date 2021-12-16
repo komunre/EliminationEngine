@@ -30,14 +30,16 @@ namespace EliminationEngine.GameObjects
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
             GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
 
+            _indicesBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, Indices.Count * sizeof(uint), Indices.ToArray(), BufferUsageHint.StaticDraw);
+
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
 
-            _indicesBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, Indices.Count * 3 * sizeof(uint), Indices.ToArray(), BufferUsageHint.StaticDraw);
+            
 
             _shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
         }
@@ -49,8 +51,9 @@ namespace EliminationEngine.GameObjects
             //GL.BindVertexArray(_vertexArr);
             //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
+            GL.BindVertexArray(_vertexArr);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, Indices.Count);
+            GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
         }
     }
 }

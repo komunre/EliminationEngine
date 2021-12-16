@@ -5,9 +5,39 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using SharpGLTF.Schema2;
+using EliminationEngine.GameObjects;
 
 namespace EliminationEngine
 {
+    public static class ModelHelper
+    {
+        public static void AddObjMeshToObject(ModelParser.ObjData data, ref GameObject obj)
+        {
+            var vertsArr = new List<float>();
+            var indices = new List<int>();
+
+            foreach (var vert in data.Vertices)
+            {
+                vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
+            }
+
+            foreach (var face in data.Faces)
+            {
+                foreach (var vert in face.Vertices)
+                {
+                    indices.Add(vert - 1);
+                }
+            }
+
+            obj.AddComponent<GameObjects.Mesh>();
+            var mesh = obj.GetComponent<GameObjects.Mesh>();
+            mesh.Vertices = vertsArr;
+            mesh.Indices = indices;
+
+            mesh.LoadMesh();
+        }
+    }
     public static class ModelParser
     {
         public class ObjData
@@ -80,6 +110,20 @@ namespace EliminationEngine
         public static GLTFData ParseGLTF(string path)
         {
             return new GLTFData(); // dummy
+        }
+
+        public static void ParseGLTFExternal(string path)
+        {
+            var model = ModelRoot.Load(path);
+            var scene = model.DefaultScene;
+            foreach (var node in scene.VisualChildren)
+            {
+                var weh = node.Skin.GetJoint(0);
+                foreach (var primitive in node.Mesh.Primitives)
+                {
+                    
+                }
+            }
         }
     }
 }

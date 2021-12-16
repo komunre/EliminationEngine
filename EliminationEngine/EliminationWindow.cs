@@ -8,6 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using EliminationEngine.GameObjects;
+using System.Globalization;
 
 namespace EliminationEngine
 {
@@ -25,30 +26,26 @@ namespace EliminationEngine
 
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+            GL.Viewport(0, 0, 800, 600);
+
             var obj = new GameObject();
-            /*var data = ModelParser.ParseObj("res/test.obj");
+            var data = ModelParser.ParseObj("res/test.obj");
             var vertsArr = new List<float>();
-            foreach (var face in data.Faces)
-            {
-                foreach (var vert in face.Vertices)
-                {
-                    var vertData = data.Vertices.ElementAt(vert - 1);
-                    vertsArr.AddRange(new float[] { vertData.X, vertData.Y, vertData.Z } );
-                }
-            }
-            Console.WriteLine("==============");
-            //foreach (var vert in vertsArr)z
-            //{
-            //    Console.WriteLine(vert);
-            //}*/
-            obj.AddComponent<Mesh>();
-            var mesh = obj.GetComponent<Mesh>();
-            //mesh.Vertices = vertsArr;
-            mesh.Vertices = new List<float> { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
-            mesh.Indices = new List<int> { 0, 1, 2 };
-            mesh.LoadMesh();
+            var indices = new List<int>();
+
+            ModelHelper.AddObjMeshToObject(data, ref obj);
 
             GameObjects.Add(obj);
+
+            var triangle = new GameObject();
+            triangle.AddComponent<Mesh>();
+            var trMesh = triangle.GetComponent<Mesh>();
+            trMesh.Vertices = new List<float> { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
+            trMesh.Indices = new List<int> { 0, 1, 2 };
+
+            trMesh.LoadMesh();
+
+            GameObjects.Add(triangle);
         }
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
