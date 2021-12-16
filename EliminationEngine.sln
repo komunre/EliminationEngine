@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttackGame", "AttackGame\AttackGame.csproj", "{4E040FE0-41F0-4B2E-A86E-C58DE8285CC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EliminationEngine", "EliminationEngine\EliminationEngine.csproj", "{52C3C195-229C-4B65-AB14-7F39E736E841}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E040FE0-41F0-4B2E-A86E-C58DE8285CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E040FE0-41F0-4B2E-A86E-C58DE8285CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E040FE0-41F0-4B2E-A86E-C58DE8285CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E040FE0-41F0-4B2E-A86E-C58DE8285CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52C3C195-229C-4B65-AB14-7F39E736E841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52C3C195-229C-4B65-AB14-7F39E736E841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52C3C195-229C-4B65-AB14-7F39E736E841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52C3C195-229C-4B65-AB14-7F39E736E841}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5DFD7A98-4C65-4E05-81C5-E13D69574E6A}
+	EndGlobalSection
+EndGlobal
