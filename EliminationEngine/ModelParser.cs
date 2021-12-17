@@ -18,22 +18,30 @@ namespace EliminationEngine
             var indices = new List<int>();
             var texCoords = new List<float>();
 
-            foreach (var vert in data.Vertices)
-            {
-                vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
-            }
+            //foreach (var vert in data.Vertices)
+            //{
+            //    vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
+            //}
 
             foreach (var face in data.Faces)
             {
-                foreach (var vert in face.Vertices)
+                var faceVerts = new int[face.Vertices.Count];
+                face.Vertices.CopyTo(faceVerts);
+                var faceVertsList = faceVerts.Reverse();
+                foreach (var vert in faceVertsList)
                 {
                     indices.Add(vert - 1);
+                    var vertData = data.Vertices[vert - 1];
+                    vertsArr.AddRange(new float[] { vertData.X, vertData.Y, vertData.Z });
                 }
-            }
-
-            foreach (var coord in data.TextureCoords)
-            {
-                texCoords.AddRange(new float[] { coord.X, coord.Y });
+                var faceTex = new int[face.TextureCoords.Count];
+                face.TextureCoords.CopyTo(faceTex);
+                var faceTexList = faceTex.Reverse();
+                foreach (var coord in faceTexList)
+                {
+                    var realCoord = data.TextureCoords[coord - 1];
+                    texCoords.AddRange(new float[] { realCoord.X, realCoord.Y });
+                }
             }
 
             obj.AddComponent<GameObjects.Mesh>();
@@ -58,6 +66,7 @@ namespace EliminationEngine
             public class FaceData
             {
                 public List<int> Vertices = new();
+                public List<int> TextureCoords = new();
             }
             public List<Vector3> Vertices = new();
             public List<Vector3> Normals = new();
@@ -96,6 +105,7 @@ namespace EliminationEngine
                             foreach (var faceDat in facesData)
                             {
                                 face.Vertices.Add(int.Parse(faceDat.Split('/')[0]));
+                                face.TextureCoords.Add(int.Parse(faceDat.Split('/')[1]));
                             }
                             data.Faces.Add(face);
                             break;
