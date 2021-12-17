@@ -10,7 +10,7 @@ namespace EliminationEngine.GameObjects
     public class GameObject
     {
         public Vector3 Position { get; set; } = Vector3.Zero;
-        public Quaternion rotation { get; private set; } = Quaternion.Identity;
+        public Quaternion Rotation { get; set; } = Quaternion.Identity;
         protected Dictionary<Type, EntityComponent> Components { get; private set; } = new();
 
         public GameObject()

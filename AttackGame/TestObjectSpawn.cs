@@ -30,7 +30,8 @@ namespace AttackGame
         {
             base.OnUpdate();
 
-            test.Position += new OpenTK.Mathematics.Vector3(0, 0.0005f, 0);
+            test.Position += new OpenTK.Mathematics.Vector3(0, 0.0001f, 0);
+            test.Rotation += OpenTK.Mathematics.Quaternion.FromEulerAngles(test.Position * 10);
         }
     }
 }

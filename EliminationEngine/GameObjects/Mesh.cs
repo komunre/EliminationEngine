@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,16 @@ namespace EliminationEngine.GameObjects
                 vertsPos[i] += Owner.Position.X;
                 vertsPos[i + 1] += Owner.Position.Y;
                 vertsPos[i + 2] += Owner.Position.Z;
+            }
+
+            for (var i = 0; i < vertsPos.Length; i += 3)
+            {
+                var vec = new Vector4(vertsPos[i], vertsPos[i + 1], vertsPos[i + 2], 1.0f);
+                var matrix = Matrix4.CreateFromQuaternion(Owner.Rotation);
+                vec *= matrix;
+                vertsPos[i] *= vec.X;
+                vertsPos[i + 1] += vec.Y;
+                vertsPos[i + 2] += vec.Z;
             }
 
             GL.BufferData(BufferTarget.ArrayBuffer, vertsPos.Length * sizeof(float), vertsPos, BufferUsageHint.StaticDraw);
