@@ -19,7 +19,9 @@ namespace EliminationEngine.GameObjects
 
         public void AddComponent<CompType>() where CompType : EntityComponent
         {
-            Components.Add(typeof(CompType), Activator.CreateInstance<CompType>());
+            var comp = Activator.CreateInstance<CompType>();
+            comp.Owner = this;
+            Components.Add(typeof(CompType), comp);
         }
 
         public CompType? GetComponent<CompType>() where CompType : EntityComponent

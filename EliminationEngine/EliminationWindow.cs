@@ -15,9 +15,10 @@ namespace EliminationEngine
     public class EliminationWindow : GameWindow
     {
         public List<GameObject> GameObjects = new();
-        public EliminationWindow(GameWindowSettings settings, NativeWindowSettings nativeSettings) : base(settings, nativeSettings)
+        public Elimination Engine;
+        public EliminationWindow(GameWindowSettings settings, NativeWindowSettings nativeSettings, Elimination engine) : base(settings, nativeSettings)
         {
-
+            Engine = engine;
         }
 
         protected override void OnLoad()
@@ -26,26 +27,10 @@ namespace EliminationEngine
 
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-            GL.Viewport(0, 0, 800, 600);
-
-            var obj = new GameObject();
-            var data = ModelParser.ParseObj("res/test.obj");
-            var vertsArr = new List<float>();
-            var indices = new List<int>();
-
-            ModelHelper.AddObjMeshToObject(data, "res/basic.png", ref obj);
-
-            GameObjects.Add(obj);
-
-            var triangle = new GameObject();
-            triangle.AddComponent<Mesh>();
-            var trMesh = triangle.GetComponent<Mesh>();
-            trMesh.Vertices = new List<float> { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
-            trMesh.Indices = new List<int> { 0, 1, 2 };
-
-            trMesh.LoadMesh("res/basic.png");
-
-            GameObjects.Add(triangle);
+            foreach (var system in Engine.RegisteredSystems.Values)
+            {
+                system.OnLoad();
+            }
         }
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
@@ -54,6 +39,10 @@ namespace EliminationEngine
                 Close();
             }
 
+            foreach (var system in Engine.RegisteredSystems.Values)
+            {
+                system.OnUpdate();
+            }
             base.OnUpdateFrame(args);
         }
 
@@ -71,7 +60,15 @@ namespace EliminationEngine
                 }
             }
 
+
             SwapBuffers();
+        }
+
+        protected override void OnResize(ResizeEventArgs e)
+        {
+            base.OnResize(e);
+
+            GL.Viewport(0, 0, e.Width, e.Height);
         }
     }
 }

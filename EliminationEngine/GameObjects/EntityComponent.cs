@@ -8,6 +8,6 @@ namespace EliminationEngine.GameObjects
 {
     public class EntityComponent
     {
-        public GameObject Owner = null;
+        public GameObject? Owner = null;
     }
 }

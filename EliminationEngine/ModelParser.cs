@@ -87,7 +87,6 @@ namespace EliminationEngine
                         case "v":
                             var split = line.Split(' ');
                             var vec = new Vector3((float)double.Parse(split[1], new CultureInfo("en-US")), (float)double.Parse(split[2], new CultureInfo("en-US")), (float)double.Parse(split[3], new CultureInfo("en-US")));
-                            Console.WriteLine(vec.X + ":" + vec.Y + ":" + vec.Z);
                             data.Vertices.Add(vec);
                             break;
                         case "f":
