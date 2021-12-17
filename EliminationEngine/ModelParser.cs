@@ -29,11 +29,10 @@ namespace EliminationEngine
                 {
                     indices.Add(vert - 1);
                 }
-            }
-
-            foreach (var coord in data.TextureCoords)
-            {
-                texCoords.AddRange(new float[] { coord.X, coord.Y });
+                foreach (var coord in face.TextureCoords)
+                {
+                    texCoords.Add(coord - 1);
+                }
             }
 
             obj.AddComponent<GameObjects.Mesh>();
@@ -58,6 +57,7 @@ namespace EliminationEngine
             public class FaceData
             {
                 public List<int> Vertices = new();
+                public List<int> TextureCoords = new();
             }
             public List<Vector3> Vertices = new();
             public List<Vector3> Normals = new();
@@ -96,6 +96,7 @@ namespace EliminationEngine
                             foreach (var faceDat in facesData)
                             {
                                 face.Vertices.Add(int.Parse(faceDat.Split('/')[0]));
+                                face.TextureCoords.Add(int.Parse(faceDat.Split('/')[1]));
                             }
                             data.Faces.Add(face);
                             break;

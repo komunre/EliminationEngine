@@ -9,6 +9,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using EliminationEngine.GameObjects;
 using System.Globalization;
+using OpenTK.Mathematics;
 
 namespace EliminationEngine
 {

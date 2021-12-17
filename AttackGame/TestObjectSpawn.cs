@@ -5,19 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine;
 using EliminationEngine.GameObjects;
+using OpenTK.Mathematics;
 
 namespace AttackGame
 {
     public class TestObjectSpawn : EntitySystem
     {
         GameObject test;
+        private float add = 0;
         public override void OnLoad()
         {
             base.OnLoad();
             if (Engine == null) return;
 
             var obj = new GameObject();
-            var data = ModelParser.ParseObj("res/test.obj");
+            var data = ModelParser.ParseObj("res/monkey.obj");
+
+            obj.Position = new Vector3(0, 0, -1.5f);
 
             test = obj;
 
@@ -30,8 +34,10 @@ namespace AttackGame
         {
             base.OnUpdate();
 
-            test.Position += new OpenTK.Mathematics.Vector3(0, 0.0001f, 0);
-            test.Rotation += OpenTK.Mathematics.Quaternion.FromEulerAngles(test.Position * 10);
+            add += 0.0005f;
+
+            //test.Position += new Vector3(0, 0.0001f, 0);
+            test.Rotation += Quaternion.FromEulerAngles(new Vector3(0, add, 0));
         }
     }
 }

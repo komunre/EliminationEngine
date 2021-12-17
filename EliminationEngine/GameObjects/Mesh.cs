@@ -72,19 +72,20 @@ namespace EliminationEngine.GameObjects
             var vertsPos = Vertices.ToArray();
             for (var i = 0; i < vertsPos.Length; i += 3)
             {
-                vertsPos[i] += Owner.Position.X;
-                vertsPos[i + 1] += Owner.Position.Y;
-                vertsPos[i + 2] += Owner.Position.Z;
-            }
-
-            for (var i = 0; i < vertsPos.Length; i += 3)
-            {
                 var vec = new Vector4(vertsPos[i], vertsPos[i + 1], vertsPos[i + 2], 1.0f);
+                var trans = Matrix4.CreateTranslation(Owner.Position);
                 var matrix = Matrix4.CreateFromQuaternion(Owner.Rotation);
+                //var fovMatrix = Matrix4.CreateOrthographic(1, 1, 0.1f, 100f);
+                var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), 800.0f / 600.0f, 0.01f, 100f);
+                var lookAt = Matrix4.LookAt(new Vector3(0, 0, 10f), Owner.Position, new Vector3(0, 1, 0));
+                vec *= fovMatrix;
+                vec *= trans;
                 vec *= matrix;
-                vertsPos[i] *= vec.X;
-                vertsPos[i + 1] += vec.Y;
-                vertsPos[i + 2] += vec.Z;
+                //vec *= lookAt;
+                //Console.WriteLine(vec.X + ":" + vec.Y +":" + vec.Z);
+                vertsPos[i] = vec.X;
+                vertsPos[i + 1] = vec.Y;
+                vertsPos[i + 2] = vec.Z;
             }
 
             GL.BufferData(BufferTarget.ArrayBuffer, vertsPos.Length * sizeof(float), vertsPos, BufferUsageHint.StaticDraw);
