@@ -52,8 +52,8 @@ namespace EliminationEngine.GameObjects
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Nearest);
             _texCoordBuffer = GL.GenBuffer();
             
-            GL.BindBuffer(BufferTarget.TextureBuffer, _texCoordBuffer);
-            GL.BufferData(BufferTarget.TextureBuffer, TexCoords.Count * sizeof(float), TexCoords.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _texCoordBuffer);
+            GL.BufferData(BufferTarget.ArrayBuffer, TexCoords.Count * sizeof(float), TexCoords.ToArray(), BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
             GL.EnableVertexAttribArray(1);
@@ -73,19 +73,19 @@ namespace EliminationEngine.GameObjects
             for (var i = 0; i < vertsPos.Length; i += 3)
             {
                 var vec = new Vector4(vertsPos[i], vertsPos[i + 1], vertsPos[i + 2], 1.0f);
-                var trans = Matrix4.CreateTranslation(Owner.Position);
+                //var trans = Matrix4.CreateTranslation(Owner.Position);
                 var matrix = Matrix4.CreateFromQuaternion(Owner.Rotation);
                 //var fovMatrix = Matrix4.CreateOrthographic(1, 1, 0.1f, 100f);
                 var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), 800.0f / 600.0f, 0.01f, 100f);
-                var lookAt = Matrix4.LookAt(new Vector3(0, 0, 10f), Owner.Position, new Vector3(0, 1, 0));
+                var lookAt = Matrix4.LookAt(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 1, 0)); // TODO: Replace with camera position and rotation
                 vec *= fovMatrix;
-                vec *= trans;
                 vec *= matrix;
+                vec *= lookAt;
                 //vec *= lookAt;
                 //Console.WriteLine(vec.X + ":" + vec.Y +":" + vec.Z);
-                vertsPos[i] = vec.X;
-                vertsPos[i + 1] = vec.Y;
-                vertsPos[i + 2] = vec.Z;
+                vertsPos[i] = vec.X + Owner.Position.X;
+                vertsPos[i + 1] = vec.Y + Owner.Position.Y;
+                vertsPos[i + 2] = vec.Z + Owner.Position.Z;
             }
 
             GL.BufferData(BufferTarget.ArrayBuffer, vertsPos.Length * sizeof(float), vertsPos, BufferUsageHint.StaticDraw);
@@ -98,6 +98,7 @@ namespace EliminationEngine.GameObjects
             //GL.BindVertexArray(_vertexArr);
             //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
+            GL.BindTexture(TextureTarget.Texture2D, _tex);
             GL.BindVertexArray(_vertexArr);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
             GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
