@@ -18,20 +18,29 @@ namespace EliminationEngine
             var indices = new List<int>();
             var texCoords = new List<float>();
 
-            foreach (var vert in data.Vertices)
-            {
-                vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
-            }
+            //foreach (var vert in data.Vertices)
+            //{
+            //    vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
+            //}
 
             foreach (var face in data.Faces)
             {
-                foreach (var vert in face.Vertices)
+                var faceVerts = new int[face.Vertices.Count];
+                face.Vertices.CopyTo(faceVerts);
+                var faceVertsList = faceVerts.Reverse();
+                foreach (var vert in faceVertsList)
                 {
                     indices.Add(vert - 1);
+                    var vertData = data.Vertices[vert - 1];
+                    vertsArr.AddRange(new float[] { vertData.X, vertData.Y, vertData.Z });
                 }
-                foreach (var coord in face.TextureCoords)
+                var faceTex = new int[face.TextureCoords.Count];
+                face.TextureCoords.CopyTo(faceTex);
+                var faceTexList = faceTex.Reverse();
+                foreach (var coord in faceTexList)
                 {
-                    texCoords.Add(coord - 1);
+                    var realCoord = data.TextureCoords[coord - 1];
+                    texCoords.AddRange(new float[] { realCoord.X, realCoord.Y });
                 }
             }
 

@@ -73,19 +73,19 @@ namespace EliminationEngine.GameObjects
             for (var i = 0; i < vertsPos.Length; i += 3)
             {
                 var vec = new Vector4(vertsPos[i], vertsPos[i + 1], vertsPos[i + 2], 1.0f);
-                //var trans = Matrix4.CreateTranslation(Owner.Position);
+                var trans = Matrix4.CreateTranslation(Owner.Position);
                 var matrix = Matrix4.CreateFromQuaternion(Owner.Rotation);
                 //var fovMatrix = Matrix4.CreateOrthographic(1, 1, 0.1f, 100f);
-                var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), 800.0f / 600.0f, 0.01f, 100f);
-                var lookAt = Matrix4.LookAt(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 1, 0)); // TODO: Replace with camera position and rotation
-                vec *= fovMatrix;
-                vec *= matrix;
-                vec *= lookAt;
+                var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), 800.0f / 600.0f, 0.01f, 1000f);
+                var lookAt = Matrix4.LookAt(new Vector3(0, 0, 4), new Vector3(0, 0, -1), new Vector3(0, 1, 0)); // TODO: Replace with camera position and rotation
+                //var res = fovMatrix * lookAt * trans * matrix * vec;
+                var res = vec * matrix * trans * lookAt * (fovMatrix * 0.1f);
                 //vec *= lookAt;
                 //Console.WriteLine(vec.X + ":" + vec.Y +":" + vec.Z);
-                vertsPos[i] = vec.X + Owner.Position.X;
-                vertsPos[i + 1] = vec.Y + Owner.Position.Y;
-                vertsPos[i + 2] = vec.Z + Owner.Position.Z;
+                vertsPos[i] = res.X;
+                vertsPos[i + 1] = res.Y;
+                vertsPos[i + 2] = res.Z;
+                //Console.WriteLine(res.X + ":" + res.Y + ":" + res.Z);
             }
 
             GL.BufferData(BufferTarget.ArrayBuffer, vertsPos.Length * sizeof(float), vertsPos, BufferUsageHint.StaticDraw);
@@ -100,8 +100,9 @@ namespace EliminationEngine.GameObjects
 
             GL.BindTexture(TextureTarget.Texture2D, _tex);
             GL.BindVertexArray(_vertexArr);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
-            GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
+            //GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
+            //GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Count);
         }
     }
 }

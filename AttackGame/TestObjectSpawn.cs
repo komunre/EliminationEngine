@@ -22,7 +22,7 @@ namespace AttackGame
             var obj = new GameObject();
             var data = ModelParser.ParseObj("res/cube.obj");
 
-            obj.Position = new Vector3(-0.9f, -0.5f, 0);
+            obj.Position = new Vector3(0, 0, 10);
             obj.Rotation = Quaternion.FromEulerAngles(15f, 0, 0);
 
             test = obj;

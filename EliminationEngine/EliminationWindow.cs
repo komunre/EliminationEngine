@@ -28,6 +28,11 @@ namespace EliminationEngine
 
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Less); // Doesn't work properly without CullFace? (Draws only back side)
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+
             foreach (var system in Engine.RegisteredSystems.Values)
             {
                 system.OnLoad();
@@ -51,7 +56,7 @@ namespace EliminationEngine
         {
             base.OnRenderFrame(args);
 
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             foreach (var gameObject in GameObjects)
             {
