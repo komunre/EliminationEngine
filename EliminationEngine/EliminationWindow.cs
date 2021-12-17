@@ -10,6 +10,7 @@ using OpenTK.Windowing.Desktop;
 using EliminationEngine.GameObjects;
 using System.Globalization;
 using OpenTK.Mathematics;
+using System.Diagnostics;
 
 namespace EliminationEngine
 {
@@ -17,6 +18,7 @@ namespace EliminationEngine
     {
         public List<GameObject> GameObjects = new();
         public Elimination Engine;
+        protected Stopwatch stopwatch = new();
         public EliminationWindow(GameWindowSettings settings, NativeWindowSettings nativeSettings, Elimination engine) : base(settings, nativeSettings)
         {
             Engine = engine;
@@ -40,6 +42,8 @@ namespace EliminationEngine
         }
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+            stopwatch.Start();
+
             if (KeyboardState.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape))
             {
                 Close();
@@ -49,6 +53,7 @@ namespace EliminationEngine
             {
                 system.OnUpdate();
             }
+
             base.OnUpdateFrame(args);
         }
 
@@ -69,6 +74,12 @@ namespace EliminationEngine
 
 
             SwapBuffers();
+
+            stopwatch.Stop();
+
+            Engine.DeltaTime = stopwatch.ElapsedTicks / 10000000f;
+
+            stopwatch.Reset();
         }
 
         protected override void OnResize(ResizeEventArgs e)

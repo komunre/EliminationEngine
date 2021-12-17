@@ -11,8 +11,8 @@ namespace AttackGame
 {
     public class TestObjectSpawn : EntitySystem
     {
-        GameObject test;
-        GameObject test2;
+        GameObject? test;
+        GameObject? test2;
         private float add = 0;
         public override void OnLoad()
         {
@@ -45,11 +45,12 @@ namespace AttackGame
         {
             base.OnUpdate();
 
-            add += 0.0005f;
+            add += 1 * Engine.DeltaTime;
+            Console.WriteLine(add);
 
             //test.Position += new Vector3(0, 0.0001f, 0);
             test.Rotation += Quaternion.FromEulerAngles(new Vector3(15, add, 0));
-            test2.Rotation += Quaternion.FromEulerAngles(new Vector3(0, add, 0));
+            test2.Rotation += Quaternion.FromAxisAngle(new Vector3(0, 1, 0), add);
         }
     }
 }
