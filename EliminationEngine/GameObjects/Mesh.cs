@@ -64,6 +64,21 @@ namespace EliminationEngine.GameObjects
 
         }
 
+        public void UpdatePos()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
+
+            var vertsPos = Vertices.ToArray();
+            for (var i = 0; i < vertsPos.Length; i += 3)
+            {
+                vertsPos[i] += Owner.Position.X;
+                vertsPos[i + 1] += Owner.Position.Y;
+                vertsPos[i + 2] += Owner.Position.Z;
+            }
+
+            GL.BufferData(BufferTarget.ArrayBuffer, vertsPos.Length * sizeof(float), vertsPos, BufferUsageHint.StaticDraw);
+        }
+
         public void DrawMesh()
         {
             _shader.Use();

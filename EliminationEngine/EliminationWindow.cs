@@ -56,6 +56,7 @@ namespace EliminationEngine
             {
                 if (gameObject.TryGetComponent<Mesh>(out var mesh))
                 {
+                    mesh.UpdatePos();
                     mesh.DrawMesh();
                 }
             }

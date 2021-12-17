@@ -29,6 +29,8 @@ namespace AttackGame
         public override void OnUpdate()
         {
             base.OnUpdate();
+
+            test.Position += new OpenTK.Mathematics.Vector3(0, 0.0005f, 0);
         }
     }
 }
