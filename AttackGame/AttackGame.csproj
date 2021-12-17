@@ -11,4 +11,18 @@
     <ProjectReference Include="..\EliminationEngine\EliminationEngine.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="res\**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ResFiles Include="res\**"></ResFiles>
+	</ItemGroup>
+
+	<Target Name="CopyCustomContent" AfterTargets="AfterResGen">
+		<Copy SourceFiles="@(ResFiles)" DestinationFolder="$(OutDir)"/>
+	</Target>
+	
 </Project>
