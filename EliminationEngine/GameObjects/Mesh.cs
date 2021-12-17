@@ -55,7 +55,7 @@ namespace EliminationEngine.GameObjects
             GL.BindBuffer(BufferTarget.TextureBuffer, _texCoordBuffer);
             GL.BufferData(BufferTarget.TextureBuffer, TexCoords.Count * sizeof(float), TexCoords.ToArray(), BufferUsageHint.StaticDraw);
 
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
             GL.EnableVertexAttribArray(1);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);

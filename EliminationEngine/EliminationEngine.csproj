@@ -29,6 +29,16 @@
 	  </Content>
   </ItemGroup>
 
+	<ItemGroup>
+		<ResFiles Include="res\**"></ResFiles>
+		<ShaderFiles Include="Shaders\**"></ShaderFiles>
+	</ItemGroup>
+
+	<Target Name="CopyCustomContent" AfterTargets="AfterResGen">
+		<Copy SourceFiles="@(ResFiles)" DestinationFolder="$(OutDir)"/>
+		<Copy SourceFiles="@(ShaderFiles)" DestinationFolder="$(OutDir)"/>
+	</Target>
+
   <ItemGroup>
     <Folder Include="res\" />
   </ItemGroup>
