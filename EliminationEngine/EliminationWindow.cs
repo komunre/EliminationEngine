@@ -33,7 +33,7 @@ namespace EliminationEngine
             var vertsArr = new List<float>();
             var indices = new List<int>();
 
-            ModelHelper.AddObjMeshToObject(data, ref obj);
+            ModelHelper.AddObjMeshToObject(data, "res/basic.png", ref obj);
 
             GameObjects.Add(obj);
 
@@ -43,7 +43,7 @@ namespace EliminationEngine
             trMesh.Vertices = new List<float> { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
             trMesh.Indices = new List<int> { 0, 1, 2 };
 
-            trMesh.LoadMesh();
+            trMesh.LoadMesh("res/basic.png");
 
             GameObjects.Add(triangle);
         }

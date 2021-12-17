@@ -16,25 +16,17 @@
     <PackageReference Include="FbxSharp" Version="0.9.0" />
     <PackageReference Include="OpenTK" Version="4.6.7" />
     <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0023" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
     <PackageReference Include="VulkanSharp" Version="0.1.10" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="res\test.fbx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="res\test.mtl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="res\test.obj">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Shaders\textured.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Shaders\textured.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+	  <Content Include="res\**">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Shaders\**">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
   </ItemGroup>
 
   <ItemGroup>

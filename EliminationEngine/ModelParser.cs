@@ -12,10 +12,11 @@ namespace EliminationEngine
 {
     public static class ModelHelper
     {
-        public static void AddObjMeshToObject(ModelParser.ObjData data, ref GameObject obj)
+        public static void AddObjMeshToObject(ModelParser.ObjData data, string texture, ref GameObject obj)
         {
             var vertsArr = new List<float>();
             var indices = new List<int>();
+            var texCoords = new List<float>();
 
             foreach (var vert in data.Vertices)
             {
@@ -30,12 +31,18 @@ namespace EliminationEngine
                 }
             }
 
+            foreach (var coord in data.TextureCoords)
+            {
+                texCoords.AddRange(new float[] { coord.X, coord.Y });
+            }
+
             obj.AddComponent<GameObjects.Mesh>();
             var mesh = obj.GetComponent<GameObjects.Mesh>();
             mesh.Vertices = vertsArr;
             mesh.Indices = indices;
+            mesh.TexCoords = texCoords;
 
-            mesh.LoadMesh();
+            mesh.LoadMesh(texture);
         }
     }
     public static class ModelParser
@@ -44,9 +51,9 @@ namespace EliminationEngine
         {
             public class TextureCoord
             {
-                public int X;
-                public int Y;
-                public int Uv;
+                public float X;
+                public float Y;
+                public int U;
             }
             public class FaceData
             {
@@ -92,6 +99,19 @@ namespace EliminationEngine
                                 face.Vertices.Add(int.Parse(faceDat.Split('/')[0]));
                             }
                             data.Faces.Add(face);
+                            break;
+                        case "vt":
+                            var tsplit = line.Split(' ');
+                            var x = float.Parse(tsplit[1], new CultureInfo("en-US"));
+                            var y = float.Parse(tsplit[2], new CultureInfo("en-US"));
+                            //var u = int.Parse(tsplit[3].Replace("[", "").Replace("]", ""));
+
+                            var coord = new ObjData.TextureCoord();
+                            coord.X = x;
+                            coord.Y = y;
+                            //coord.U = u;
+
+                            data.TextureCoords.Add(coord);
                             break;
                         default:
                             break;

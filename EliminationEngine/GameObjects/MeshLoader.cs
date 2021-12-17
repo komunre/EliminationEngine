@@ -9,7 +9,7 @@ namespace EliminationEngine.GameObjects
 {
     public static class MeshLoader
     {
-        public static void LoadMeshFromFbx(string path, ref GameObject obj)
+        /*public static void LoadMeshFromFbx(string path, ref GameObject obj)
         {
             obj.AddComponent<Mesh>();
             var mesh = obj.GetComponent<Mesh>();
@@ -37,6 +37,6 @@ namespace EliminationEngine.GameObjects
                 mesh.Vertices = realVerts;
                 mesh.LoadMesh();
             }
-        }
+        }*/
     }
 }
