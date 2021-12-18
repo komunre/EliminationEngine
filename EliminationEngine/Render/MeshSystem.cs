@@ -61,6 +61,14 @@ namespace EliminationEngine.Render
         {
             base.OnUpdate();
 
+            var cameras = Engine.GetObjectsOfType<CameraComponent>().Select(e => { if (e.Active) return e; else return null; });
+            if (cameras == null) return;
+            var camera = cameras.ElementAt(0);
+            if (camera == null) return;
+            var cameraRot = camera.Owner.Rotation;
+            var forward = new Vector3(0, 0, -1);
+            var up = new Vector3(0, 1, 0);
+
             var meshGroups = Engine.GetObjectsOfType<MeshGroupComponent>();
             foreach (var meshGroup in meshGroups)
             {
@@ -74,7 +82,7 @@ namespace EliminationEngine.Render
                     var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.Rotation);
                     var scale = Matrix4.CreateScale(meshGroup.Owner.Scale);
                     var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), 800.0f / 600.0f, 0.01f, 1000f);
-                    var lookAt = Matrix4.LookAt(new Vector3(0, 0, 4), new Vector3(0, 0, -1), new Vector3(0, 1, 0)); // TODO: Replace with camera position and rotation
+                    var lookAt = Matrix4.LookAt(camera.Owner.Position, forward, up);
                     mesh._shader.SetMatrix4("mvpMatrix", trans * matrix * scale * lookAt * (fovMatrix * 0.1f));
 
                     GL.BindTexture(TextureTarget.Texture2D, mesh._tex);

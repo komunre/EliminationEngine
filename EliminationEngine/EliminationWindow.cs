@@ -59,6 +59,8 @@ namespace EliminationEngine
         {
             stopwatch.Start();
 
+            Engine.KeyState = KeyboardState;
+
             if (KeyboardState.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape))
             {
                 Close();

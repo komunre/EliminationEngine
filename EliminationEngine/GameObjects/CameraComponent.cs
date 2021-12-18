@@ -9,7 +9,6 @@ namespace EliminationEngine.GameObjects
 {
     public class CameraComponent : EntityComponent
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
+        public bool Active = true;
     }
 }

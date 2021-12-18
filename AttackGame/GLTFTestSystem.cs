@@ -6,15 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Mathematics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace AttackGame
 {
     public class GLTFTestSystem : EntitySystem
     {
         public GameObject GltfObject;
+        private GameObject _camera;
         public override void OnLoad()
         {
             base.OnLoad();
+
+            var camera = new GameObject();
+            camera.AddComponent<CameraComponent>();
+            camera.Position = new Vector3(0, 0, 2);
+            camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
+
+            Engine.AddGameObject(camera);
+            _camera = camera;
 
             var data = ModelParser.ParseGLTFExternal("res/fox.glb");
             var obj = new GameObject();
@@ -40,8 +52,24 @@ namespace AttackGame
         public override void OnUpdate()
         {
             base.OnUpdate();
-
-            GltfObject.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(50, (float)Engine.Elapsed.TotalMilliseconds * 0.001f, 38));
+            var dir = Vector3.Zero;
+            if (Engine.KeyState.IsKeyDown(Keys.D)) {
+                dir += new Vector3(1, 0, 0);
+            }
+            if (Engine.KeyState.IsKeyDown(Keys.W))
+            {
+                dir += new Vector3(0, 1, 0);
+            }
+            if (Engine.KeyState.IsKeyDown(Keys.A))
+            {
+                dir += new Vector3(-1, 0, 0);
+            }
+            if (Engine.KeyState.IsKeyDown(Keys.S))
+            {
+                dir += new Vector3(0, -1, 0);
+            }
+            _camera.Position += dir * 2 * Engine.DeltaTime;
+            _camera.LookAt(Vector3.Zero);
         }
     }
 }

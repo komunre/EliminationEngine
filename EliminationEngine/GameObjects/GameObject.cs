@@ -19,6 +19,25 @@ namespace EliminationEngine.GameObjects
             // AddComponent<Mesh>(); // Add mesh for future usage during drawing
         }
 
+        public Vector3 Forward()
+        {
+            var direction = Vector3.Zero;
+            var euler = Rotation.ToEulerAngles();
+            direction.X = (float)Math.Cos(MathHelper.DegreesToRadians(euler.Z)) * (float)Math.Cos(MathHelper.DegreesToRadians(euler.X));
+            direction.Y = (float)Math.Sin(MathHelper.DegreesToRadians(euler.Z));
+            direction.Z = (float)Math.Cos(MathHelper.DegreesToRadians(euler.Z)) * (float)Math.Sin(MathHelper.DegreesToRadians(euler.X));
+            direction.Normalize();
+
+            direction += Position;
+
+            return direction;
+        }
+
+        public void LookAt(Vector3 target)
+        {
+            Rotation = EliminationMathHelper.QuaternionFromEuler(Position - target);
+        }
+
         public CompType AddComponent<CompType>() where CompType : EntityComponent
         {
             var comp = Activator.CreateInstance<CompType>();

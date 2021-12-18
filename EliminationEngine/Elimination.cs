@@ -7,6 +7,7 @@ using EliminationEngine.GameObjects;
 using EliminationEngine.Render;
 using OpenTK;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace EliminationEngine
 {
@@ -17,6 +18,7 @@ namespace EliminationEngine
         public Dictionary<Type, EntitySystem> RegisteredSystems = new();
         public float DeltaTime = 0;
         public TimeSpan Elapsed = new TimeSpan(0);
+        public KeyboardState KeyState;
 
         public Elimination(int width, int height)
         {
