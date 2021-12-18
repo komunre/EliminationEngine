@@ -75,11 +75,12 @@ namespace EliminationEngine.GameObjects
                 var vec = new Vector4(vertsPos[i], vertsPos[i + 1], vertsPos[i + 2], 1.0f);
                 var trans = Matrix4.CreateTranslation(Owner.Position);
                 var matrix = Matrix4.CreateFromQuaternion(Owner.Rotation);
+                var scale = Matrix4.CreateScale(Owner.Scale);
                 //var fovMatrix = Matrix4.CreateOrthographic(1, 1, 0.1f, 100f);
                 var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), 800.0f / 600.0f, 0.01f, 1000f);
                 var lookAt = Matrix4.LookAt(new Vector3(0, 0, 4), new Vector3(0, 0, -1), new Vector3(0, 1, 0)); // TODO: Replace with camera position and rotation
                 //var res = fovMatrix * lookAt * trans * matrix * vec;
-                var res = vec * matrix * trans * lookAt * (fovMatrix * 0.1f);
+                var res = vec * trans * matrix * scale * lookAt * (fovMatrix * 0.1f);
                 //vec *= lookAt;
                 //Console.WriteLine(vec.X + ":" + vec.Y +":" + vec.Z);
                 vertsPos[i] = res.X;
