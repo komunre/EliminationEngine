@@ -31,7 +31,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyCustomContent" AfterTargets="AfterResGen">
-		<Copy SourceFiles="@(ShaderFiles)" DestinationFolder="$(OutDir)"/>
+		<Copy SourceFiles="@(ShaderFiles)" DestinationFolder="$(OutDir)" />
 	</Target>
 
   <ItemGroup>

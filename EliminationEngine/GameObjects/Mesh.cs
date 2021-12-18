@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,10 +11,10 @@ namespace EliminationEngine.GameObjects
 {
     public class Mesh : EntityComponent
     {
-        public List<float> Vertices { get; set; } = new();
-        public List<int> Indices { get; set; } = new();
-        public List<float> TexCoords { get; set; } = new();
-        protected List<float> Normals { get; set; } = new();
+        public float[] Vertices { get; set; }
+        public uint[] Indices { get; set; }
+        public float[] TexCoords { get; set; }
+        protected float[] Normals { get; set; }
         private int _buffer = 0;
         private int _vertexArr = 0;
         private int _indicesBuffer = 0;
@@ -25,7 +26,6 @@ namespace EliminationEngine.GameObjects
         {
             _buffer = GL.GenBuffer();
         }
-
         public void LoadMesh(string texPath)
         {
             var image = ImageLoader.LoadTexture(texPath);
@@ -33,11 +33,11 @@ namespace EliminationEngine.GameObjects
             GL.BindVertexArray(_vertexArr);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * sizeof(float), Vertices, BufferUsageHint.StaticDraw);
 
             _indicesBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, Indices.Count * sizeof(uint), Indices.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, Indices.Length * sizeof(uint), Indices, BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
@@ -53,7 +53,7 @@ namespace EliminationEngine.GameObjects
             _texCoordBuffer = GL.GenBuffer();
             
             GL.BindBuffer(BufferTarget.ArrayBuffer, _texCoordBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, TexCoords.Count * sizeof(float), TexCoords.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, TexCoords.Length * sizeof(float), TexCoords.ToArray(), BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
             GL.EnableVertexAttribArray(1);
@@ -95,14 +95,10 @@ namespace EliminationEngine.GameObjects
         {
             _shader.Use();
 
-            //GL.BindVertexArray(_vertexArr);
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-
             GL.BindTexture(TextureTarget.Texture2D, _tex);
             GL.BindVertexArray(_vertexArr);
-            //GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
-            //GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Count);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indicesBuffer);
+            GL.DrawElements(PrimitiveType.Triangles, Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
     }
 }

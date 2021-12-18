@@ -18,11 +18,12 @@ namespace EliminationEngine.GameObjects
             // AddComponent<Mesh>(); // Add mesh for future usage during drawing
         }
 
-        public void AddComponent<CompType>() where CompType : EntityComponent
+        public CompType AddComponent<CompType>() where CompType : EntityComponent
         {
             var comp = Activator.CreateInstance<CompType>();
             comp.Owner = this;
             Components.Add(typeof(CompType), comp);
+            return comp;
         }
 
         public CompType? GetComponent<CompType>() where CompType : EntityComponent

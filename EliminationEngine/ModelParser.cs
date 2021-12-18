@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using SharpGLTF.Schema2;
 using EliminationEngine.GameObjects;
 
@@ -12,181 +6,62 @@ namespace EliminationEngine
 {
     public static class ModelHelper
     {
-        public static void AddObjMeshToObject(ModelParser.ObjData data, string texture, ref GameObject obj)
-        {
-            var vertsArr = new List<float>();
-            var indices = new List<int>();
-            var texCoords = new List<float>();
-
-            //foreach (var vert in data.Vertices)
-            //{
-            //    vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
-            //}
-
-            foreach (var face in data.Faces)
-            {
-                var faceVerts = new int[face.Vertices.Count];
-                face.Vertices.CopyTo(faceVerts);
-                var faceVertsList = faceVerts.Reverse();
-                foreach (var vert in faceVertsList)
-                {
-                    indices.Add(vert - 1);
-                    var vertData = data.Vertices[vert - 1];
-                    vertsArr.AddRange(new float[] { vertData.X, vertData.Y, vertData.Z });
-                }
-                var faceTex = new int[face.TextureCoords.Count];
-                face.TextureCoords.CopyTo(faceTex);
-                var faceTexList = faceTex.Reverse();
-                foreach (var coord in faceTexList)
-                {
-                    var realCoord = data.TextureCoords[coord - 1];
-                    texCoords.AddRange(new float[] { realCoord.X, realCoord.Y });
-                }
-            }
-
-            obj.AddComponent<GameObjects.Mesh>();
-            var mesh = obj.GetComponent<GameObjects.Mesh>();
-            mesh.Vertices = vertsArr;
-            mesh.Indices = indices;
-            mesh.TexCoords = texCoords;
-
-            mesh.LoadMesh(texture);
-        }
-
-        public class VertTex
+        public class MeshData
         {
             public List<float> Vertices = new();
+            public List<uint> Indices = new();
             public List<float> UVs = new();
         }
 
-        public static VertTex PostParseMesh(List<ModelParser.GLTFData.MeshData> meshes)
+        //TODO: something other than a ref uint?
+        public static MeshData PostParseMesh(List<ModelParser.GLTFData.MeshData> meshes, ref uint indexOffset, MeshData? data = null)
         {
-            var vt = new VertTex();
+            data ??= new MeshData();
             foreach (var meshData in meshes)
             {
                 foreach (var prim in meshData.Primitives)
                 {
-                    foreach (var ind in prim.Indices)
-                    {
-                        var vert = prim.Vertices[(int)ind];
-                        vt.Vertices.AddRange(new float[] { vert.X, vert.Y, vert.Z });
-                        var coord = prim.UVs[(int)ind];
-                        vt.UVs.AddRange(new float[] { coord.X, coord.Y });
-                    }
+                    data.Vertices.AddRange(prim.Vertices.SelectMany(e => new []{e.X, e.Y, e.Z}));
+                    data.UVs.AddRange(prim.UVs.SelectMany(e => new []{e.X, e.Y}));
+
+                    uint indexCopy = indexOffset;
+                    data.Indices.AddRange(prim.Indices.Select(e => e + indexCopy));
+                    indexOffset += (uint)prim.Vertices.Length;
                 }
-
-                var vtChild = PostParseMesh(meshData.Children);
-                vt.Vertices.AddRange(vtChild.Vertices);
-                vt.UVs.AddRange(vtChild.UVs);
-            }
-
-            return vt;
-        }
-
-        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, string texture, ref GameObject obj)
-        {
-            var vertsArr = new List<float>();
-            var indices = new List<int>();
-            var texCoords = new List<float>();
-
-            var vt = PostParseMesh(data.Meshes);
-            vertsArr = vt.Vertices;
-            texCoords = vt.UVs;
-
-            obj.AddComponent<GameObjects.Mesh>();
-            var mesh = obj.GetComponent<GameObjects.Mesh>();
-            mesh.Vertices = vertsArr;
-            mesh.Indices = indices;
-            mesh.TexCoords = texCoords;
-
-            mesh.LoadMesh(texture);
-        }
-    }
-    public static class ModelParser
-    {
-        public class ObjData
-        {
-            public class TextureCoord
-            {
-                public float X;
-                public float Y;
-                public int U;
-            }
-            public class FaceData
-            {
-                public List<int> Vertices = new();
-                public List<int> TextureCoords = new();
-            }
-            public List<Vector3> Vertices = new();
-            public List<Vector3> Normals = new();
-            public List<TextureCoord> TextureCoords = new();
-            public List<FaceData> Faces = new();
-        }
-
-        public static ObjData ParseObj(string path)
-        {
-            var data = new ObjData();
-
-            var reader = new StreamReader(File.OpenRead(path));
-
-            while (!reader.EndOfStream)
-            {
-                var line = reader.ReadLine();
-                if (line != null && line != "")
-                {
-                    var type = line[0];
-                    var realType = new string(new char[] { type });
-                    if (line[1] != ' ')
-                    {
-                        realType = new string(new char[] { line[0], line[1] });
-                    }
-                    switch (realType)
-                    {
-                        case "v":
-                            var split = line.Split(' ');
-                            var vec = new Vector3((float)double.Parse(split[1], new CultureInfo("en-US")), (float)double.Parse(split[2], new CultureInfo("en-US")), (float)double.Parse(split[3], new CultureInfo("en-US")));
-                            data.Vertices.Add(vec);
-                            break;
-                        case "f":
-                            var fsplit = line.Split(' ');
-                            var facesData = fsplit.Skip(1);
-                            var face = new ObjData.FaceData();
-                            foreach (var faceDat in facesData)
-                            {
-                                face.Vertices.Add(int.Parse(faceDat.Split('/')[0]));
-                                face.TextureCoords.Add(int.Parse(faceDat.Split('/')[1]));
-                            }
-                            data.Faces.Add(face);
-                            break;
-                        case "vt":
-                            var tsplit = line.Split(' ');
-                            var x = float.Parse(tsplit[1], new CultureInfo("en-US"));
-                            var y = float.Parse(tsplit[2], new CultureInfo("en-US"));
-                            //var u = int.Parse(tsplit[3].Replace("[", "").Replace("]", ""));
-
-                            var coord = new ObjData.TextureCoord();
-                            coord.X = x;
-                            coord.Y = y;
-                            //coord.U = u;
-
-                            data.TextureCoords.Add(coord);
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                
+                PostParseMesh(meshData.Children, ref indexOffset, data);
             }
 
             return data;
         }
 
+        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, string texture, ref GameObject obj)
+        {
+            uint io = 0;
+            var vt = PostParseMesh(data.Meshes, ref io);
+            var mesh = obj.AddComponent<GameObjects.Mesh>();
+            mesh.Vertices = vt.Vertices.ToArray();
+            mesh.Indices = vt.Indices.ToArray();
+            mesh.TexCoords = vt.UVs.ToArray();
+            mesh.LoadMesh(texture);
+        }
+    }
+    public static class ModelParser
+    {
         public class GLTFData
         {
-            public class PrimitiveData
+            public readonly struct PrimitiveData
             {
-                public List<Vector3> Vertices = new();
-                public List<Vector2> UVs = new();
-                public List<uint> Indices = new();
+                public Vector3[] Vertices { get; }
+                public Vector2[] UVs { get; }
+                public uint[] Indices { get; }
+
+                public PrimitiveData(Vector3[] vertices, Vector2[] uvs, uint[] indices)
+                {
+                    this.Vertices = vertices;
+                    this.UVs = uvs;
+                    this.Indices = indices;
+                }
             }
             public class MeshData
             {
@@ -197,11 +72,6 @@ namespace EliminationEngine
             public List<MeshData> Meshes = new();
         }
 
-        [Obsolete]
-        public static GLTFData ParseGLTF(string path)
-        {
-            return new GLTFData(); // dummy
-        }
 
         public static GLTFData ParseGLTFExternal(string path)
         {
@@ -232,19 +102,12 @@ namespace EliminationEngine
             meshData.Weights = weights.ToList();
             foreach (var primitive in node.Mesh.Primitives)
             {
-                var prim = new GLTFData.PrimitiveData();
-                var verts = primitive.GetVertices("POSITION");
-                var indices = primitive.GetIndices();
-                prim.Indices = indices.ToList();
-                foreach (var vert in verts.AsVector3Array())
-                {
-                    prim.Vertices.Add(new Vector3(vert.X, vert.Y, vert.Z));
-                }
-                foreach (var coord in primitive.GetVertices("TEXCOORD_0").AsVector2Array())
-                {
-                    prim.UVs.Add(new Vector2(coord.X, coord.Y));
-                }
-                meshData.Primitives.Add(prim);
+                var vertices = primitive.GetVertices("POSITION");
+                var uvs = primitive.GetVertices("TEXCOORD_0");
+                meshData.Primitives.Add(new GLTFData.PrimitiveData(
+                    vertices.AsVector3Array().ToArray(),
+                    uvs.AsVector2Array().ToArray(),
+                    primitive.GetIndices().ToArray()));
             }
 
             foreach (var child in node.VisualChildren)

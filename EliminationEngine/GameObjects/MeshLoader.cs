@@ -34,7 +34,7 @@ namespace EliminationEngine.GameObjects
                     realVerts.AddRange(vert);
                 }
 
-                mesh.Vertices = realVerts;
+                mesh.VertexIndices = realVerts;
                 mesh.LoadMesh();
             }
         }*/
