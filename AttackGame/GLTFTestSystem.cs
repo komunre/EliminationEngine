@@ -16,11 +16,13 @@ namespace AttackGame
         {
             base.OnLoad();
 
-            var data = ModelParser.ParseGLTFExternal("res/misshat.glb");
+            var data = ModelParser.ParseGLTFExternal("res/cube.glb");
             var obj = new GameObject();
             var second = new GameObject();
-            ModelHelper.AddGLTFMeshToObject(data, "res/cube_test_texture.png", ref obj);
-            ModelHelper.AddGLTFMeshToObject(data, "res/cube_test_texture.png", ref second);
+            ModelHelper.AddGLTFMeshToObject(data, ref obj);
+
+            var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
+            ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 
             obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
             obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);

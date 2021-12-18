@@ -14,9 +14,19 @@ namespace EliminationEngine.GameObjects
             
         }
 
+        public virtual void PostLoad()
+        {
+
+        }
+
         public virtual void OnUpdate()
         {
             
+        }
+
+        public virtual void OnDraw()
+        {
+
         }
     }
 }

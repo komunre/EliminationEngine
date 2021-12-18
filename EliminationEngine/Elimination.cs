@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
+using EliminationEngine.Render;
 using OpenTK;
 using OpenTK.Windowing.Desktop;
 
@@ -30,6 +31,7 @@ namespace EliminationEngine
         public void Run()
         {
             if (window == null) throw new InvalidDataException("No window was opened");
+            RegisterSystem<MeshSystem>();
             window.Run();
         }
 
@@ -43,6 +45,11 @@ namespace EliminationEngine
             var system = Activator.CreateInstance<EntitySystemType>();
             system.Engine = this;
             RegisteredSystems.Add(typeof(EntitySystemType), system);
+        }
+
+        public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
+        {
+            return window.GetObjectsOfType<CompType>();
         }
     }
 }
