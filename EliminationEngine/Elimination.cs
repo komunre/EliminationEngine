@@ -15,6 +15,7 @@ namespace EliminationEngine
         public EliminationWindow? window = null;
         public Dictionary<Type, EntitySystem> RegisteredSystems = new();
         public float DeltaTime = 0;
+        public TimeSpan Elapsed = new TimeSpan(0);
 
         public Elimination(int width, int height)
         {

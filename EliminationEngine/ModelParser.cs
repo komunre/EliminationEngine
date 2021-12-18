@@ -53,29 +53,45 @@ namespace EliminationEngine
             mesh.LoadMesh(texture);
         }
 
-        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, string texture, ref GameObject obj)
+        public class VertTex
         {
-            var vertsArr = new List<float>();
-            var indices = new List<int>();
-            var texCoords = new List<float>();
+            public List<float> Vertices = new();
+            public List<float> UVs = new();
+        }
 
-            foreach (var meshData in data.Meshes)
+        public static VertTex PostParseMesh(List<ModelParser.GLTFData.MeshData> meshes)
+        {
+            var vt = new VertTex();
+            foreach (var meshData in meshes)
             {
                 foreach (var prim in meshData.Primitives)
                 {
                     foreach (var ind in prim.Indices)
                     {
                         var vert = prim.Vertices[(int)ind];
-                        vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
+                        vt.Vertices.AddRange(new float[] { vert.X, vert.Y, vert.Z });
                         var coord = prim.UVs[(int)ind];
-                        texCoords.AddRange(new float[] { coord.X, coord.Y });
+                        vt.UVs.AddRange(new float[] { coord.X, coord.Y });
                     }
-                    //foreach (var coord in prim.UVs)
-                    //{
-                    //    texCoords.AddRange(new float[] { coord.X, coord.Y });
-                    //}
                 }
+
+                var vtChild = PostParseMesh(meshData.Children);
+                vt.Vertices.AddRange(vtChild.Vertices);
+                vt.UVs.AddRange(vtChild.UVs);
             }
+
+            return vt;
+        }
+
+        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, string texture, ref GameObject obj)
+        {
+            var vertsArr = new List<float>();
+            var indices = new List<int>();
+            var texCoords = new List<float>();
+
+            var vt = PostParseMesh(data.Meshes);
+            vertsArr = vt.Vertices;
+            texCoords = vt.UVs;
 
             obj.AddComponent<GameObjects.Mesh>();
             var mesh = obj.GetComponent<GameObjects.Mesh>();
@@ -176,6 +192,7 @@ namespace EliminationEngine
             {
                 public List<float> Weights = new();
                 public List<PrimitiveData> Primitives = new();
+                public List<MeshData> Children = new();
             }
             public List<MeshData> Meshes = new();
         }
@@ -194,29 +211,52 @@ namespace EliminationEngine
             var scene = model.DefaultScene;
             foreach (var node in scene.VisualChildren)
             {
-                var meshData = new GLTFData.MeshData();
-                var weights = node.Mesh.MorphWeights;
-                meshData.Weights = weights.ToList();
-                foreach (var primitive in node.Mesh.Primitives)
+                var meshData = ParseMesh(node);
+
+                if (meshData != null)
                 {
-                    var prim = new GLTFData.PrimitiveData();
-                    var verts = primitive.GetVertices("POSITION");
-                    var indices = primitive.GetIndices();
-                    prim.Indices = indices.ToList();
-                    foreach (var vert in verts.AsVector3Array())
-                    {
-                        prim.Vertices.Add(new Vector3(vert.X, vert.Y, vert.Z));
-                    }
-                    foreach (var coord in primitive.GetVertices("TEXCOORD_0").AsVector2Array())
-                    {
-                        prim.UVs.Add(new Vector2(coord.X, coord.Y));
-                    }
-                    meshData.Primitives.Add(prim);
+                    modelData.Meshes.Add(meshData);
                 }
-                modelData.Meshes.Add(meshData);
             }
 
             return modelData;
+        }
+
+        public static GLTFData.MeshData? ParseMesh(Node node)
+        {
+            Console.WriteLine(node.Name);
+
+            var meshData = new GLTFData.MeshData();
+            if (node.Mesh == null) return null;
+            var weights = node.Mesh.MorphWeights;
+            meshData.Weights = weights.ToList();
+            foreach (var primitive in node.Mesh.Primitives)
+            {
+                var prim = new GLTFData.PrimitiveData();
+                var verts = primitive.GetVertices("POSITION");
+                var indices = primitive.GetIndices();
+                prim.Indices = indices.ToList();
+                foreach (var vert in verts.AsVector3Array())
+                {
+                    prim.Vertices.Add(new Vector3(vert.X, vert.Y, vert.Z));
+                }
+                foreach (var coord in primitive.GetVertices("TEXCOORD_0").AsVector2Array())
+                {
+                    prim.UVs.Add(new Vector2(coord.X, coord.Y));
+                }
+                meshData.Primitives.Add(prim);
+            }
+
+            foreach (var child in node.VisualChildren)
+            {
+                var childData = ParseMesh(child);
+                if (childData != null)
+                {
+                    meshData.Children.Add(childData);
+                }
+            }
+
+            return meshData;
         }
     }
 }

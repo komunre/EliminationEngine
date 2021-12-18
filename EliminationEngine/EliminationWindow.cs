@@ -77,6 +77,7 @@ namespace EliminationEngine
 
             stopwatch.Stop();
 
+            Engine.Elapsed = Engine.Elapsed.Add(stopwatch.Elapsed);
             Engine.DeltaTime = stopwatch.ElapsedTicks / 10000000f;
 
             stopwatch.Reset();
