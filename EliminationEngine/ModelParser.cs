@@ -52,6 +52,39 @@ namespace EliminationEngine
 
             mesh.LoadMesh(texture);
         }
+
+        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, string texture, ref GameObject obj)
+        {
+            var vertsArr = new List<float>();
+            var indices = new List<int>();
+            var texCoords = new List<float>();
+
+            foreach (var meshData in data.Meshes)
+            {
+                foreach (var prim in meshData.Primitives)
+                {
+                    foreach (var ind in prim.Indices)
+                    {
+                        var vert = prim.Vertices[(int)ind];
+                        vertsArr.AddRange(new float[] { vert.X, vert.Y, vert.Z });
+                        var coord = prim.UVs[(int)ind];
+                        texCoords.AddRange(new float[] { coord.X, coord.Y });
+                    }
+                    //foreach (var coord in prim.UVs)
+                    //{
+                    //    texCoords.AddRange(new float[] { coord.X, coord.Y });
+                    //}
+                }
+            }
+
+            obj.AddComponent<GameObjects.Mesh>();
+            var mesh = obj.GetComponent<GameObjects.Mesh>();
+            mesh.Vertices = vertsArr;
+            mesh.Indices = indices;
+            mesh.TexCoords = texCoords;
+
+            mesh.LoadMesh(texture);
+        }
     }
     public static class ModelParser
     {
@@ -133,26 +166,57 @@ namespace EliminationEngine
 
         public class GLTFData
         {
-
+            public class PrimitiveData
+            {
+                public List<Vector3> Vertices = new();
+                public List<Vector2> UVs = new();
+                public List<uint> Indices = new();
+            }
+            public class MeshData
+            {
+                public List<float> Weights = new();
+                public List<PrimitiveData> Primitives = new();
+            }
+            public List<MeshData> Meshes = new();
         }
 
+        [Obsolete]
         public static GLTFData ParseGLTF(string path)
         {
             return new GLTFData(); // dummy
         }
 
-        public static void ParseGLTFExternal(string path)
+        public static GLTFData ParseGLTFExternal(string path)
         {
+            var modelData = new GLTFData();
+
             var model = ModelRoot.Load(path);
             var scene = model.DefaultScene;
             foreach (var node in scene.VisualChildren)
             {
-                var weh = node.Skin.GetJoint(0);
+                var meshData = new GLTFData.MeshData();
+                var weights = node.Mesh.MorphWeights;
+                meshData.Weights = weights.ToList();
                 foreach (var primitive in node.Mesh.Primitives)
                 {
-                    
+                    var prim = new GLTFData.PrimitiveData();
+                    var verts = primitive.GetVertices("POSITION");
+                    var indices = primitive.GetIndices();
+                    prim.Indices = indices.ToList();
+                    foreach (var vert in verts.AsVector3Array())
+                    {
+                        prim.Vertices.Add(new Vector3(vert.X, vert.Y, vert.Z));
+                    }
+                    foreach (var coord in primitive.GetVertices("TEXCOORD_0").AsVector2Array())
+                    {
+                        prim.UVs.Add(new Vector2(coord.X, coord.Y));
+                    }
+                    meshData.Primitives.Add(prim);
                 }
+                modelData.Meshes.Add(meshData);
             }
+
+            return modelData;
         }
     }
 }
