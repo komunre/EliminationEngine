@@ -53,8 +53,11 @@ namespace EliminationEngine
                     indexOffset += (uint)primitive.Vertices.Length;
                 }
 
-                var color = mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Content.ToArray();
-                renderMesh.Image = color.ToArray();
+                if (mesh.Mat != null)
+                {
+                    var color = mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Content.ToArray();
+                    renderMesh.Image = color.ToArray();
+                }
                 renderMesh.Width = 32;
                 renderMesh.Height = 32;
                 renderMesh.Vertices = vertsData.ToArray();
