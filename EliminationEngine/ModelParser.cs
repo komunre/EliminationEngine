@@ -37,7 +37,7 @@ namespace EliminationEngine
             return data;
         }
 
-        public static void PostParseMeshes(ref MeshGroupComponent meshGroup, List<ModelParser.GLTFData.MeshData> meshes, ref uint indexOffset)
+        public static void PostParseMeshes(ref MeshGroupComponent meshGroup, List<ModelParser.GLTFData.MeshData> meshes)
         {
             foreach (var mesh in meshes)
             {
@@ -48,9 +48,7 @@ namespace EliminationEngine
                 foreach (var primitive in mesh.Primitives) {
                     vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X, e.Y, e.Z }));
                     uvData.AddRange(primitive.UVs.SelectMany(e => new[] { e.X, e.Y }));
-                    var indexCopy = indexOffset;
-                    indices.AddRange(primitive.Indices.Select(e => e + indexCopy));
-                    indexOffset += (uint)primitive.Vertices.Length;
+                    indices.AddRange(primitive.Indices.Select(e => e));
                 }
 
                 if (mesh.Mat != null)
@@ -66,17 +64,17 @@ namespace EliminationEngine
 
                 meshGroup.Meshes.Add(renderMesh);
 
-                PostParseMeshes(ref meshGroup, mesh.Children, ref indexOffset);
+                PostParseMeshes(ref meshGroup, mesh.Children);
             }
         }
 
         public static void AddGLTFMeshToObject(ModelParser.GLTFData data, ref GameObject obj)
         {
             uint io = 0;
-            var vt = PostParseMesh(data.Meshes, ref io);
+            var vt = PostParseMesh(data.Meshes, ref io); // TODO: is that even needed here?
             var mesh = obj.AddComponent<GameObjects.MeshGroupComponent>();
 
-            PostParseMeshes(ref mesh, data.Meshes, ref io);
+            PostParseMeshes(ref mesh, data.Meshes);
         }
     }
     public static class ModelParser
