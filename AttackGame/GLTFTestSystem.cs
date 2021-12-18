@@ -16,7 +16,7 @@ namespace AttackGame
         {
             base.OnLoad();
 
-            var data = ModelParser.ParseGLTFExternal("res/cube.glb");
+            var data = ModelParser.ParseGLTFExternal("res/fox.glb");
             var obj = new GameObject();
             var second = new GameObject();
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
@@ -26,6 +26,7 @@ namespace AttackGame
 
             obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
             obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
+            obj.Scale = new Vector3(0.01f, 0.01f, 0.01f);
 
             second.Position = new OpenTK.Mathematics.Vector3(0.5f, 0.5f, 2);
             second.Scale = new OpenTK.Mathematics.Vector3(1.5f, 1.5f, 1.5f);

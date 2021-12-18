@@ -48,7 +48,7 @@ namespace EliminationEngine
 
         public static ImageData LoadTextureFromImage(Image<Rgba32> image)
         {
-            image.Mutate(x => x.Flip(FlipMode.Vertical));
+            //image.Mutate(x => x.Flip(FlipMode.Vertical));
 
             var pixels = new List<byte>(4 * image.Width * image.Height);
 
