@@ -16,7 +16,6 @@ namespace AttackGame
             base.OnLoad();
 
             var data = ModelParser.ParseGLTFExternal("res/misshat.glb");
-
             var obj = new GameObject();
             ModelHelper.AddGLTFMeshToObject(data, "res/basic.png", ref obj);
 
