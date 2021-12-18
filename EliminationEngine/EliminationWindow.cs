@@ -24,6 +24,19 @@ namespace EliminationEngine
             Engine = engine;
         }
 
+        public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
+        {
+            var compsList = new List<CompType>();
+            foreach (var obj in GameObjects)
+            {
+                if (obj.TryGetComponent<CompType>(out var comp))
+                {
+                    compsList.Add(comp);
+                }
+            }
+            return compsList.ToArray();
+        }
+
         protected override void OnLoad()
         {
             base.OnLoad();
@@ -31,13 +44,15 @@ namespace EliminationEngine
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Less); // Doesn't work properly without CullFace? (Draws only back side)
+            GL.DepthFunc(DepthFunction.Less); // Doesn't work properly without CullFace? (Draws only back side) // I don't remember
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
             foreach (var system in Engine.RegisteredSystems.Values)
             {
                 system.OnLoad();
+
+                system.PostLoad();
             }
         }
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -63,13 +78,9 @@ namespace EliminationEngine
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            foreach (var gameObject in GameObjects)
+            foreach (var system in Engine.RegisteredSystems.Values)
             {
-                if (gameObject.TryGetComponent<Mesh>(out var mesh))
-                {
-                    mesh.UpdatePos();
-                    mesh.DrawMesh();
-                }
+                system.OnDraw();
             }
 
 

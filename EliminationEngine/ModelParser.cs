@@ -1,6 +1,8 @@
 ﻿using System.Numerics;
 using SharpGLTF.Schema2;
 using EliminationEngine.GameObjects;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace EliminationEngine
 {
@@ -35,15 +37,43 @@ namespace EliminationEngine
             return data;
         }
 
-        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, string texture, ref GameObject obj)
+        public static void PostParseMeshes(ref MeshGroupComponent meshGroup, List<ModelParser.GLTFData.MeshData> meshes, ref uint indexOffset)
+        {
+            foreach (var mesh in meshes)
+            {
+                var renderMesh = new Render.Mesh();
+                var vertsData = new List<float>();
+                var uvData = new List<float>();
+                var indices = new List<uint>();
+                foreach (var primitive in mesh.Primitives) {
+                    vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X, e.Y, e.Z }));
+                    uvData.AddRange(primitive.UVs.SelectMany(e => new[] { e.X, e.Y }));
+                    var indexCopy = indexOffset;
+                    indices.AddRange(primitive.Indices.Select(e => e + indexCopy));
+                    indexOffset += (uint)primitive.Vertices.Length;
+                }
+
+                var color = mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Content.ToArray();
+                renderMesh.Image = color.ToArray();
+                renderMesh.Width = 32;
+                renderMesh.Height = 32;
+                renderMesh.Vertices = vertsData.ToArray();
+                renderMesh.TexCoords = uvData.ToArray();
+                renderMesh.Indices = indices.ToArray();
+
+                meshGroup.Meshes.Add(renderMesh);
+
+                PostParseMeshes(ref meshGroup, mesh.Children, ref indexOffset);
+            }
+        }
+
+        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, ref GameObject obj)
         {
             uint io = 0;
             var vt = PostParseMesh(data.Meshes, ref io);
-            var mesh = obj.AddComponent<GameObjects.Mesh>();
-            mesh.Vertices = vt.Vertices.ToArray();
-            mesh.Indices = vt.Indices.ToArray();
-            mesh.TexCoords = vt.UVs.ToArray();
-            mesh.LoadMesh(texture);
+            var mesh = obj.AddComponent<GameObjects.MeshGroupComponent>();
+
+            PostParseMeshes(ref mesh, data.Meshes, ref io);
         }
     }
     public static class ModelParser
@@ -68,6 +98,7 @@ namespace EliminationEngine
                 public List<float> Weights = new();
                 public List<PrimitiveData> Primitives = new();
                 public List<MeshData> Children = new();
+                public Material Mat;
             }
             public List<MeshData> Meshes = new();
         }
@@ -97,17 +128,24 @@ namespace EliminationEngine
             Console.WriteLine(node.Name);
 
             var meshData = new GLTFData.MeshData();
-            if (node.Mesh == null) return null;
-            var weights = node.Mesh.MorphWeights;
-            meshData.Weights = weights.ToList();
-            foreach (var primitive in node.Mesh.Primitives)
+            if (node.IsSkinSkeleton)
             {
-                var vertices = primitive.GetVertices("POSITION");
-                var uvs = primitive.GetVertices("TEXCOORD_0");
-                meshData.Primitives.Add(new GLTFData.PrimitiveData(
-                    vertices.AsVector3Array().ToArray(),
-                    uvs.AsVector2Array().ToArray(),
-                    primitive.GetIndices().ToArray()));
+                // Load skeleton here
+            }
+            if (node.Mesh != null)
+            {
+                var weights = node.Mesh.MorphWeights;
+                meshData.Weights = weights.ToList();
+                foreach (var primitive in node.Mesh.Primitives)
+                {
+                    var vertices = primitive.GetVertices("POSITION");
+                    var uvs = primitive.GetVertices("TEXCOORD_0");
+                    meshData.Primitives.Add(new GLTFData.PrimitiveData(
+                        vertices.AsVector3Array().ToArray(),
+                        uvs.AsVector2Array().ToArray(),
+                        primitive.GetIndices().ToArray()));
+                    meshData.Mat = primitive.Material;
+                }
             }
 
             foreach (var child in node.VisualChildren)
