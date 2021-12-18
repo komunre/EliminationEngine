@@ -53,11 +53,11 @@ namespace EliminationEngine
 
                 if (mesh.Mat != null)
                 {
-                    var color = mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Content.ToArray();
-                    renderMesh.Image = color.ToArray();
+                    var image = (Image<Rgba32>)SixLabors.ImageSharp.Image.Load(mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Open());
+                    renderMesh.Width = image.Width;
+                    renderMesh.Height = image.Height;
+                    renderMesh.Image = ImageLoader.LoadTextureFromImage(image).Pixels.ToArray();
                 }
-                renderMesh.Width = 32;
-                renderMesh.Height = 32;
                 renderMesh.Vertices = vertsData.ToArray();
                 renderMesh.TexCoords = uvData.ToArray();
                 renderMesh.Indices = indices.ToArray();
