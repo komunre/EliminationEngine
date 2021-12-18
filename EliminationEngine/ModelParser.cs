@@ -58,6 +58,20 @@ namespace EliminationEngine
                     renderMesh.Height = image.Height;
                     renderMesh.Image = ImageLoader.LoadTextureFromImage(image).Pixels.ToArray();
                 }
+                else
+                {
+                    var image = new Image<Rgba32>(32, 32);
+                    for (var i = 0; i < image.Height; i++)
+                    {
+                        for (var j = 0; j < image.Width; j++)
+                        {
+                            image[j, i] = new Rgba32(251, 72, 196);
+                        }
+                    }
+                    renderMesh.Width = image.Width;
+                    renderMesh.Height = image.Height;
+                    renderMesh.Image = ImageLoader.LoadTextureFromImage(image).Pixels.ToArray();
+                }
                 renderMesh.Vertices = vertsData.ToArray();
                 renderMesh.TexCoords = uvData.ToArray();
                 renderMesh.Indices = indices.ToArray();

@@ -20,7 +20,9 @@ namespace AttackGame
             var obj = new GameObject();
             var second = new GameObject();
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
-            ModelHelper.AddGLTFMeshToObject(data, ref second);
+
+            var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
+            ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 
             obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
             obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
