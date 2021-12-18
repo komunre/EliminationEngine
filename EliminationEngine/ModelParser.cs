@@ -51,7 +51,7 @@ namespace EliminationEngine
                     indices.AddRange(primitive.Indices.Select(e => e));
                 }
 
-                if (mesh.Mat != null)
+                if (mesh.Mat != null && mesh.Mat.Channels.ElementAt(0).Texture != null)
                 {
                     var image = (Image<Rgba32>)SixLabors.ImageSharp.Image.Load(mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Open());
                     renderMesh.Width = image.Width;
@@ -153,12 +153,11 @@ namespace EliminationEngine
                 meshData.Weights = weights.ToList();
                 foreach (var primitive in node.Mesh.Primitives)
                 {
-                    var vertices = primitive.GetVertices("POSITION");
-                    var uvs = primitive.GetVertices("TEXCOORD_0");
-                    meshData.Primitives.Add(new GLTFData.PrimitiveData(
-                        vertices.AsVector3Array().ToArray(),
-                        uvs.AsVector2Array().ToArray(),
-                        primitive.GetIndices().ToArray()));
+                    var vertices = primitive.GetVertices("POSITION").AsVector3Array().ToArray();
+                    var uvs = primitive.GetVertices("TEXCOORD_0").AsVector2Array().ToArray();
+                    var bakedIndices = primitive.GetIndices();
+                    meshData.Primitives.Add(new GLTFData.PrimitiveData(vertices, uvs,
+                        bakedIndices?.ToArray() ?? Enumerable.Range(0, vertices.Length).Select(e => (uint)e).ToArray()));
                     meshData.Mat = primitive.Material;
                 }
             }
