@@ -92,7 +92,7 @@ namespace AttackGame
             }
             //_camera.Position += dir * 2f * Engine.DeltaTime;
             _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
-            _camera.Position.Y = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
             _camera.LookAt(new Vector3(0, 6, 0)); // works too
         }

@@ -46,12 +46,12 @@ namespace EliminationEngine.GameObjects
 
         public Vector3 Up()
         {
-            return Vector3.Cross(Forward(), new Vector3(1, 0, 0));
+            return Vector3.Cross(Forward(), Right());
         }
 
         public Vector3 Right()
         {
-            return Vector3.Cross(Forward(), new Vector3(0, 1, 0));
+            return Vector3.Cross(Forward(), new Vector3(0, -1, 0));
         }
 
         public void LookAt(Vector3 target)
@@ -78,7 +78,7 @@ namespace EliminationEngine.GameObjects
             rotAxis = Vector3.Normalize(rotAxis);
 
             var desired = Quaternion.FromAxisAngle(rotAxis, rotAngle);
-            Rotation = Quaternion.Slerp(desired * 0.9f, desired * 1.2f, 0.05f);
+            Rotation = desired;
         }
 
         public CompType AddComponent<CompType>() where CompType : EntityComponent
