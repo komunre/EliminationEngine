@@ -22,7 +22,7 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 10, 0);
+            camera.Position = new Vector3(0, 7, 0);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
@@ -49,6 +49,16 @@ namespace AttackGame
             Engine.AddGameObject(obj);
             Engine.AddGameObject(second);
             Engine.AddGameObject(dummyBottle);
+
+            var cubeData = ModelParser.ParseGLTFExternal("res/cube.glb");
+            for (var i = 0; i < 20; i++)
+            {
+                var obj2 = new GameObject();
+                var random = new Random();
+                obj2.Position = new Vector3(random.Next(-10, 10), random.Next(-10, 10), random.Next(-10, 10));
+                ModelHelper.AddGLTFMeshToObject(cubeData, ref obj2);
+                Engine.AddGameObject(obj2);
+            }
 
             GltfObject = obj;
         }
@@ -82,7 +92,7 @@ namespace AttackGame
             }
             //_camera.Position += dir * 2f * Engine.DeltaTime;
             _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
-            _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            _camera.Position.Y = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
             _camera.LookAt(new Vector3(0, 6, 0)); // works too
         }

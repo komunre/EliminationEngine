@@ -62,20 +62,23 @@ namespace EliminationEngine.GameObjects
 
             float dot = Vector3.Dot(-Vector3.UnitZ, forwardVector);
 
-            if (Math.Abs(dot - (-1.0f)) < 0.000001f)
+            /*if (Math.Abs(dot - (-1.0f)) < 0.000001f)
             {
                 Rotation = new Quaternion(Vector3.UnitY.X, Vector3.UnitY.Y, Vector3.UnitY.Z, 3.1415926535897932f);
+                return;
             }
             if (Math.Abs(dot - (1.0f)) < 0.000001f)
             {
                 Rotation = Quaternion.Identity;
-            }
+                return;
+            }*/
 
             float rotAngle = (float)Math.Acos(dot);
             Vector3 rotAxis = Vector3.Cross(-Vector3.UnitZ, forwardVector);
             rotAxis = Vector3.Normalize(rotAxis);
 
-            Rotation = Quaternion.FromAxisAngle(rotAxis, rotAngle);
+            var desired = Quaternion.FromAxisAngle(rotAxis, rotAngle);
+            Rotation = Quaternion.Slerp(desired * 0.9f, desired * 1.2f, 0.05f);
         }
 
         public CompType AddComponent<CompType>() where CompType : EntityComponent
