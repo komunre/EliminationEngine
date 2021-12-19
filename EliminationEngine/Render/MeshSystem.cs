@@ -66,8 +66,8 @@ namespace EliminationEngine.Render
             var camera = cameras.ElementAt(0);
             if (camera == null) return;
             var cameraRot = camera.Owner.Rotation;
-            var forward = new Vector3(0, 0, -1);
-            var up = new Vector3(0, 1, 0);
+            var forward = camera.Owner.Forward();
+            var up = camera.Owner.Up();
 
             var meshGroups = Engine.GetObjectsOfType<MeshGroupComponent>();
             foreach (var meshGroup in meshGroups)
@@ -76,7 +76,7 @@ namespace EliminationEngine.Render
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._buffer);
                     GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsageHint.StaticDraw);
-                    
+
                     mesh._shader.Use();
                     var trans = Matrix4.CreateTranslation(meshGroup.Owner.Position);
                     var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.Rotation);

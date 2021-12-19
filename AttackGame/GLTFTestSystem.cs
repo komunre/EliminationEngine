@@ -22,29 +22,43 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 0, 2);
+            camera.Position = new Vector3(0, 7, 0);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
             _camera = camera;
 
-            var data = ModelParser.ParseGLTFExternal("res/fox.glb");
+            var data = ModelParser.ParseGLTFExternal("res/WaterBottle.glb");
             var obj = new GameObject();
             var second = new GameObject();
+            var dummyBottle = new GameObject();
+            dummyBottle.Position = new Vector3(0, 6, 0);
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
+            ModelHelper.AddGLTFMeshToObject(data, ref dummyBottle);
 
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 
             obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
             obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
-            obj.Scale = new Vector3(0.01f, 0.01f, 0.01f);
+            obj.Scale = new Vector3(1f, 1f, 1f);
 
-            second.Position = new OpenTK.Mathematics.Vector3(0.5f, 0.5f, 2);
-            second.Scale = new OpenTK.Mathematics.Vector3(1.5f, 1.5f, 1.5f);
+            second.Position = new OpenTK.Mathematics.Vector3(2, 0, 10);
+            second.Scale = new OpenTK.Mathematics.Vector3(1f, 1f, 1f);
 
             Engine.AddGameObject(obj);
-            //Engine.AddGameObject(second);
+            Engine.AddGameObject(second);
+            Engine.AddGameObject(dummyBottle);
+
+            var cubeData = ModelParser.ParseGLTFExternal("res/cube.glb");
+            for (var i = 0; i < 20; i++)
+            {
+                var obj2 = new GameObject();
+                var random = new Random();
+                obj2.Position = new Vector3(random.Next(-10, 10), random.Next(-10, 10), random.Next(-10, 10));
+                ModelHelper.AddGLTFMeshToObject(cubeData, ref obj2);
+                Engine.AddGameObject(obj2);
+            }
 
             GltfObject = obj;
         }
@@ -54,22 +68,33 @@ namespace AttackGame
             base.OnUpdate();
             var dir = Vector3.Zero;
             if (Engine.KeyState.IsKeyDown(Keys.D)) {
-                dir += new Vector3(1, 0, 0);
+                dir += Vector3.UnitX;
             }
             if (Engine.KeyState.IsKeyDown(Keys.W))
             {
-                dir += new Vector3(0, 1, 0);
+                dir += Vector3.UnitZ;
             }
             if (Engine.KeyState.IsKeyDown(Keys.A))
             {
-                dir += new Vector3(-1, 0, 0);
+                dir += -Vector3.UnitX;
             }
             if (Engine.KeyState.IsKeyDown(Keys.S))
             {
-                dir += new Vector3(0, -1, 0);
+                dir += -Vector3.UnitZ;
             }
-            _camera.Position += dir * 2 * Engine.DeltaTime;
-            _camera.LookAt(Vector3.Zero);
+            if (Engine.KeyState.IsKeyDown(Keys.Space))
+            {
+                dir += Vector3.UnitY;
+            }
+            if (Engine.KeyState.IsKeyDown(Keys.LeftShift))
+            {
+                dir += -Vector3.UnitY;
+            }
+            //_camera.Position += dir * 2f * Engine.DeltaTime;
+            _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            _camera.Position.Y = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
+            _camera.LookAt(new Vector3(0, 6, 0)); // works too
         }
     }
 }
