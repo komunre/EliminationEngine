@@ -22,7 +22,7 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 0, 2);
+            camera.Position = new Vector3(-2, 0, 2);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
@@ -40,11 +40,11 @@ namespace AttackGame
             obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
             obj.Scale = new Vector3(0.01f, 0.01f, 0.01f);
 
-            second.Position = new OpenTK.Mathematics.Vector3(0.5f, 0.5f, 2);
+            second.Position = new OpenTK.Mathematics.Vector3(100, 100, 10);
             second.Scale = new OpenTK.Mathematics.Vector3(1.5f, 1.5f, 1.5f);
 
             Engine.AddGameObject(obj);
-            //Engine.AddGameObject(second);
+            Engine.AddGameObject(second);
 
             GltfObject = obj;
         }
@@ -54,22 +54,22 @@ namespace AttackGame
             base.OnUpdate();
             var dir = Vector3.Zero;
             if (Engine.KeyState.IsKeyDown(Keys.D)) {
-                dir += new Vector3(1, 0, 0);
+                dir += Vector3.UnitZ;
             }
             if (Engine.KeyState.IsKeyDown(Keys.W))
             {
-                dir += new Vector3(0, 1, 0);
+                dir += Vector3.UnitY;
             }
             if (Engine.KeyState.IsKeyDown(Keys.A))
             {
-                dir += new Vector3(-1, 0, 0);
+                dir += -Vector3.UnitZ;
             }
             if (Engine.KeyState.IsKeyDown(Keys.S))
             {
-                dir += new Vector3(0, -1, 0);
+                dir += -Vector3.UnitY;
             }
             _camera.Position += dir * 2 * Engine.DeltaTime;
-            _camera.LookAt(Vector3.Zero);
+            _camera.LookAt(new Vector3(100, 100, 10));
         }
     }
 }

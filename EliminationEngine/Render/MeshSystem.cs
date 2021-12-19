@@ -66,8 +66,8 @@ namespace EliminationEngine.Render
             var camera = cameras.ElementAt(0);
             if (camera == null) return;
             var cameraRot = camera.Owner.Rotation;
-            var forward = new Vector3(0, 0, -1);
-            var up = new Vector3(0, 1, 0);
+            var forward = camera.Owner.Forward();
+            var up = Vector3.UnitY;
 
             var meshGroups = Engine.GetObjectsOfType<MeshGroupComponent>();
             foreach (var meshGroup in meshGroups)

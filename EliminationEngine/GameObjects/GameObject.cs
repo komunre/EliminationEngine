@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace EliminationEngine.GameObjects
 {
+    public class SimpleRotation
+    {
+        public float Pitch = 0;
+        public float Roll = 0;
+        public float Yaw = 0;
+    }
     public class GameObject
     {
         public Vector3 Position { get; set; } = Vector3.Zero;
@@ -23,19 +29,54 @@ namespace EliminationEngine.GameObjects
         {
             var direction = Vector3.Zero;
             var euler = Rotation.ToEulerAngles();
-            direction.X = (float)Math.Cos(MathHelper.DegreesToRadians(euler.Z)) * (float)Math.Cos(MathHelper.DegreesToRadians(euler.X));
-            direction.Y = (float)Math.Sin(MathHelper.DegreesToRadians(euler.Z));
-            direction.Z = (float)Math.Cos(MathHelper.DegreesToRadians(euler.Z)) * (float)Math.Sin(MathHelper.DegreesToRadians(euler.X));
-            direction.Normalize();
 
-            direction += Position;
+            var mul = 180;
+            direction.X = (float)Math.Cos(MathHelper.DegreesToRadians(euler.X * mul)) * (float)Math.Cos(MathHelper.DegreesToRadians(euler.Y * mul));
+            direction.Y = (float)Math.Sin(MathHelper.DegreesToRadians(euler.X * mul));
+            direction.Z = (float)Math.Cos(MathHelper.DegreesToRadians(euler.X * mul)) * (float)Math.Sin(MathHelper.DegreesToRadians(euler.Y * mul));
+            
+            //direction.X = (float)Math.Cos(euler.Y * mul) * (float)Math.Cos(euler.X * mul);
+            //direction.Y = (float)Math.Sin(euler.Y * mul) * (float)Math.Cos(euler.X * mul);
+            //direction.Z = (float)Math.Sin(euler.X);
+
+
+            direction = Vector3.Normalize(direction);
+
+            Console.WriteLine(direction.X + ":" + direction.Y + ":" + direction.Z);
+            direction = Position + direction;
 
             return direction;
         }
 
+        public Vector3 Up()
+        {
+            return Vector3.Cross(Forward(), new Vector3(0, 0, 1));
+        }
+
+        public Vector3 Right()
+        {
+            return Vector3.Cross(Forward(), new Vector3(0, 1, 0));
+        }
+
         public void LookAt(Vector3 target)
         {
-            Rotation = EliminationMathHelper.QuaternionFromEuler(Position - target);
+            Vector3 forwardVector = Vector3.Normalize(target - Position);
+
+            float dot = Vector3.Dot(Vector3.UnitZ, forwardVector);
+
+            if (Math.Abs(dot - (-1.0f)) < 0.000001f)
+            {
+                Rotation = new Quaternion(Vector3.UnitY.X, Vector3.UnitY.Y, Vector3.UnitY.Z, 3.1415926535897932f);
+            }
+            if (Math.Abs(dot - (1.0f)) < 0.000001f)
+            {
+                Rotation = Quaternion.Identity;
+            }
+
+            float rotAngle = (float)Math.Acos(dot);
+            Vector3 rotAxis = Vector3.Cross(Vector3.UnitZ, forwardVector);
+            rotAxis = Vector3.Normalize(rotAxis);
+            Rotation = Quaternion.FromAxisAngle(rotAxis, rotAngle);
         }
 
         public CompType AddComponent<CompType>() where CompType : EntityComponent
