@@ -22,29 +22,33 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(-2, 0, 2);
+            camera.Position = new Vector3(0, 3, 0);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
             _camera = camera;
 
-            var data = ModelParser.ParseGLTFExternal("res/fox.glb");
+            var data = ModelParser.ParseGLTFExternal("res/WaterBottle.glb");
             var obj = new GameObject();
             var second = new GameObject();
+            var dummyBottle = new GameObject();
+            dummyBottle.Position = new Vector3(0, 6, 0);
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
+            ModelHelper.AddGLTFMeshToObject(data, ref dummyBottle);
 
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 
             obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
             obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
-            obj.Scale = new Vector3(0.01f, 0.01f, 0.01f);
+            obj.Scale = new Vector3(1f, 1f, 1f);
 
-            second.Position = new OpenTK.Mathematics.Vector3(100, 100, 10);
-            second.Scale = new OpenTK.Mathematics.Vector3(1.5f, 1.5f, 1.5f);
+            second.Position = new OpenTK.Mathematics.Vector3(2, 0, 10);
+            second.Scale = new OpenTK.Mathematics.Vector3(1f, 1f, 1f);
 
             Engine.AddGameObject(obj);
             Engine.AddGameObject(second);
+            Engine.AddGameObject(dummyBottle);
 
             GltfObject = obj;
         }
@@ -69,7 +73,8 @@ namespace AttackGame
                 dir += -Vector3.UnitY;
             }
             _camera.Position += dir * 2 * Engine.DeltaTime;
-            _camera.LookAt(new Vector3(100, 100, 10));
+            //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-90, 0, 0)); // WORKS!
+            _camera.LookAt(new Vector3(0, 0, 0));
         }
     }
 }

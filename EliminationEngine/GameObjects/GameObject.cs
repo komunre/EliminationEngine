@@ -31,26 +31,22 @@ namespace EliminationEngine.GameObjects
             var euler = Rotation.ToEulerAngles();
 
             var mul = 180;
-            direction.X = (float)Math.Cos(MathHelper.DegreesToRadians(euler.X * mul)) * (float)Math.Cos(MathHelper.DegreesToRadians(euler.Y * mul));
-            direction.Y = (float)Math.Sin(MathHelper.DegreesToRadians(euler.X * mul));
-            direction.Z = (float)Math.Cos(MathHelper.DegreesToRadians(euler.X * mul)) * (float)Math.Sin(MathHelper.DegreesToRadians(euler.Y * mul));
-            
-            //direction.X = (float)Math.Cos(euler.Y * mul) * (float)Math.Cos(euler.X * mul);
-            //direction.Y = (float)Math.Sin(euler.Y * mul) * (float)Math.Cos(euler.X * mul);
+            direction.X = (float)Math.Cos(euler.X) * (float)Math.Cos(euler.Y);
+            direction.Y = (float)Math.Sin(euler.X);
+            direction.Z = (float)Math.Cos(euler.X) * (float)Math.Sin(euler.Y);
+
+            //direction.X = (float)Math.Cos(euler.Y) * (float)Math.Cos(euler.X);
+            //direction.Y = (float)Math.Sin(euler.Y) * (float)Math.Cos(euler.X);
             //direction.Z = (float)Math.Sin(euler.X);
 
-
             direction = Vector3.Normalize(direction);
-
-            Console.WriteLine(direction.X + ":" + direction.Y + ":" + direction.Z);
-            direction = Position + direction;
 
             return direction;
         }
 
         public Vector3 Up()
         {
-            return Vector3.Cross(Forward(), new Vector3(0, 0, 1));
+            return Vector3.Cross(Forward(), new Vector3(1, 0, 0));
         }
 
         public Vector3 Right()
@@ -60,9 +56,12 @@ namespace EliminationEngine.GameObjects
 
         public void LookAt(Vector3 target)
         {
+            var rot = Rotation.ToEulerAngles();
+            Console.WriteLine(rot.X + ":" + rot.Y + ":" + rot.Z);
+
             Vector3 forwardVector = Vector3.Normalize(target - Position);
 
-            float dot = Vector3.Dot(Vector3.UnitZ, forwardVector);
+            float dot = Vector3.Dot(-Vector3.UnitZ, forwardVector);
 
             if (Math.Abs(dot - (-1.0f)) < 0.000001f)
             {
@@ -74,8 +73,9 @@ namespace EliminationEngine.GameObjects
             }
 
             float rotAngle = (float)Math.Acos(dot);
-            Vector3 rotAxis = Vector3.Cross(Vector3.UnitZ, forwardVector);
+            Vector3 rotAxis = Vector3.Cross(-Vector3.UnitZ, forwardVector);
             rotAxis = Vector3.Normalize(rotAxis);
+
             Rotation = Quaternion.FromAxisAngle(rotAxis, rotAngle);
         }
 

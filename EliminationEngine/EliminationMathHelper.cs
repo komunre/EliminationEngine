@@ -16,7 +16,7 @@ namespace EliminationEngine
         /// <returns>New quaternion</returns>
         public static Quaternion QuaternionFromEuler(Vector3 vec)
         {
-            return Quaternion.FromEulerAngles(MathHelper.NormalizeAngle(vec.X), MathHelper.NormalizeAngle(vec.Y), MathHelper.NormalizeAngle(vec.Z));
+            return Quaternion.FromEulerAngles(MathHelper.DegreesToRadians(vec.X), MathHelper.DegreesToRadians(vec.Y), MathHelper.DegreesToRadians(vec.Z));
         }
     }
 }
