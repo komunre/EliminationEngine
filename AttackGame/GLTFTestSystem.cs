@@ -22,7 +22,7 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 3, 0);
+            camera.Position = new Vector3(0, 10, 0);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
@@ -58,23 +58,33 @@ namespace AttackGame
             base.OnUpdate();
             var dir = Vector3.Zero;
             if (Engine.KeyState.IsKeyDown(Keys.D)) {
-                dir += Vector3.UnitZ;
+                dir += Vector3.UnitX;
             }
             if (Engine.KeyState.IsKeyDown(Keys.W))
             {
-                dir += Vector3.UnitY;
+                dir += Vector3.UnitZ;
             }
             if (Engine.KeyState.IsKeyDown(Keys.A))
             {
-                dir += -Vector3.UnitZ;
+                dir += -Vector3.UnitX;
             }
             if (Engine.KeyState.IsKeyDown(Keys.S))
             {
+                dir += -Vector3.UnitZ;
+            }
+            if (Engine.KeyState.IsKeyDown(Keys.Space))
+            {
+                dir += Vector3.UnitY;
+            }
+            if (Engine.KeyState.IsKeyDown(Keys.LeftShift))
+            {
                 dir += -Vector3.UnitY;
             }
-            _camera.Position += dir * 2 * Engine.DeltaTime;
-            //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-90, 0, 0)); // WORKS!
-            _camera.LookAt(new Vector3(0, 0, 0));
+            //_camera.Position += dir * 2f * Engine.DeltaTime;
+            _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
+            _camera.LookAt(new Vector3(0, 6, 0)); // works too
         }
     }
 }

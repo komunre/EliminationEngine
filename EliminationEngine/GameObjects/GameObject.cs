@@ -15,9 +15,9 @@ namespace EliminationEngine.GameObjects
     }
     public class GameObject
     {
-        public Vector3 Position { get; set; } = Vector3.Zero;
-        public Quaternion Rotation { get; set; } = Quaternion.Identity;
-        public Vector3 Scale { get; set; } = Vector3.One;
+        public Vector3 Position = Vector3.Zero;
+        public Quaternion Rotation = Quaternion.Identity;
+        public Vector3 Scale = Vector3.One;
         protected Dictionary<Type, EntityComponent> Components { get; private set; } = new();
 
         public GameObject()
@@ -31,9 +31,9 @@ namespace EliminationEngine.GameObjects
             var euler = Rotation.ToEulerAngles();
 
             var mul = 180;
-            direction.X = (float)Math.Cos(euler.X) * (float)Math.Cos(euler.Y);
-            direction.Y = (float)Math.Sin(euler.X);
-            direction.Z = (float)Math.Cos(euler.X) * (float)Math.Sin(euler.Y);
+            direction.X = (float)Math.Cos(Rotation.X) * (float)Math.Cos(Rotation.Y);
+            direction.Y = (float)Math.Sin(Rotation.X);
+            direction.Z = (float)Math.Cos(Rotation.X) * (float)Math.Sin(Rotation.Y);
 
             //direction.X = (float)Math.Cos(euler.Y) * (float)Math.Cos(euler.X);
             //direction.Y = (float)Math.Sin(euler.Y) * (float)Math.Cos(euler.X);
@@ -41,7 +41,7 @@ namespace EliminationEngine.GameObjects
 
             direction = Vector3.Normalize(direction);
 
-            return direction;
+            return Rotation * new Vector3(0, 0, -1) + Position;
         }
 
         public Vector3 Up()
@@ -57,7 +57,6 @@ namespace EliminationEngine.GameObjects
         public void LookAt(Vector3 target)
         {
             var rot = Rotation.ToEulerAngles();
-            Console.WriteLine(rot.X + ":" + rot.Y + ":" + rot.Z);
 
             Vector3 forwardVector = Vector3.Normalize(target - Position);
 
