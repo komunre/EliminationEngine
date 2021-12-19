@@ -1,0 +1,1 @@
+Sorry, I accidentally deleted everything during git manipulations, so you won't find it in main repo. Please also read licenses.txt
