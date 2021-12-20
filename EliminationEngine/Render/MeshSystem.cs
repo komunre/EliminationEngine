@@ -11,6 +11,8 @@ namespace EliminationEngine.Render
 {
     public class MeshSystem : EntitySystem
     {
+        protected int lightsBuffer = 0;
+        public float MaxLightDistance = 30;
         public override void PostLoad()
         {
             base.OnLoad();
@@ -52,9 +54,18 @@ namespace EliminationEngine.Render
 
                     GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._buffer);
 
+                    mesh._normalsBuffer = GL.GenBuffer();
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._normalsBuffer);
+                    GL.BufferData(BufferTarget.ArrayBuffer, mesh.Normals.Length * sizeof(float), mesh.Normals, BufferUsageHint.StaticDraw);
+
+                    GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+                    GL.EnableVertexAttribArray(2);
+
                     mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
                 }
             }
+
+            lightsBuffer = GL.GenBuffer();
         }
 
         public override void OnDraw()
@@ -68,6 +79,17 @@ namespace EliminationEngine.Render
             var cameraRot = camera.Owner.Rotation;
             var forward = camera.Owner.Forward();
             var up = camera.Owner.Up();
+
+            var lightPos = new List<float>();
+            var lightColors = new List<float>();
+
+            var lights = Engine.GetObjectsOfType<LightComponent>();
+            foreach (var light in lights)
+            {
+                var trans = light.Owner.Position;
+                lightPos.AddRange(new float[] { trans.X, trans.Y, trans.Z });
+                lightColors.AddRange(new float[] { light.Color.R, light.Color.G, light.Color.B, light.Color.A });
+            }
 
             var meshGroups = Engine.GetObjectsOfType<MeshGroupComponent>();
             foreach (var meshGroup in meshGroups)
@@ -84,6 +106,24 @@ namespace EliminationEngine.Render
                     var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
                     var lookAt = Matrix4.LookAt(camera.Owner.Position, forward, up);
                     mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix * 0.1f));
+                    mesh._shader.SetVector3("viewPos", camera.Owner.Position);
+
+                    var counter = 0;
+                    for (var i = 0; i < lights.Length; i++)
+                    {
+                        var light = lights[i];
+                        if ((light.Owner.Position - meshGroup.Owner.Position).Length > MaxLightDistance)
+                        {
+                            continue;
+                        }
+                        if (counter >= 20) break;
+                        mesh._shader.SetVector3("pointLights[" + counter + "].pos", light.Owner.Position);
+                        mesh._shader.SetFloat("pointLights[" + counter + "].constant", light.Constant);
+                        mesh._shader.SetFloat("pointLights[" + counter + "].linear", light.Diffuse);
+                        mesh._shader.SetVector3("pointLights[" + counter + "].diffuse", new Vector3(light.Color.R, light.Color.G, light.Color.B));
+                        counter++;
+                    }
+                    mesh._shader.SetInt("lightsNum", counter);
 
                     GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
                     GL.BindVertexArray(mesh._vertexArr);

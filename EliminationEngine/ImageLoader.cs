@@ -35,7 +35,6 @@ namespace EliminationEngine
                     pixels.Add(row[x].R);
                     pixels.Add(row[x].G);
                     pixels.Add(row[x].B);
-                    pixels.Add(row[x].A);
                 }
             }
 

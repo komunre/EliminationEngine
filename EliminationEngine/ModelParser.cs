@@ -45,10 +45,12 @@ namespace EliminationEngine
                 var vertsData = new List<float>();
                 var uvData = new List<float>();
                 var indices = new List<uint>();
+                var normals = new List<float>();
                 foreach (var primitive in mesh.Primitives) {
                     vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X, e.Y, e.Z }));
                     uvData.AddRange(primitive.UVs.SelectMany(e => new[] { e.X, e.Y }));
                     indices.AddRange(primitive.Indices.Select(e => e));
+                    normals.AddRange(primitive.Normals.SelectMany(e => new[] { e.X, e.Y, e.Z }));
                 }
 
                 if (mesh.Mat != null && mesh.Mat.Channels.ElementAt(0).Texture != null)
@@ -75,6 +77,7 @@ namespace EliminationEngine
                 renderMesh.Vertices = vertsData.ToArray();
                 renderMesh.TexCoords = uvData.ToArray();
                 renderMesh.Indices = indices.ToArray();
+                renderMesh.Normals = normals.ToArray();
 
                 meshGroup.Meshes.Add(renderMesh);
 
@@ -84,8 +87,6 @@ namespace EliminationEngine
 
         public static void AddGLTFMeshToObject(ModelParser.GLTFData data, ref GameObject obj)
         {
-            uint io = 0;
-            var vt = PostParseMesh(data.Meshes, ref io); // TODO: is that even needed here?
             var mesh = obj.AddComponent<GameObjects.MeshGroupComponent>();
 
             PostParseMeshes(ref mesh, data.Meshes);
@@ -100,12 +101,14 @@ namespace EliminationEngine
                 public Vector3[] Vertices { get; }
                 public Vector2[] UVs { get; }
                 public uint[] Indices { get; }
+                public Vector3[] Normals { get; }
 
-                public PrimitiveData(Vector3[] vertices, Vector2[] uvs, uint[] indices)
+                public PrimitiveData(Vector3[] vertices, Vector2[] uvs, uint[] indices, Vector3[] normals)
                 {
                     this.Vertices = vertices;
                     this.UVs = uvs;
                     this.Indices = indices;
+                    this.Normals = normals;
                 }
             }
             public class MeshData
@@ -156,8 +159,9 @@ namespace EliminationEngine
                     var vertices = primitive.GetVertices("POSITION").AsVector3Array().ToArray();
                     var uvs = primitive.GetVertices("TEXCOORD_0").AsVector2Array().ToArray();
                     var bakedIndices = primitive.GetIndices();
+                    var normals = primitive.GetVertices("NORMAL").AsVector3Array().ToArray();
                     meshData.Primitives.Add(new GLTFData.PrimitiveData(vertices, uvs,
-                        bakedIndices?.ToArray() ?? Enumerable.Range(0, vertices.Length).Select(e => (uint)e).ToArray()));
+                        bakedIndices?.ToArray() ?? Enumerable.Range(0, vertices.Length).Select(e => (uint)e).ToArray(), normals));
                     meshData.Mat = primitive.Material;
                 }
             }

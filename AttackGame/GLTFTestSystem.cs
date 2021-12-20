@@ -22,19 +22,19 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 7, 0);
+            camera.Position = new Vector3(0, 1.5f, 0);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
             _camera = camera;
 
-            var data = ModelParser.ParseGLTFExternal("res/WaterBottle.glb");
+            var data = ModelParser.ParseGLTFExternal("res/ocean.glb");
             var obj = new GameObject();
             var second = new GameObject();
-            var dummyBottle = new GameObject();
-            dummyBottle.Position = new Vector3(0, 6, 0);
+            //var dummyBottle = new GameObject();
+            //dummyBottle.Position = new Vector3(0, 6, 0);
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
-            ModelHelper.AddGLTFMeshToObject(data, ref dummyBottle);
+            //ModelHelper.AddGLTFMeshToObject(data, ref dummyBottle);
 
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
@@ -48,7 +48,7 @@ namespace AttackGame
 
             Engine.AddGameObject(obj);
             Engine.AddGameObject(second);
-            Engine.AddGameObject(dummyBottle);
+            //Engine.AddGameObject(dummyBottle);
 
             var cubeData = ModelParser.ParseGLTFExternal("res/cube.glb");
             for (var i = 0; i < 20; i++)
@@ -61,6 +61,19 @@ namespace AttackGame
             }
 
             GltfObject = obj;
+
+            var light = new GameObject();
+            var lightComp = light.AddComponent<LightComponent>();
+            light.Position = new Vector3(0, 5, 0);
+            lightComp.Diffuse = 70f;
+
+            var secLight = new GameObject();
+            var secLightComp = secLight.AddComponent<LightComponent>();
+            secLightComp.Diffuse = 30f;
+            secLightComp.Color = new EliminationEngine.Tools.Color(255, 0, 0, 255);
+            secLight.Position = new Vector3(10, 5, 0);
+            Engine.AddGameObject(light);
+            Engine.AddGameObject(secLight);
         }
 
         public override void OnUpdate()
@@ -91,8 +104,8 @@ namespace AttackGame
                 dir += -Vector3.UnitY;
             }
             //_camera.Position += dir * 2f * Engine.DeltaTime;
-            _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
-            _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 3.5f;
+            _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+            _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
             _camera.LookAt(new Vector3(0, 6, 0)); // works too
         }

@@ -185,5 +185,11 @@ namespace EliminationEngine
             GL.UseProgram(Handle);
             GL.Uniform3(_uniformLocations[name], data);
         }
+
+        public void SetFloatUniform(string name, float[] data)
+        {
+            GL.UseProgram(Handle);
+            GL.Uniform3(_uniformLocations[name], data.Length, data);
+        }
     }
 }

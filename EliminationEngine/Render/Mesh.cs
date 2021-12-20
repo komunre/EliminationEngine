@@ -13,12 +13,13 @@ namespace EliminationEngine.Render
         public float[]? Vertices { get; set; }
         public uint[]? Indices { get; set; }
         public float[]? TexCoords { get; set; }
-        protected float[]? Normals { get; set; }
+        public float[]? Normals { get; set; }
         public int _buffer = 0;
         public int _vertexArr = 0;
         public int _indicesBuffer = 0;
         public int _texCoordBuffer = 0;
         public int _tex = 0;
+        public int _normalsBuffer = 0;
         public Shader? _shader;
         public byte[] Image;
         public int Width = 0;
