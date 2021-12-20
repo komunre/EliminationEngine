@@ -68,5 +68,12 @@ namespace EliminationEngine
         {
             return window.GetObjectsOfType<CompType>();
         }
+
+        public void AddChildTo(GameObject parent, GameObject child)
+        {
+            child.Parent = parent;
+            parent.Children.Add(child);
+            AddGameObject(child);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using EliminationEngine.Tools;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,13 @@ namespace EliminationEngine.GameObjects
     }
     public class GameObject
     {
+        public GameObject? Parent = null;
+        public List<GameObject> Children = new List<GameObject>();
+
+        public Vector3 GlobalPosition => ParentHelper.GetAddedPos(this);
+        public Quaternion GlobalRotation => ParentHelper.GetAddedRot(this);
+        public Vector3 GlobalScale => ParentHelper.GetAddedScale(this);
+
         public Vector3 Position = Vector3.Zero;
         public Quaternion Rotation = Quaternion.Identity;
         public Vector3 Scale = Vector3.One;
@@ -41,7 +49,7 @@ namespace EliminationEngine.GameObjects
 
             direction = Vector3.Normalize(direction);
 
-            return Rotation * new Vector3(0, 0, -1) + Position;
+            return ParentHelper.GetAddedRot(this) * new Vector3(0, 0, -1) + Position;
         }
 
         public Vector3 Up()

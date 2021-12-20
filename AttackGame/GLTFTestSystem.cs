@@ -9,6 +9,7 @@ using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using EliminationEngine.Render;
 
 namespace AttackGame
 {
@@ -22,7 +23,7 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 1.5f, 0);
+            camera.Position = new Vector3(0, 4.5f, 0);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
@@ -40,7 +41,7 @@ namespace AttackGame
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 
             obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
-            obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
+            //obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
             obj.Scale = new Vector3(1f, 1f, 1f);
 
             second.Position = new OpenTK.Mathematics.Vector3(2, 0, 10);
@@ -51,14 +52,16 @@ namespace AttackGame
             //Engine.AddGameObject(dummyBottle);
 
             var cubeData = ModelParser.ParseGLTFExternal("res/cube.glb");
-            for (var i = 0; i < 20; i++)
+            /*for (var i = 0; i < 15; i++)
             {
                 var obj2 = new GameObject();
                 var random = new Random();
                 obj2.Position = new Vector3(random.Next(-10, 10), random.Next(-10, 10), random.Next(-10, 10));
                 ModelHelper.AddGLTFMeshToObject(cubeData, ref obj2);
+                //var l = obj2.AddComponent<LightComponent>();
+                //l.Diffuse = 150;
                 Engine.AddGameObject(obj2);
-            }
+            }*/
 
             GltfObject = obj;
 
@@ -74,6 +77,20 @@ namespace AttackGame
             secLight.Position = new Vector3(10, 5, 0);
             Engine.AddGameObject(light);
             Engine.AddGameObject(secLight);
+
+            var parent = new GameObject();
+            var parented = new GameObject();
+            parent.Position = new Vector3(0, 1, 0);
+
+            parent.AddComponent<RotateDemoComponent>();
+            parented.Position = new Vector3(0, 0, 0);
+            parented.Scale = new Vector3(0.2f, 0.2f, 0.2f);
+
+            ModelHelper.AddGLTFMeshToObject(cubeData, ref parent);
+            ModelHelper.AddGLTFMeshToObject(misshatData, ref parented);
+
+            Engine.AddChildTo(parent, parented);
+            Engine.AddGameObject(parent);
         }
 
         public override void OnUpdate()
@@ -107,7 +124,14 @@ namespace AttackGame
             _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
             _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
-            _camera.LookAt(new Vector3(0, 6, 0)); // works too
+            //_camera.LookAt(new Vector3(0, 0, 0)); // works too
+
+            var rotateDemos = Engine.GetObjectsOfType<RotateDemoComponent>();
+            foreach (var rotate in rotateDemos)
+            {
+                rotate.Owner.Rotation *= EliminationMathHelper.QuaternionFromEuler(rotate.RotDir * Engine.DeltaTime);
+            }
+            _camera.LookAt(rotateDemos[0].Owner.GlobalPosition);
         }
     }
 }

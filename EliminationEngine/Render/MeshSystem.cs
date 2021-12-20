@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
+using EliminationEngine.Tools;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -76,7 +77,7 @@ namespace EliminationEngine.Render
             if (cameras == null) return;
             var camera = cameras.ElementAt(0);
             if (camera == null) return;
-            var cameraRot = camera.Owner.Rotation;
+            var cameraRot = camera.Owner.GlobalRotation;
             var forward = camera.Owner.Forward();
             var up = camera.Owner.Up();
 
@@ -90,14 +91,16 @@ namespace EliminationEngine.Render
                     GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._buffer);
                     GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsageHint.StaticDraw);
 
+                    var cameraPos = ParentHelper.GetAddedPos(camera.Owner);
+
                     mesh._shader.Use();
-                    var trans = Matrix4.CreateTranslation(meshGroup.Owner.Position);
-                    var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.Rotation);
-                    var scale = Matrix4.CreateScale(meshGroup.Owner.Scale);
+                    var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition);
+                    var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.GlobalRotation);
+                    var scale = Matrix4.CreateScale(meshGroup.Owner.GlobalScale);
                     var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
-                    var lookAt = Matrix4.LookAt(camera.Owner.Position, forward, up);
+                    var lookAt = Matrix4.LookAt(cameraPos, forward, up);
                     mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix * 0.1f));
-                    mesh._shader.SetVector3("viewPos", camera.Owner.Position);
+                    mesh._shader.SetVector3("viewPos", cameraPos);
 
                     var counter = 0;
                     for (var i = 0; i < lights.Length; i++)
