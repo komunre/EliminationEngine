@@ -49,6 +49,21 @@ namespace EliminationEngine
             RegisteredSystems.Add(typeof(EntitySystemType), system);
         }
 
+        public EntitySystemType? GetSystem<EntitySystemType>() where EntitySystemType : EntitySystem
+        {
+            return RegisteredSystems[typeof(EntitySystemType)] as EntitySystemType;
+        }
+
+        public bool TryGetSystem<EntitySystemType>(out EntitySystemType? system) where EntitySystemType : EntitySystem
+        {
+            if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys) {
+                system = sys as EntitySystemType;
+                return true;
+            }
+            system = null;
+            return false;
+        }
+
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
             return window.GetObjectsOfType<CompType>();
