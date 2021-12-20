@@ -56,7 +56,7 @@ namespace EliminationEngine
 
         public bool TryGetSystem<EntitySystemType>(out EntitySystemType? system) where EntitySystemType : EntitySystem
         {
-            if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys) {
+            if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys)) {
                 system = sys as EntitySystemType;
                 return true;
             }
