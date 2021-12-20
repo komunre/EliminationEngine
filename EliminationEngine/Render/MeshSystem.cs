@@ -80,16 +80,7 @@ namespace EliminationEngine.Render
             var forward = camera.Owner.Forward();
             var up = camera.Owner.Up();
 
-            var lightPos = new List<float>();
-            var lightColors = new List<float>();
-
             var lights = Engine.GetObjectsOfType<LightComponent>();
-            foreach (var light in lights)
-            {
-                var trans = light.Owner.Position;
-                lightPos.AddRange(new float[] { trans.X, trans.Y, trans.Z });
-                lightColors.AddRange(new float[] { light.Color.R, light.Color.G, light.Color.B, light.Color.A });
-            }
 
             var meshGroups = Engine.GetObjectsOfType<MeshGroupComponent>();
             foreach (var meshGroup in meshGroups)
