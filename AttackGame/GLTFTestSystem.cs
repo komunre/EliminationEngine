@@ -11,6 +11,7 @@ using OpenTK.Input;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using EliminationEngine.Render;
 using EliminationEngine.Tools;
+using EliminationEngine.Systems;
 
 namespace AttackGame
 {
@@ -19,6 +20,7 @@ namespace AttackGame
         public GameObject? GltfObject;
         private GameObject? _camera;
         private GameObject? redLight;
+        private SoundSystem _soundSystem;
 
         public GLTFTestSystem(Elimination e) : base(e)
         {
@@ -27,6 +29,8 @@ namespace AttackGame
         public override void OnLoad()
         {
             base.OnLoad();
+
+            _soundSystem = Engine.GetSystem<SoundSystem>();
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
@@ -153,6 +157,10 @@ namespace AttackGame
                 rotate.Owner.Rotation *= EliminationMathHelper.QuaternionFromEuler(rotate.RotDir * Engine.DeltaTime);
             }
             //_camera.LookAt(rotateDemos[0].Owner.GlobalPosition);
+
+            if (Engine.KeyState.IsKeyDown(Keys.O)) {
+                _soundSystem.GenSound(1046, SoundType.Noise, 100, 1);
+            }
         }
     }
 }

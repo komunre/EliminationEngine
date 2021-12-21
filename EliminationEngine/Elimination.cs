@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
 using EliminationEngine.Render;
+using EliminationEngine.Systems;
 using EliminationEngine.Tools;
 using OpenTK;
 using OpenTK.Windowing.Desktop;
@@ -37,6 +38,7 @@ namespace EliminationEngine
         {
             if (window == null) throw new InvalidDataException("No window was opened");
             RegisterSystem<MeshSystem>();
+            RegisterSystem<SoundSystem>();
             window.Run();
         }
 
