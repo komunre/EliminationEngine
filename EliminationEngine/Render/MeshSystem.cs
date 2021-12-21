@@ -14,7 +14,6 @@ namespace EliminationEngine.Render
     public class MeshSystem : EntitySystem
     {
         protected int lightsBuffer = 0;
-        public float MaxLightDistance = 30;
 
         public MeshSystem(Elimination e) : base(e)
         {
@@ -132,7 +131,7 @@ namespace EliminationEngine.Render
                         for (var i = 0; i < lights.Length; i++)
                         {
                             var light = lights[i];
-                            if ((light.Owner.GlobalPosition - meshGroup.Owner.GlobalPosition).Length > MaxLightDistance)
+                            if ((light.Owner.GlobalPosition - meshGroup.Owner.GlobalPosition).Length > light.MaxAffectDstance)
                             {
                                 continue;
                             }

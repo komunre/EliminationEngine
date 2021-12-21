@@ -16,5 +16,6 @@ namespace EliminationEngine.GameObjects
         public float Constant = 0;
         public float Diffuse = 100f;
         public Color Color = new Color(255, 255, 255, 255);
+        public float MaxAffectDstance = 30f;
     }
 }
