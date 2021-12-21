@@ -21,7 +21,7 @@ namespace EliminationEngine.Render
         public int _tex = 0;
         public int _normalsBuffer = 0;
         public Shader? _shader;
-        public byte[] Image;
+        public byte[]? Image;
         public int Width = 0;
         public int Height = 0;
     }

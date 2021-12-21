@@ -116,7 +116,7 @@ namespace EliminationEngine
                 public List<float> Weights = new();
                 public List<PrimitiveData> Primitives = new();
                 public List<MeshData> Children = new();
-                public Material Mat;
+                public Material? Mat;
             }
             public List<MeshData> Meshes = new();
         }

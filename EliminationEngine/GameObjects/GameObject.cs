@@ -2,6 +2,8 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,25 +32,14 @@ namespace EliminationEngine.GameObjects
 
         public GameObject()
         {
-            // AddComponent<Mesh>(); // Add mesh for future usage during drawing
+            
         }
 
         public Vector3 Forward()
         {
             var direction = Vector3.Zero;
 
-            var rot = ParentHelper.GetAddedRot(this);
-
-            var mul = 180;
-            direction.X = (float)Math.Cos(rot.X) * (float)Math.Cos(rot.Y);
-            direction.Y = (float)Math.Sin(rot.X);
-            direction.Z = (float)Math.Cos(rot.X) * (float)Math.Sin(rot.Y);
-
-            //direction.X = (float)Math.Cos(euler.Y) * (float)Math.Cos(euler.X);
-            //direction.Y = (float)Math.Sin(euler.Y) * (float)Math.Cos(euler.X);
-            //direction.Z = (float)Math.Sin(euler.X);
-
-            direction = Vector3.Normalize(direction);
+            var rot = GlobalRotation;
 
             return rot * new Vector3(0, 0, -1) + GlobalPosition;
         }
@@ -92,8 +83,8 @@ namespace EliminationEngine.GameObjects
 
         public CompType AddComponent<CompType>() where CompType : EntityComponent
         {
-            var comp = Activator.CreateInstance<CompType>();
-            comp.Owner = this;
+            var comp = Activator.CreateInstance(typeof(CompType), new object[] { this }) as CompType;
+            Debug.Assert(comp != null, "No owner was added to component during creation");
             Components.Add(typeof(CompType), comp);
             return comp;
         }
@@ -103,11 +94,11 @@ namespace EliminationEngine.GameObjects
             return Components[typeof(CompType)] as CompType;
         }
 
-        public bool TryGetComponent<CompType>(out CompType? component) where CompType : EntityComponent
+        public bool TryGetComponent<CompType>([NotNullWhen(true)] out CompType? component) where CompType : EntityComponent
         {
             if (Components.TryGetValue(typeof(CompType), out var comp))
             {
-                component = comp as CompType;
+                component = (CompType)comp;
                 return true;
             }
             component = null;

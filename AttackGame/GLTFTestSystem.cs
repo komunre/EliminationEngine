@@ -16,9 +16,14 @@ namespace AttackGame
 {
     public class GLTFTestSystem : EntitySystem
     {
-        public GameObject GltfObject;
-        private GameObject _camera;
-        private GameObject redLight;
+        public GameObject? GltfObject;
+        private GameObject? _camera;
+        private GameObject? redLight;
+
+        public GLTFTestSystem(Elimination e) : base(e)
+        {
+
+        }
         public override void OnLoad()
         {
             base.OnLoad();
@@ -128,14 +133,21 @@ namespace AttackGame
             }
             //_camera.Position += dir * 2f * Engine.DeltaTime;
 
-            redLight.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
-            redLight.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+            if (redLight != null)
+            {
+                redLight.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+                redLight.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+            }
 
-            
+
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
-            _camera.LookAt(new Vector3(0, 0, 0)); // works too
+            if (_camera != null)
+            {
+                _camera.LookAt(new Vector3(0, 0, 0)); // works too
+            }
 
             var rotateDemos = Engine.GetObjectsOfType<RotateDemoComponent>();
+            if (rotateDemos == null) return;
             foreach (var rotate in rotateDemos)
             {
                 rotate.Owner.Rotation *= EliminationMathHelper.QuaternionFromEuler(rotate.RotDir * Engine.DeltaTime);

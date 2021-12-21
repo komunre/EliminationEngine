@@ -8,7 +8,11 @@ namespace EliminationEngine.GameObjects
 {
     public class EntitySystem
     {
-        public Elimination? Engine = null;
+        public Elimination Engine;
+        public EntitySystem(Elimination e)
+        {
+            Engine = e;
+        }
         public virtual void OnLoad()
         {
             

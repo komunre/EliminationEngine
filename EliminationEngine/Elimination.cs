@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
 using EliminationEngine.Render;
+using EliminationEngine.Tools;
 using OpenTK;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -29,6 +31,7 @@ namespace EliminationEngine
             native.Title = Title;
             native.Flags = OpenTK.Windowing.Common.ContextFlags.ForwardCompatible;
             window = new EliminationWindow(settings, native, this);
+            KeyState = window.KeyboardState;
         }
         public void Run()
         {
@@ -39,13 +42,23 @@ namespace EliminationEngine
 
         public void AddGameObject(GameObject obj)
         {
+            if (window == null)
+            {
+                Logger.Warning("Start the engine before accessing gameobjects");
+                return;
+            }
+            if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
+            {
+                var meshSys = GetSystem<MeshSystem>();
+                meshSys?.LoadMeshGroup(comp);
+            }
             window.GameObjects.Add(obj);
         }
 
         public void RegisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
-            var system = Activator.CreateInstance<EntitySystemType>();
-            system.Engine = this;
+            var system = Activator.CreateInstance(typeof(EntitySystemType), new object[] { this }) as EntitySystemType;
+            Debug.Assert(system != null, "System is null after creation during registration");
             RegisteredSystems.Add(typeof(EntitySystemType), system);
         }
 
@@ -64,8 +77,13 @@ namespace EliminationEngine
             return false;
         }
 
-        public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
+        public CompType[]? GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
+            if (window == null)
+            {
+                Logger.Warning("Start the engine before accessing gameobjects");
+                return null;
+            }
             return window.GetObjectsOfType<CompType>();
         }
 

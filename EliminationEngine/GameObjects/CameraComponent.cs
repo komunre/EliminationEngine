@@ -9,6 +9,10 @@ namespace EliminationEngine.GameObjects
 {
     public class CameraComponent : EntityComponent
     {
+        public CameraComponent(GameObject o) : base(o)
+        {
+
+        }
         public bool Active = true;
         public int Width = 800;
         public int Height = 600;

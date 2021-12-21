@@ -31,7 +31,10 @@ namespace EliminationEngine
             {
                 if (obj.TryGetComponent<CompType>(out var comp))
                 {
-                    compsList.Add(comp);
+                    if (comp != null)
+                    {
+                        compsList.Add(comp);
+                    }
                 }
             }
             return compsList.ToArray();

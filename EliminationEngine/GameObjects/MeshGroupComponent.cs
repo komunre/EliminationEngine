@@ -16,7 +16,7 @@ namespace EliminationEngine.GameObjects
     {
         public List<Mesh> Meshes = new();
 
-        public MeshGroupComponent()
+        public MeshGroupComponent(GameObject o) : base(o)
         {
             
         }

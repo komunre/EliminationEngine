@@ -13,5 +13,25 @@ namespace EliminationEngine.Tools
         {
             Console.WriteLine(vec.X + ":" + vec.Y + ":" + vec.Z);
         }
+
+        public static void LogWithPrefix(string prefix, string message)
+        {
+            Console.WriteLine("[" + prefix + "] " + message);
+        }
+
+        public static void Engine(string message)
+        {
+            LogWithPrefix("ENG", message);
+        }
+
+        public static void Info(string message)
+        {
+            LogWithPrefix("INF", message);
+        }
+
+        public static void Warning(string message)
+        {
+            LogWithPrefix("WRN", message);
+        }
     }
 }

@@ -10,6 +10,10 @@ namespace AttackGame
 {
     public class RotateDemoComponent : EntityComponent
     {
+        public RotateDemoComponent(GameObject o) : base(o)
+        {
+
+        }
         public Vector3 RotDir = new Vector3(30, 30, 0);
     }
 }
