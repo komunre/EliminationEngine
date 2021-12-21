@@ -131,11 +131,6 @@ namespace AttackGame
             redLight.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
             redLight.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
 
-            Console.Write("Camera: ");
-            Logger.LogVector(_camera.GlobalPosition);
-            Console.Write("Light: ");
-            Logger.LogVector(redLight.GlobalPosition);
-
             
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
             _camera.LookAt(new Vector3(0, 0, 0)); // works too

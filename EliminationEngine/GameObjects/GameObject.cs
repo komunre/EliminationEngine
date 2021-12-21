@@ -50,7 +50,7 @@ namespace EliminationEngine.GameObjects
 
             direction = Vector3.Normalize(direction);
 
-            return rot * new Vector3(0, 0, -1) + Position;
+            return rot * new Vector3(0, 0, -1) + GlobalPosition;
         }
 
         public Vector3 Up()
