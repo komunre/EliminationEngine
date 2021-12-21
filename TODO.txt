@@ -1,0 +1,3 @@
+Network synchronization verification number or hash generator
+Default netwokring
+Ability to disable default networking

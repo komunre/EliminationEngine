@@ -36,12 +36,13 @@ namespace EliminationEngine.GameObjects
         public Vector3 Forward()
         {
             var direction = Vector3.Zero;
-            var euler = Rotation.ToEulerAngles();
+
+            var rot = ParentHelper.GetAddedRot(this);
 
             var mul = 180;
-            direction.X = (float)Math.Cos(Rotation.X) * (float)Math.Cos(Rotation.Y);
-            direction.Y = (float)Math.Sin(Rotation.X);
-            direction.Z = (float)Math.Cos(Rotation.X) * (float)Math.Sin(Rotation.Y);
+            direction.X = (float)Math.Cos(rot.X) * (float)Math.Cos(rot.Y);
+            direction.Y = (float)Math.Sin(rot.X);
+            direction.Z = (float)Math.Cos(rot.X) * (float)Math.Sin(rot.Y);
 
             //direction.X = (float)Math.Cos(euler.Y) * (float)Math.Cos(euler.X);
             //direction.Y = (float)Math.Sin(euler.Y) * (float)Math.Cos(euler.X);
@@ -49,7 +50,7 @@ namespace EliminationEngine.GameObjects
 
             direction = Vector3.Normalize(direction);
 
-            return ParentHelper.GetAddedRot(this) * new Vector3(0, 0, -1) + Position;
+            return rot * new Vector3(0, 0, -1) + Position;
         }
 
         public Vector3 Up()

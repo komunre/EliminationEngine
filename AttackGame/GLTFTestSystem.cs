@@ -10,6 +10,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using EliminationEngine.Render;
+using EliminationEngine.Tools;
 
 namespace AttackGame
 {
@@ -17,13 +18,14 @@ namespace AttackGame
     {
         public GameObject GltfObject;
         private GameObject _camera;
+        private GameObject redLight;
         public override void OnLoad()
         {
             base.OnLoad();
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 4.5f, 0);
+            camera.Position = new Vector3(0, 4.5f, -10);
             camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
 
             Engine.AddGameObject(camera);
@@ -72,25 +74,29 @@ namespace AttackGame
 
             var secLight = new GameObject();
             var secLightComp = secLight.AddComponent<LightComponent>();
-            secLightComp.Diffuse = 30f;
-            secLightComp.Color = new EliminationEngine.Tools.Color(255, 0, 0, 255);
-            secLight.Position = new Vector3(10, 5, 0);
-            Engine.AddGameObject(light);
-            Engine.AddGameObject(secLight);
+            secLightComp.Diffuse = 20f;
+            secLightComp.Color = new EliminationEngine.Tools.Color(255, 255, 255, 255);
+            secLight.Position = new Vector3(0, 5, 0);
+            //Engine.AddGameObject(light);
+            //Engine.AddGameObject(secLight);
+            redLight = secLight;
 
             var parent = new GameObject();
             var parented = new GameObject();
             parent.Position = new Vector3(0, 1, 0);
 
-            parent.AddComponent<RotateDemoComponent>();
+            //parent.AddComponent<RotateDemoComponent>();
+            parent.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(123, 230, 0));
             parented.Position = new Vector3(0, 0, 0);
             parented.Scale = new Vector3(0.2f, 0.2f, 0.2f);
 
-            ModelHelper.AddGLTFMeshToObject(cubeData, ref parent);
+            //ModelHelper.AddGLTFMeshToObject(cubeData, ref parent);
             ModelHelper.AddGLTFMeshToObject(misshatData, ref parented);
 
             Engine.AddChildTo(parent, parented);
             Engine.AddGameObject(parent);
+
+            Engine.AddChildTo(camera, redLight);
         }
 
         public override void OnUpdate()
@@ -121,17 +127,25 @@ namespace AttackGame
                 dir += -Vector3.UnitY;
             }
             //_camera.Position += dir * 2f * Engine.DeltaTime;
-            _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
-            _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+
+            redLight.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+            redLight.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalMilliseconds * 0.001f) * 10.5f;
+
+            Console.Write("Camera: ");
+            Logger.LogVector(_camera.GlobalPosition);
+            Console.Write("Light: ");
+            Logger.LogVector(redLight.GlobalPosition);
+
+            
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
-            //_camera.LookAt(new Vector3(0, 0, 0)); // works too
+            _camera.LookAt(new Vector3(0, 0, 0)); // works too
 
             var rotateDemos = Engine.GetObjectsOfType<RotateDemoComponent>();
             foreach (var rotate in rotateDemos)
             {
                 rotate.Owner.Rotation *= EliminationMathHelper.QuaternionFromEuler(rotate.RotDir * Engine.DeltaTime);
             }
-            _camera.LookAt(rotateDemos[0].Owner.GlobalPosition);
+            //_camera.LookAt(rotateDemos[0].Owner.GlobalPosition);
         }
     }
 }

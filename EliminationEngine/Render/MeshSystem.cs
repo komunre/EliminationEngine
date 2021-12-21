@@ -100,18 +100,20 @@ namespace EliminationEngine.Render
                     var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
                     var lookAt = Matrix4.LookAt(cameraPos, forward, up);
                     mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix * 0.1f));
+                    mesh._shader.SetMatrix4("modelMatrix", matrix * trans * scale);
                     mesh._shader.SetVector3("viewPos", cameraPos);
+                    mesh._shader.SetVector3("worldPos", meshGroup.Owner.GlobalPosition);
 
                     var counter = 0;
                     for (var i = 0; i < lights.Length; i++)
                     {
                         var light = lights[i];
-                        if ((light.Owner.Position - meshGroup.Owner.Position).Length > MaxLightDistance)
+                        if ((light.Owner.GlobalPosition - meshGroup.Owner.GlobalPosition).Length > MaxLightDistance)
                         {
                             continue;
                         }
                         if (counter >= 20) break;
-                        mesh._shader.SetVector3("pointLights[" + counter + "].pos", light.Owner.Position);
+                        mesh._shader.SetVector3("pointLights[" + counter + "].pos", light.Owner.GlobalPosition);
                         mesh._shader.SetFloat("pointLights[" + counter + "].constant", light.Constant);
                         mesh._shader.SetFloat("pointLights[" + counter + "].linear", light.Diffuse);
                         mesh._shader.SetVector3("pointLights[" + counter + "].diffuse", new Vector3(light.Color.R, light.Color.G, light.Color.B));
