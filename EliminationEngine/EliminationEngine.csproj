@@ -33,8 +33,35 @@
 		<Copy SourceFiles="@(ShaderFiles)" DestinationFolder="$(OutDir)" />
 	</Target>
 
+	<ItemGroup>
+	  <Content Remove="Shaders\text.frag" />
+	  <Content Remove="Shaders\text.vert" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ShaderFiles Remove="Shaders\text.frag" />
+	  <ShaderFiles Remove="Shaders\text.vert" />
+	</ItemGroup>
+
   <ItemGroup>
     <Folder Include="res\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpFont\Source\SharpFont.GDI\SharpFont.Gdi.csproj" />
+    <ProjectReference Include="..\SharpFont\Source\SharpFont\SharpFont.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="freetype6.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\text.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\text.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -83,7 +83,8 @@ namespace AttackGame
 
             var secLight = new GameObject();
             var secLightComp = secLight.AddComponent<LightComponent>();
-            secLightComp.Diffuse = 20f;
+            secLightComp.Diffuse = 10f;
+            secLightComp.MaxAffectDstance = 10000f;
             secLightComp.Color = new EliminationEngine.Tools.Color(255, 255, 255, 255);
             secLight.Position = new Vector3(0, 5, 0);
             //Engine.AddGameObject(light);

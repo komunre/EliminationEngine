@@ -51,6 +51,9 @@ namespace EliminationEngine
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
             foreach (var system in Engine.RegisteredSystems.Values)
             {
                 system.OnLoad();

@@ -45,9 +45,32 @@ namespace EliminationEngine
             return data;
         }
 
-        public static ImageData LoadTextureFromImage(Image<Rgba32> image)
+        public static Image<Rgba32> MakeColorTransparent(Image<Rgba32> image, Rgba32 color)
         {
-            //image.Mutate(x => x.Flip(FlipMode.Vertical));
+            var im = image;
+            for (var y = 0; y < im.Height; y++)
+            {
+                var row = im.GetPixelRowSpan(y);
+
+                for (var x = 0; x < im.Width; x++)
+                {
+                    var pixel = row[x];
+                    if (pixel.Equals(color))
+                    {
+                        row[x] = Rgba32.ParseHex("#000000");
+                        row[x].A = 0;
+                    }
+                }
+            }
+            return im;
+        }
+
+        public static ImageData LoadTextureFromImage(Image<Rgba32> image, bool flip = false)
+        {
+            if (flip)
+            {
+                image.Mutate(x => x.Flip(FlipMode.Vertical));
+            }
 
             var pixels = new List<byte>(4 * image.Width * image.Height);
 

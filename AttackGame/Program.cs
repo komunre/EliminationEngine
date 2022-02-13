@@ -6,4 +6,5 @@ using EliminationEngine.GameObjects;
 Console.WriteLine("Hello, World!");
 var engine = new Elimination(800, 600);
 engine.RegisterSystem<GLTFTestSystem>();
+engine.RegisterSystem<TextTestSystem>();
 engine.Run();
