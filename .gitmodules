@@ -1,6 +1,3 @@
 [submodule "SharpFont"]
 	path = SharpFont
 	url = https://github.com/space-wizards/SharpFont.git
-[submodule "Avalonia"]
-	path = Avalonia
-	url = https://github.com/AvaloniaUI/Avalonia.git
