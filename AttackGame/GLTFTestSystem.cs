@@ -12,6 +12,8 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using EliminationEngine.Render;
 using EliminationEngine.Tools;
 using EliminationEngine.Systems;
+using SixLabors.ImageSharp.PixelFormats;
+using OpenTK.Input;
 
 namespace AttackGame
 {
@@ -21,6 +23,7 @@ namespace AttackGame
         private GameObject? _camera;
         private GameObject? redLight;
         private SoundSystem _soundSystem;
+        private GameObject oof;
 
         public GLTFTestSystem(Elimination e) : base(e)
         {
@@ -34,8 +37,8 @@ namespace AttackGame
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 4.5f, -10);
-            camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(-35, 0, 0));
+            camera.Position = new Vector3(0, 1, -5);
+            camera.LookAt(new Vector3(0, 0, 0));
 
             Engine.AddGameObject(camera);
             _camera = camera;
@@ -51,7 +54,7 @@ namespace AttackGame
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 
-            obj.Position = new OpenTK.Mathematics.Vector3(0, 0, 0);
+            obj.Position = new OpenTK.Mathematics.Vector3(0, -2, 0);
             //obj.Rotation = OpenTK.Mathematics.Quaternion.FromEulerAngles(0.2f, 0.3f, 0);
             obj.Scale = new Vector3(1f, 1f, 1f);
 
@@ -63,16 +66,27 @@ namespace AttackGame
             //Engine.AddGameObject(dummyBottle);
 
             var cubeData = ModelParser.ParseGLTFExternal("res/cube.glb");
-            /*for (var i = 0; i < 15; i++)
+            var basic = SixLabors.ImageSharp.Image.Load<Rgba32>("res/basic.png");
+            for (var i = 0; i < 25; i++)
             {
                 var obj2 = new GameObject();
                 var random = new Random();
                 obj2.Position = new Vector3(random.Next(-10, 10), random.Next(-10, 10), random.Next(-10, 10));
-                ModelHelper.AddGLTFMeshToObject(cubeData, ref obj2);
+                var sprGenTemp = obj2.AddComponent<SpriteGenerator>();
+                sprGenTemp.GenerateMesh(basic);
+                obj2.LookAt(new Vector3(0, 0, 0));
                 //var l = obj2.AddComponent<LightComponent>();
                 //l.Diffuse = 150;
                 Engine.AddGameObject(obj2);
-            }*/
+            }
+
+            var sprite = new GameObject();
+            var sprGen = sprite.AddComponent<SpriteGenerator>();
+            sprGen.GenerateMesh(basic);
+            sprite.Position = new Vector3(0, 5, 0);
+            Engine.AddGameObject(sprite);
+            oof = sprite;
+            //sprite.LookAt(camera.Position);
 
             GltfObject = obj;
 
@@ -145,10 +159,13 @@ namespace AttackGame
             }
 
 
+            oof.Rotation *= EliminationMathHelper.QuaternionFromEuler(new Vector3(0, 0.3f, 0));
+
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
             if (_camera != null)
             {
-                _camera.LookAt(new Vector3(0, 0, 0)); // works too
+                //_camera.LookAt(new Vector3(0, 0, 0)); // works too
+                //_camera.Rotation *= EliminationMathHelper.QuaternionFromEuler(new Vector3(0, 1f, 0));
             }
 
             var rotateDemos = Engine.GetObjectsOfType<RotateDemoComponent>();
@@ -161,6 +178,12 @@ namespace AttackGame
 
             if (Engine.KeyState.IsKeyDown(Keys.O)) {
                 _soundSystem.GenSound(1046, SoundType.Noise, 100, 1);
+            }
+
+            if (Engine.MouseState.PreviousPosition != Engine.MouseState.Position)
+            {
+                var delta = (Engine.MouseState.Position - Engine.MouseState.PreviousPosition) * 0.2f;
+                _camera.Rotation *= EliminationMathHelper.QuaternionFromEuler(new Vector3(delta.Y, delta.X, 0));
             }
         }
     }

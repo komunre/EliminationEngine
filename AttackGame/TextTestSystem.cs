@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EliminationEngine;
 using EliminationEngine.GameObjects;
 using EliminationEngine.Render;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace AttackGame
 {
@@ -20,14 +21,17 @@ namespace AttackGame
             base.OnLoad();
 
             var tobj = new GameObject();
-            var tcomp = tobj.AddComponent<TextComponent>();
-            tobj.Position = new OpenTK.Mathematics.Vector3(-100, 0, 0);
-            tobj.AddComponent<RotateDemoComponent>();
-            tcomp.Font = new SharpFont.Face(Engine.GetSystem<TextSystem>().Lib, "res/Oswald-Regular.ttf");
-            tcomp.Text = "Hello text!";
-            tcomp.Changed = true;
-            tcomp.OnScreen = true;
-            tcomp.Size = 40;
+            var tcomp = tobj.AddComponent<UIWidget>();
+            var sprGen = tobj.AddComponent<SpriteGenerator>();
+            tcomp.Text = "Hello World!";
+            tcomp.Size = 80;
+            tcomp.Font = new SharpFont.Face(new SharpFont.Library(), "res/Oswald-Regular.ttf");
+            var cameras = Engine.GetObjectsOfType<CameraComponent>()?.Select(e => { if (e.Active) return e; else return null; });
+            var camera = cameras.ElementAt(0);
+            tcomp.RegenerateAll(camera);
+
+            tobj.Scale = new OpenTK.Mathematics.Vector3(1, 0.4f, 1);
+            tobj.Position = new OpenTK.Mathematics.Vector3(-1, 0, 0);
 
             Engine.AddGameObject(tobj);
         }

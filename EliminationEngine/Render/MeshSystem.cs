@@ -43,7 +43,10 @@ namespace EliminationEngine.Render
                 mesh._texCoordBuffer = GL.GenBuffer();
                 mesh._normalsBuffer = GL.GenBuffer();
 
-                mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+                if (mesh._shader == null)
+                {
+                    mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+                }
 
                 GL.BindVertexArray(mesh._vertexArr);
 

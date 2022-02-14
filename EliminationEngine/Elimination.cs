@@ -22,6 +22,7 @@ namespace EliminationEngine
         public float DeltaTime = 0;
         public TimeSpan Elapsed = new TimeSpan(0);
         public KeyboardState KeyState;
+        public MouseState MouseState;
 
         public Elimination(int width, int height)
         {
@@ -33,13 +34,14 @@ namespace EliminationEngine
             native.Flags = OpenTK.Windowing.Common.ContextFlags.ForwardCompatible;
             window = new EliminationWindow(settings, native, this);
             KeyState = window.KeyboardState;
+            MouseState = window.MouseState;
         }
         public void Run()
         {
             if (window == null) throw new InvalidDataException("No window was opened");
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
-            RegisterSystem<TextSystem>();
+            RegisterSystem<UISystem>();
             window.Run();
         }
 
@@ -47,7 +49,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warning("Start the engine before accessing gameobjects");
+                Logger.Warn("Start the engine before accessing gameobjects");
                 return;
             }
             if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
@@ -84,7 +86,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warning("Start the engine before accessing gameobjects");
+                Logger.Warn("Start the engine before accessing gameobjects");
                 return null;
             }
             return window.GetObjectsOfType<CompType>();

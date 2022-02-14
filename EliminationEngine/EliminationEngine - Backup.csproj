@@ -34,15 +34,13 @@
 	</Target>
 
 	<ItemGroup>
-	  <Content Remove="Shaders\onscreen.vert" />
 	  <Content Remove="Shaders\text.frag" />
-	  <Content Remove="Shaders\unlit.vert" />
+	  <Content Remove="Shaders\text.vert" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ShaderFiles Remove="Shaders\onscreen.vert" />
 	  <ShaderFiles Remove="Shaders\text.frag" />
-	  <ShaderFiles Remove="Shaders\unlit.vert" />
+	  <ShaderFiles Remove="Shaders\text.vert" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -58,13 +56,10 @@
     <None Update="freetype6.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Shaders\onscreen.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Shaders\text.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Shaders\unlit.vert">
+    <None Update="Shaders\text.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
