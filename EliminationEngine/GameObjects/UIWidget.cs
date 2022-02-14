@@ -25,12 +25,14 @@ namespace EliminationEngine.GameObjects
         public Face? Font = null;
         public uint Size = 30;
         public Image<Rgba32> DrawImage;
-        public Image<Rgba32> TextImage;
+        public Image<Rgba32> TextImage; // Actually used for generation
         
         public float RelX = 0;
         public float RelY = 0;
-
+        
+        [Obsolete("Usse scale instead")]
         public float Width = 50;
+        [Obsolete("Usse scale instead")]
         public float Height = 50;
 
         public int VertBuff = 0;
@@ -40,6 +42,11 @@ namespace EliminationEngine.GameObjects
         public int TextTextureIdent = 0;
 
         public bool Changed = false;
+        public bool OnScreen = true;
+        public bool Pressed = false;
+
+        public delegate void OnWidgetClick();
+        public event OnWidgetClick OnClick;
 
         public void ImageFromColor(Rgba32 color)
         {
@@ -54,7 +61,7 @@ namespace EliminationEngine.GameObjects
             }
         }
 
-        public void RegenerateAll(CameraComponent camera, bool onScreen = true)
+        public void RegenerateAll(CameraComponent camera)
         {
             GenerateText();
 
@@ -63,8 +70,8 @@ namespace EliminationEngine.GameObjects
             {
                 sprGen = Owner.AddComponent<SpriteGenerator>();
             }
-            sprGen.GenerateMesh(TextImage, onScreen);
-            if (!onScreen)
+            sprGen.GenerateMesh(TextImage, OnScreen);
+            if (!OnScreen)
             {
                 sprGen.Owner.Parent = camera.Owner;
             }
@@ -86,6 +93,12 @@ namespace EliminationEngine.GameObjects
             var loaded = SixLabors.ImageSharp.Image.Load<Rgb24>(memStream, new PngDecoder());
             TextImage = loaded.CloneAs<Rgba32>();
             TextImage = ImageLoader.MakeColorTransparent(TextImage, Rgba32.ParseHex("#000000"));
+        }
+
+        public void OnClickCall()
+        {
+            if (OnClick == null) return;
+            OnClick.Invoke();
         }
     }
 }

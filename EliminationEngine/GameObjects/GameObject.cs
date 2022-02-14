@@ -18,6 +18,7 @@ namespace EliminationEngine.GameObjects
     }
     public class GameObject
     {
+        public string Name = "Default";
         public GameObject? Parent = null;
         public List<GameObject> Children = new List<GameObject>();
 
@@ -103,6 +104,11 @@ namespace EliminationEngine.GameObjects
             }
             component = null;
             return false;
+        }
+
+        public bool HasComponent<CompType>() where CompType : EntityComponent
+        {
+            return Components.ContainsKey(typeof(CompType));
         }
     }
 }

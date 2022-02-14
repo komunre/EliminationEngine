@@ -33,13 +33,13 @@ namespace AttackGame
         {
             base.OnLoad();
 
-            Engine.LockCursor();
+            // Engine.LockCursor();
 
             _soundSystem = Engine.GetSystem<SoundSystem>();
 
             var camera = new GameObject();
             camera.AddComponent<CameraComponent>();
-            camera.Position = new Vector3(0, 1, -5);
+            camera.Position = new Vector3(0.1f, 1, -5);
             camera.LookAt(new Vector3(0, 0, 0));
 
             Engine.AddGameObject(camera);
@@ -47,11 +47,14 @@ namespace AttackGame
 
             var data = ModelParser.ParseGLTFExternal("res/ocean.glb");
             var obj = new GameObject();
+            obj.Name = "Ocean";
+            var hitBoxOceaan = obj.AddComponent<HitBox>();
+            hitBoxOceaan.AddBox(new Box3(new Vector3(-5, -0.1f, -5), new Vector3(5, 0.1f, 5)));
             var second = new GameObject();
-            //var dummyBottle = new GameObject();
-            //dummyBottle.Position = new Vector3(0, 6, 0);
+            second.Name = "misshat";
+            var misshatHitbox = second.AddComponent<HitBox>();
+            misshatHitbox.AddBox(new Box3(new Vector3(-1, 0, -1), new Vector3(-1, 0, -1)));
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
-            //ModelHelper.AddGLTFMeshToObject(data, ref dummyBottle);
 
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
@@ -200,6 +203,16 @@ namespace AttackGame
             if (Engine.KeyState.IsKeyDown(Keys.Escape))
             {
                 Engine.StopEngine();
+            }
+
+            if (Engine.MouseState.IsButtonDown(MouseButton.Left))
+            {
+                var resultList = Engine.GetSystem<Raycast>().RaycastFromCameraCenter(40);
+                var result = resultList[0];
+                if (result.Hit)
+                {
+                    Logger.Info(result.HitObject.Name);
+                }
             }
         }
     }

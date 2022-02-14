@@ -42,6 +42,7 @@ namespace EliminationEngine
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
             RegisterSystem<UISystem>();
+            RegisterSystem<Raycast>();
             window.Run();
         }
 
@@ -117,10 +118,22 @@ namespace EliminationEngine
             window.CursorGrabbed = !window.CursorGrabbed;
         }
 
+        public bool GetCursorLockState()
+        {
+            if (window == null) return false;
+            return window.CursorGrabbed;
+        }
+
         public void StopEngine()
         {
             if (window == null) return;
             window.Close();
+        }
+
+        public GameObject[]? GetAllObjects()
+        {
+            if (window == null) return null;
+            return window.GameObjects.ToArray();
         }
     }
 }
