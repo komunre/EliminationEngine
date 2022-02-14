@@ -57,7 +57,10 @@ namespace EliminationEngine
             foreach (var system in Engine.RegisteredSystems.Values)
             {
                 system.OnLoad();
+            }
 
+            foreach (var system in Engine.RegisteredSystems.Values)
+            {
                 system.PostLoad();
             }
         }
@@ -66,11 +69,6 @@ namespace EliminationEngine
             stopwatch.Start();
 
             Engine.KeyState = KeyboardState;
-
-            if (KeyboardState.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape))
-            {
-                Close();
-            }
 
             foreach (var system in Engine.RegisteredSystems.Values)
             {

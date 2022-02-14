@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ManagedBass;
+using EliminationEngine.Tools;
 
 namespace EliminationEngine.Systems
 {
@@ -19,6 +21,7 @@ namespace EliminationEngine.Systems
     {
         protected ALContext? Context;
 
+        protected List<int> Handles = new();
         protected Dictionary<int, float> Sources = new();
         protected Dictionary<int, float> Buffers = new();
 
@@ -26,9 +29,30 @@ namespace EliminationEngine.Systems
         {
         }
 
-        public void PlaySound()
+        public override void OnLoad()
         {
-            throw new NotImplementedException();
+            base.OnLoad();
+
+            if (!Bass.Init())
+            {
+                Logger.Error("Unable to initialize bass: " + Bass.LastError);
+            }
+        }
+
+        public int PlaySound(Stream stream)
+        {
+            var handle = Bass.CreateStream(StreamHelper.ReadFully(stream), 0, stream.Length, BassFlags.Default);
+            if (handle == 0)
+            {
+                Logger.Warn("Sound handle creation error: " + Bass.LastError);
+                return 0;
+            }
+            Handles.Add(handle);
+            if (!Bass.ChannelPlay(handle))
+            {
+                Logger.Warn("No sound was played: " + Bass.LastError);
+            }
+            return handle;
         }
 
         public void GenSound(int freq, SoundType type, float ampl, float length)

@@ -21,8 +21,12 @@
 		<ResFiles Include="res\**"></ResFiles>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ResFiles Remove="res\Kevin_Hartnell_Rogue_Planet.mp3" />
+	</ItemGroup>
+
 	<Target Name="CopyCustomContent" AfterTargets="AfterResGen">
-		<Copy SourceFiles="@(ResFiles)" DestinationFolder="$(OutDir)"/>
+		<Copy SourceFiles="@(ResFiles)" DestinationFolder="$(OutDir)" />
 	</Target>
 	
 </Project>

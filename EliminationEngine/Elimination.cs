@@ -98,5 +98,29 @@ namespace EliminationEngine
             parent.Children.Add(child);
             AddGameObject(child);
         }
+
+        public void LockCursor()
+        {
+            if (window == null) return;
+            window.CursorGrabbed = true;
+        }
+
+        public void UnlockCursor()
+        {
+            if (window == null) return;
+            window.CursorGrabbed = false;
+        }
+
+        public void ToggleCursor()
+        {
+            if (window == null) return;
+            window.CursorGrabbed = !window.CursorGrabbed;
+        }
+
+        public void StopEngine()
+        {
+            if (window == null) return;
+            window.Close();
+        }
     }
 }

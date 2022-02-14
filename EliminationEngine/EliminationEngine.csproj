@@ -13,10 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ManagedBass" Version="3.1.0" />
     <PackageReference Include="OpenTK" Version="4.6.7" />
     <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0023" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
-    <PackageReference Include="VulkanSharp" Version="0.1.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="bass.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="freetype6.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
