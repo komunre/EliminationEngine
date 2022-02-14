@@ -115,7 +115,7 @@ namespace EliminationEngine.Render
                     GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._buffer);
                     GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsageHint.StaticDraw);
 
-                    var cameraPos = ParentHelper.GetAddedPos(camera.Owner);
+                    var cameraPos = camera.Owner.GlobalPosition;
 
                     mesh._shader.Use();
                     var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition);

@@ -135,5 +135,20 @@ namespace EliminationEngine
             if (window == null) return null;
             return window.GameObjects.ToArray();
         }
+
+        public int CreateWorld()
+        {
+            return window.CreateWorld();
+        }
+
+        public void SwitchWorld(int world)
+        {
+            window.SwitchWorld(world);
+        }
+
+        public void RemoveWorld(int world)
+        {
+            window.RemoveWorld(world);
+        }
     }
 }

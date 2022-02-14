@@ -47,7 +47,7 @@ namespace EliminationEngine.GameObjects
 
         public Vector3 Up()
         {
-            return Vector3.Cross(Forward(), Right());
+            return Vector3.Cross(Forward(), new Vector3(-1, 0, 0));
         }
 
         public Vector3 Right()

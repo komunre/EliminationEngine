@@ -16,12 +16,37 @@ namespace EliminationEngine
 {
     public class EliminationWindow : GameWindow
     {
+        public int WorldCounter = 0;
+        public int CurrentWorld = 0;
+        public Dictionary<int, List<GameObject>> WorldObjects = new();
         public List<GameObject> GameObjects = new();
         public Elimination Engine;
         protected Stopwatch stopwatch = new();
         public EliminationWindow(GameWindowSettings settings, NativeWindowSettings nativeSettings, Elimination engine) : base(settings, nativeSettings)
         {
             Engine = engine;
+            CreateWorld();
+        }
+
+        public int CreateWorld()
+        {
+            WorldObjects.Add(WorldCounter, new List<GameObject>());
+            return WorldCounter++;
+        }
+
+        public void SwitchWorld(int world)
+        {
+            if (!WorldObjects.ContainsKey(world))
+            {
+                Logger.Error("Can not load world (does not exist): " + world);
+            }
+            CurrentWorld = world;
+            GameObjects = WorldObjects[world];
+        }
+
+        public void RemoveWorld(int world)
+        {
+            WorldObjects.Remove(world);
         }
 
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent

@@ -13,7 +13,7 @@ namespace EliminationEngine.Render
         {
         }
 
-        public override void OnLoad()
+        public override void PostLoad()
         {
             base.OnDraw();
 
