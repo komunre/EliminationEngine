@@ -21,6 +21,7 @@ namespace EliminationEngine.GameObjects
         public string Name = "Default";
         public GameObject? Parent = null;
         public List<GameObject> Children = new List<GameObject>();
+        public Color BaseColor = new Color(255, 255, 255, 255);
 
         public Vector3 GlobalPosition => ParentHelper.GetAddedPos(this);
         public Quaternion GlobalRotation => ParentHelper.GetAddedRot(this);
@@ -43,6 +44,15 @@ namespace EliminationEngine.GameObjects
             var rot = GlobalRotation;
 
             return rot * new Vector3(0, 0, -1) + GlobalPosition;
+        }
+
+        public Vector3 ForwardIsolated()
+        {
+            var direction = Vector3.Zero;
+
+            var rot = GlobalRotation;
+
+            return rot * new Vector3(0, 0, -1);
         }
 
         public Vector3 Up()

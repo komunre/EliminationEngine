@@ -3,6 +3,7 @@ using EliminationEngine;
 using OpenTK.Mathematics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using EliminationEngine.Tools;
 
 namespace AttackGame.Game
 {
@@ -29,6 +30,16 @@ namespace AttackGame.Game
                         hwc.SetDestination(howarh.Position);
                         var sprite = howarh.AddComponent<SpriteGenerator>();
                         sprite.GenerateMesh((Image<Rgba32>)Image.Load("res/howarh.png"), false);
+
+                        if (spawner.Red)
+                        {
+                            howarh.BaseColor = new EliminationEngine.Tools.Color(255, 0, 0, 255);
+                        }
+                        else
+                        {
+                            howarh.BaseColor = new EliminationEngine.Tools.Color(0, 0, 255, 255);
+                        }
+
                         Engine.AddGameObject(howarh);
                     }
 

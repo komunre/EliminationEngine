@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
 
 namespace EliminationEngine.Tools
 {
-    public class RayHit
+    public struct RayHit
     {
         public bool Hit = false;
         public GameObject? HitObject = null;
@@ -39,93 +41,153 @@ namespace EliminationEngine.Tools
         }
 
 
-        public List<RayHit> RaycastFromPos(Vector3 pos, Quaternion angle, float maxDist = 1000)
+        public RayHit[] RaycastFromPos(Vector3 pos, Vector3 dir, float maxDist = 1000, uint maxHits = 2)
         {
-            var localAngle = angle;
-            var delta = angle * pos;
-            delta.Normalize();
-            delta *= -1;
+            var delta = dir;
 
             var hitboxes = Engine.GetObjectsOfType<HitBox>();
 
-            var hits = new List<RayHit>();
+            var hits = new RayHit[maxHits];
+            var hitsCount = 0;
 
             foreach (var hitbox in hitboxes)
             {
                 foreach (var box in hitbox.GetBoxes())
                 {
-                    float txmin = box.Min.X - pos.X / delta.X;
-                    float txmax = box.Max.X - pos.X / delta.X;
 
-                    if (txmin > txmax)
+                    float x1;
+                    float x2;
+                    if (delta.X >= 0)
                     {
-                        var temp = txmin;
-                        txmin = txmax;
-                        txmax = temp;
+                        x1 = box.Bounds.Min.X;
+                        x2 = box.Bounds.Max.X;
+                    }
+                    else
+                    {
+                        x1 = box.Bounds.Max.X;
+                        x2 = box.Bounds.Min.X;
+                    }
+                    float tmin = (x1 + hitbox.Owner.Position.X - pos.X) / delta.X;
+                    float tmax = (x2 + hitbox.Owner.Position.X - pos.X) / delta.X;
+
+                    var prevx = tmin;
+
+                    float y1;
+                    float y2;
+                    if (delta.Y >= 0)
+                    {
+                        y1 = box.Bounds.Min.Y;
+                        y2 = box.Bounds.Max.Y;
+                    }
+                    else
+                    {
+                        y1 = box.Bounds.Max.Y;
+                        y2 = box.Bounds.Min.Y;
                     }
 
-                    float tymin = box.Min.Y - pos.Y / delta.Y;
-                    float tymax = box.Max.Y - pos.Y / delta.Y;
+                    float tymin = (y1 + hitbox.Owner.Position.Y - pos.Y) / delta.Y;
+                    float tymax = (y2 + hitbox.Owner.Position.Y - pos.Y) / delta.Y;
 
-                    if (txmin > tymax || tymin > tymax)
-                    {
+                    if ((tmin > tymax) || (tymin > tmax))
                         continue;
-                    }
+                    if (tymin > tmin)
+                        tmin = tymin;
+                    if (tymax < tmax)
+                        tmax = tymax;
 
-                    if (tymin > txmin)
+                    float z1;
+                    float z2;
+                    if (delta.Z >= 0)
                     {
-                        txmin = tymin;
+                        z1 = box.Bounds.Min.Z;
+                        z2 = box.Bounds.Max.Z;
                     }
-
-                    if (tymax < txmax)
+                    else
                     {
-                        txmax = tymax;
+                        z1 = box.Bounds.Max.Z;
+                        z2 = box.Bounds.Min.Z;
                     }
 
-                    float tzmin = box.Min.Z - pos.Z / delta.Z;
-                    float tzmax = box.Max.Z - pos.Z / delta.Z;
+                    float tzmin = (z1 + hitbox.Owner.Position.Z - pos.Z) / delta.Z;
+                    float tzmax = (z2 + hitbox.Owner.Position.Z - pos.Z) / delta.Z;
 
-                    if (tzmin > tzmax)
-                    {
-                        var temp = tzmin;
-                        tzmin = tzmax;
-                        tzmax = temp;
-                    }
-
-                    if ((txmin > tzmax) || (tzmin > txmax))
+                    if ((tmin > tzmax) || (tzmin > tmax))
                         continue;
+                    if (tzmin > tmin)
+                        tmin = tzmin;
+                    if (tzmax < tmax)
+                        tmax = tzmax;
 
-                    if (tzmin > txmin)
-                        txmin = tzmin;
 
-                    if (tzmax < txmax)
-                        txmax = tzmax;
 
-                    hits.Add(new RayHit(true, hitbox.Owner, (box.Center - pos).Length, pos, box.Center));
+                    var hitPos = pos + delta * tmin;
+                    hits[hitsCount] = new RayHit(true, hitbox.Owner, tmin, pos, hitPos);
+                    hitsCount++;
+                    if (hitsCount >= maxHits)
+                    {
+                        return hits;
+                    }
                 }
 
             }
 
-            if (hits.Count < 1)
+            if (hitsCount < 1)
             {
-                return new List<RayHit>() { new RayHit(false, null, 0, pos, Vector3.Zero) };
+                return new RayHit[] { new RayHit(false, null, 0, pos, Vector3.Zero) };
             }
             return hits;
         }
 
-        public List<RayHit> RaycastFromObject(GameObject obj, float maxDist = 1000)
+        public RayHit[] RaycastFromObject(GameObject obj, float maxDist = 1000)
         {
-            return RaycastFromPos(obj.Position, obj.Rotation, maxDist);
+            var dir = obj.ForwardIsolated();
+            dir.Normalize();
+            return RaycastFromPos(obj.Position, dir, maxDist);
         }
 
-        public List<RayHit> RaycastFromCameraCenter(float maxDist = 1000)
+        public RayHit[] RaycastFromCameraCenter(float maxDist = 1000)
         {
             var cameras = Engine.GetObjectsOfType<CameraComponent>()?.Select(e => { if (e.Active) return e; else return null; });
-            if (cameras == null) return new List<RayHit>() { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
+            if (cameras == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
             var camera = cameras.ElementAt(0);
-            if (camera == null) return new List<RayHit>() { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
+            if (camera == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
 
             return RaycastFromObject(camera.Owner, maxDist);
+        }
+
+        public RayHit[] RaycastFromCameraCursor(float maxDist = 1000)
+        {
+            var cameras = Engine.GetObjectsOfType<CameraComponent>()?.Select(e => { if (e.Active) return e; else return null; });
+            if (cameras == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
+            var camera = cameras.ElementAt(0);
+            if (camera == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
+
+            var camPos = camera.Owner.Position;
+            var forward = camera.Owner.Forward();
+            var up = camera.Owner.Up();
+
+            var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
+            var lookAt = Matrix4.LookAt(camera.Owner.GlobalPosition, forward, up);
+            var viewMatrix = lookAt * (fovMatrix);
+            var mousePos = Engine.MouseState.Position;
+            var newMousePos = mousePos;
+            newMousePos.X = 2f * mousePos.X / camera.Width - 1;
+            newMousePos.Y = 2f * mousePos.Y / camera.Height - 1;
+            newMousePos.Y *= -1;
+            var coords = new Vector4(newMousePos.X, newMousePos.Y, -1, 1);
+
+            fovMatrix.Invert();
+            var eyeCoords = fovMatrix * coords;
+            var eyeCoords2 = new Vector4(eyeCoords.X, eyeCoords.Y, -1, 1);
+
+            lookAt.Invert();
+
+            var rayWorld = lookAt * eyeCoords2;
+            var mouseRay = new Vector3(rayWorld.X, rayWorld.Y, rayWorld.Z);
+
+            mouseRay.Normalize();
+
+            return RaycastFromPos(camera.Owner.GlobalPosition, mouseRay);
         }
     }
 }

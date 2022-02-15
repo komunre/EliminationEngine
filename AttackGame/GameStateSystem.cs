@@ -69,7 +69,7 @@ namespace AttackGame
                 var map = new GameObject();
                 var mapData = ModelParser.ParseGLTFExternal("res/map.glb");
                 var boxes = map.AddComponent<HitBox>();
-                boxes.AddBox(new Box3(new Vector3(-20, -1, -20), new Vector3(20, 1, 20)));
+                boxes.AddBox(new Box3(new Vector3(-1090, -1, -1090), new Vector3(1090, 1, 1090)));
                 ModelHelper.AddGLTFMeshToObject(mapData, ref map);
                 map.Position = new Vector3(0, 0, 0);
 
@@ -87,6 +87,7 @@ namespace AttackGame
                 var lightComp = light.AddComponent<LightComponent>();
                 lightComp.Diffuse = 8;
                 lightComp.MaxAffectDstance = 1000;
+                lightComp.Constant = 10;
                 light.Position = new Vector3(0, 80, 0);
 
                 Engine.AddGameObject(map);

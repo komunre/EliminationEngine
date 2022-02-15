@@ -6,6 +6,7 @@ uniform vec3 worldPos;
 uniform mat4 modelMatrix;
 
 out vec2 TexCoord;
+out vec3 AddFragColor;
 
 void main()
 {

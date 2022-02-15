@@ -49,11 +49,11 @@ namespace AttackGame
             var obj = new GameObject();
             obj.Name = "Ocean";
             var hitBoxOceaan = obj.AddComponent<HitBox>();
-            hitBoxOceaan.AddBox(new Box3(new Vector3(-5, -0.1f, -5), new Vector3(5, 0.1f, 5)));
+            hitBoxOceaan.AddBox(new Box3(new Vector3(-5, -0.1f, -5), new Vector3(5, 0.1f, 5)), true);
             var second = new GameObject();
             second.Name = "misshat";
             var misshatHitbox = second.AddComponent<HitBox>();
-            misshatHitbox.AddBox(new Box3(new Vector3(-1, 0, -1), new Vector3(-1, 0, -1)));
+            misshatHitbox.AddBox(new Box3(new Vector3(-1, 0, -1), new Vector3(-1, 0, -1)), true);
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
 
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
+using EliminationEngine.Physics;
 using EliminationEngine.Render;
 using EliminationEngine.Systems;
 using EliminationEngine.Tools;
@@ -23,6 +24,9 @@ namespace EliminationEngine
         public TimeSpan Elapsed = new TimeSpan(0);
         public KeyboardState KeyState;
         public MouseState MouseState;
+
+        public delegate void ObjectCreateEvent(GameObject obj, int world);
+        public event ObjectCreateEvent OnObjectCreate;
 
         public Elimination(int width, int height)
         {
@@ -43,6 +47,8 @@ namespace EliminationEngine
             RegisterSystem<SoundSystem>();
             RegisterSystem<UISystem>();
             RegisterSystem<Raycast>();
+            RegisterSystem<CollisionSystem>();
+            RegisterSystem<RemovalSystem>();
             window.Run();
         }
 
@@ -59,6 +65,20 @@ namespace EliminationEngine
                 meshSys?.LoadMeshGroup(comp);
             }
             window.GameObjects.Add(obj);
+            if (OnObjectCreate != null)
+            {
+                OnObjectCreate.Invoke(obj, window.CurrentWorld);
+            }
+        }
+
+        public void RemoveGameObject(GameObject obj)
+        {
+            if (window == null)
+            {
+                Logger.Warn("Start the engine before accessing gameobjects");
+                return;
+            }
+            window.GameObjects.Remove(obj);
         }
 
         public void RegisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem

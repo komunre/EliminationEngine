@@ -44,7 +44,7 @@ namespace AttackGame.Game
                 dir.X -= 1;
             }
 
-            camera.Owner.Position += dir * 2 * Engine.DeltaTime;
+            camera.Owner.Position += dir * 5 * Engine.DeltaTime;
         }
     }
 }

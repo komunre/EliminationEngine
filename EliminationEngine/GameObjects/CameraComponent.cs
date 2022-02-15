@@ -13,6 +13,7 @@ namespace EliminationEngine.GameObjects
         {
 
         }
+        public int FoV = 80;
         public bool Active = true;
         public int Width = 800;
         public int Height = 600;

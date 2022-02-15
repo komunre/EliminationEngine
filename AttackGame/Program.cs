@@ -10,4 +10,5 @@ engine.RegisterSystem<GameStateSystem>();
 engine.RegisterSystem<HowarhSystem>();
 engine.RegisterSystem<SpawnSystem>();
 engine.RegisterSystem<CameraSystem>();
+engine.RegisterSystem<MouseControlsSystem>();
 engine.Run();

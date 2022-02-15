@@ -121,9 +121,9 @@ namespace EliminationEngine.Render
                     var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition);
                     var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.GlobalRotation);
                     var scale = Matrix4.CreateScale(meshGroup.Owner.GlobalScale);
-                    var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(80), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
+                    var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
                     var lookAt = Matrix4.LookAt(cameraPos, forward, up);
-                    mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix * 0.1f));
+                    mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));
                     mesh._shader.SetMatrix4("modelMatrix", matrix * trans * scale);
                     mesh._shader.SetVector3("viewPos", cameraPos);
                     mesh._shader.SetVector3("worldPos", meshGroup.Owner.GlobalPosition);
@@ -147,6 +147,9 @@ namespace EliminationEngine.Render
                         }
                     }
                     mesh._shader.SetInt("lightsNum", counter);
+
+                    var col = meshGroup.Owner.BaseColor;
+                    mesh._shader.SetVector3("addColor", new Vector3(col.R, col.G, col.B));
 
                     GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
                     GL.BindVertexArray(mesh._vertexArr);
