@@ -22,12 +22,6 @@ namespace EliminationEngine.GameObjects
             {
                 meshGroup = Owner.AddComponent<MeshGroupComponent>();
             }
-            if (!Owner.TryGetComponent<LightComponent>(out _))
-            {
-                var light = Owner.AddComponent<LightComponent>();
-                light.Diffuse = 100;
-                light.MaxAffectDstance = 1;
-            }
 
             var mesh = new Mesh();
             mesh.Vertices = new float[4 * 3]
