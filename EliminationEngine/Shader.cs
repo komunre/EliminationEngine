@@ -142,6 +142,12 @@ namespace EliminationEngine
             //GL.Uniform3(_uniformLocations[name], data);
         }
 
+        public void SetVector4(string name, Vector4 data)
+        {
+            GL.UseProgram(Handle);
+            GL.Uniform4(GetUniformLocation(name), data);
+        }
+
         public void SetFloatUniform(string name, float[] data)
         {
             GL.UseProgram(Handle);

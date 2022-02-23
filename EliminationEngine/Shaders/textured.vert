@@ -3,14 +3,22 @@
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec2 aTexCoord;
 layout(location = 2) in vec3 aNormal;
+layout(location = 3) in vec4 aWeights;
+layout(location = 4) in vec4 aJoints;
 uniform mat4 mvpMatrix;
 uniform mat4 modelMatrix;
 uniform vec3 viewPos;
 uniform vec3 worldPos;
+uniform vec4 anim;
 out vec2 texCoord;
 out vec3 fragPos;
 out vec3 normal;
 out vec4 fragAddColor;
+
+#define MAX_JOINTS 80
+uniform mat4 in_jointsTransform[MAX_JOINTS];
+
+#define MAX_WEIGHTS 3
 
 struct PointLight {
     vec3 pos;
@@ -58,5 +66,16 @@ void main(void)
     normal = aNormal;
     fragPos = aPosition;
     texCoord = aTexCoord;
-    gl_Position = vec4(aPosition, 1.0) * mvpMatrix;
+
+    mat4 skinMatrix = 
+        aWeights.x * in_jointsTransform[int(aJoints.x)] + 
+        aWeights.y * in_jointsTransform[int(aJoints.y)] +
+        aWeights.z * in_jointsTransform[int(aJoints.z)] +
+        aWeights.w * in_jointsTransform[int(aJoints.w)];
+
+    vec4 animated = vec4(aPosition, 1.0) * modelMatrix * skinMatrix;
+
+    fragAddColor *= skinMatrix;
+
+    gl_Position =  animated * mvpMatrix;
 }

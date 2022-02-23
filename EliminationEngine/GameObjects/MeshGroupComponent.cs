@@ -15,6 +15,7 @@ namespace EliminationEngine.GameObjects
     public class MeshGroupComponent : EntityComponent
     {
         public List<Mesh> Meshes = new();
+        public Animator Animator = new();
 
         public MeshGroupComponent(GameObject o) : base(o)
         {

@@ -55,9 +55,9 @@ namespace AttackGame.Game
 
                 var hitPos = Engine.GetSystem<Raycast>().RaycastFromCameraCursor()[0].EndPos;
                 //var hitPos = Engine.GetSystem<Raycast>().RaycastFromPos(new Vector3(0.1f, 15, 0.1f), EliminationMathHelper.QuaternionFromEuler(new Vector3(0, -1, 0)))[0].EndPos;
-                Logger.Info(hitPos.X + ":" + hitPos.Y + ":" + hitPos.Z);
+                Logger.Info(Radius.ToString());
                 SelectVisual.Position = hitPos;
-                //SelectVisual.Scale = new Vector3(Radius, Radius, Radius);
+                SelectVisual.Scale = new Vector3(Math.Max(1, Radius), Math.Max(1, Radius), 1);
                 foreach (var select in Engine.GetSystem<CollisionSystem>().ObjectsInSphere(hitPos, Radius))
                 {
                     if (select.HasComponent<HowarhComponent>() && !Selected.Contains(select))

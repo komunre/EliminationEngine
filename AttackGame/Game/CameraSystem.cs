@@ -43,6 +43,10 @@ namespace AttackGame.Game
             {
                 dir.X -= 1;
             }
+            if (Engine.KeyState.IsKeyDown(Keys.Space))
+            {
+                dir.Y += 1;
+            }
 
             camera.Owner.Position += dir * 5 * Engine.DeltaTime;
         }

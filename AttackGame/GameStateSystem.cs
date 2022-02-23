@@ -63,7 +63,7 @@ namespace AttackGame
                 Engine.SwitchWorld(GameRoundWorld);
                 var cam = new GameObject();
                 cam.AddComponent<CameraComponent>();
-                cam.Position = new Vector3(0, 10, -10);
+                cam.Position = new Vector3(5, 3, -10);
                 cam.LookAt(new Vector3(0, 0, 0));
 
                 var map = new GameObject();
@@ -73,6 +73,15 @@ namespace AttackGame
                 ModelHelper.AddGLTFMeshToObject(mapData, ref map);
                 map.Position = new Vector3(0, 0, 0);
 
+                var testAnim = new GameObject();
+                var amily = ModelParser.ParseGLTFExternal("res/Amily.glb");
+                ModelHelper.AddGLTFMeshToObject(amily, ref testAnim);
+                //ModelHelper.LoadObjectAnims(amily, ref testAnim);
+                var amilyAnims = ModelParser.ParseGLTFExternal("res/anims/SimpleCharacter.glb");
+                ModelHelper.AddAnimationsToObject(amilyAnims, ref testAnim);
+                testAnim.GetComponent<MeshGroupComponent>().Animator.ActiveAnimation = "Eww";
+                Engine.AddGameObject(testAnim);
+
                 var spawnerBlue = new GameObject();
                 spawnerBlue.AddComponent<SpawnerComponent>();
 
@@ -80,8 +89,8 @@ namespace AttackGame
                 var spwn = spawnerRed.AddComponent<SpawnerComponent>();
                 spwn.Red = true;
 
-                spawnerBlue.Position = new Vector3(-15, 0, -15);
-                spawnerRed.Position = new Vector3(15, 0, 15);
+                spawnerBlue.Position = new Vector3(-15, 1.1f, -15);
+                spawnerRed.Position = new Vector3(15, 1.1f, 15);
 
                 var light = new GameObject();
                 var lightComp = light.AddComponent<LightComponent>();
@@ -90,7 +99,7 @@ namespace AttackGame
                 lightComp.Constant = 10;
                 light.Position = new Vector3(0, 80, 0);
 
-                Engine.AddGameObject(map);
+                //Engine.AddGameObject(map);
                 Engine.AddGameObject(cam);
                 Engine.AddGameObject(spawnerBlue);
                 Engine.AddGameObject(spawnerRed);

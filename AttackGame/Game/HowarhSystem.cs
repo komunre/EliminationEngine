@@ -27,7 +27,7 @@ namespace AttackGame.Game
             {
                 if (howarh.State == HowarhState.Wandering && howarh.Owner.Position == howarh.GetDestination())
                 {
-                    howarh.SetDestination(howarh.Owner.Position + new Vector3((float)rand.NextDouble(), 0, (float)rand.NextDouble()));
+                    howarh.SetDestination(howarh.Owner.Position);
                 }
 
                 howarh.Owner.Position += (howarh.GetDestination() + howarh.Owner.Position).Normalized() * 0.5f * Engine.DeltaTime;

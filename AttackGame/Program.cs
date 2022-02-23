@@ -8,7 +8,7 @@ Console.WriteLine("Hello, World!");
 var engine = new Elimination(800, 600);
 engine.RegisterSystem<GameStateSystem>();
 engine.RegisterSystem<HowarhSystem>();
-engine.RegisterSystem<SpawnSystem>();
+//engine.RegisterSystem<SpawnSystem>();
 engine.RegisterSystem<CameraSystem>();
 engine.RegisterSystem<MouseControlsSystem>();
 engine.Run();

@@ -17,13 +17,14 @@ namespace AttackGame.Game
         {
             base.OnUpdate();
 
+            var rand = new Random();
             foreach (var spawner in Engine.GetObjectsOfType<SpawnerComponent>())
             {
                 if (Engine.Elapsed.Seconds > spawner.NextSpawnTime)
                 {
                     for (var i = 0; i < spawner.NextSpawnCount; i++) {
                         var howarh = new GameObject();
-                        howarh.Position = spawner.Owner.Position;
+                        howarh.Position = spawner.Owner.Position + new Vector3((float)rand.NextDouble() * rand.Next(-1, 1), 0, (float)rand.NextDouble() * rand.Next(-1, 1));
                         var box = howarh.AddComponent<HitBox>();
                         box.AddBox(new Box3(new Vector3(-0.05f, -0.05f, -0.05f), new Vector3(0.05f, 0.05f, 0.05f)));
                         var hwc = howarh.AddComponent<HowarhComponent>();

@@ -6,10 +6,11 @@ uniform vec3 worldPos;
 uniform mat4 modelMatrix;
 
 out vec2 TexCoord;
-out vec3 AddFragColor;
+out vec4 AddFragColor;
 
 void main()
 {
     gl_Position = vec4(aPosition, 1.0) * modelMatrix;
     TexCoord = aTexCoord;
+    AddFragColor = vec4(255, 255, 255, 255);
 }

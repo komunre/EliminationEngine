@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AttackGame": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\komunre\\Desktop\\codes\\EliminationEngine\\AttackGame\\bin\\Debug\\net6.0\\AttackGame.exe"
+    }
+  }
+}
