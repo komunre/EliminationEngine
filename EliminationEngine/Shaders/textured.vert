@@ -73,7 +73,7 @@ void main(void)
         aWeights.z * in_jointsTransform[int(aJoints.z)] +
         aWeights.w * in_jointsTransform[int(aJoints.w)];
 
-    vec4 animated = vec4(aPosition, 1.0) * modelMatrix * skinMatrix;
+    vec4 animated = vec4(aPosition, 1.0) * skinMatrix;
 
     fragAddColor *= skinMatrix;
 

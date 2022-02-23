@@ -146,36 +146,64 @@ namespace EliminationEngine
             return anims;
         }
 
-        private static void SetAnimsDeep(ref EliminationEngine.Render.Mesh meshParent, Animation[] anims)
+        private static void SetAnimsDeep(ModelParser.GLTFData.SkeletonData.Joint joint)
         {
-            meshParent.Animations = anims;
-            foreach (var mesh in meshParent.TechnicalChildren)
+            joint.Animations = joint.AssignedNode.LogicalParent.LogicalAnimations.ToArray();
+            foreach (var child in joint.Children)
             {
-                if (mesh.IsJoint || mesh.IsSkeletonChild)
-                {
-                    mesh.Animations = anims;
-                }
-
-                var meshVar = mesh;
-                SetAnimsDeep(ref meshVar, anims);
+                SetAnimsDeep(child);
             }
         }
 
-        private static void PostParseAnim(ref MeshGroupComponent meshGroup, ModelParser.GLTFData.SkeletonData skeleton)
+        private static Render.Mesh? FindMeshByIndex(int index, Render.Mesh current)
         {
-            var anims = new List<Animation>();
-            foreach (var joint in skeleton.Joints)
+            if (current.AssignedNode.LogicalIndex == index)
             {
-                anims.AddRange(JointsGoDeeper(joint));
+                return current;
             }
-            if (anims != null)
+            foreach (var child in current.TechnicalChildren)
             {
-                foreach (var mesh in meshGroup.Meshes)
+                var result = FindMeshByIndex(index, child);
+                if (result != null)
                 {
-                    var meshVar = mesh;
-                    SetAnimsDeep(ref meshVar, anims.ToArray());
+                    return result;
                 }
             }
+            return null;
+        }
+
+        private static void SetMeshAnimsDeep(ModelParser.GLTFData.MeshData mesh, Render.Mesh addToRoot)
+        {
+            if (mesh.AssignedNode.LogicalParent.LogicalAnimations.Count > 0)
+            {
+                var found = FindMeshByIndex(mesh.AssignedNode.LogicalIndex, addToRoot);
+                if (found != null)
+                {
+                    found.Animations = mesh.AssignedNode.LogicalParent.LogicalAnimations.ToArray();
+                }
+            }
+
+            foreach (var child in mesh.Children)
+            {
+                SetMeshAnimsDeep(child, addToRoot);
+            }
+        }
+
+        private static void PostParseAnim(ref MeshGroupComponent meshGroup, ModelParser.GLTFData data)
+        {
+            foreach (var mesh in data.Meshes)
+            {
+                foreach (var child in mesh.Children)
+                {
+                    foreach (var rootMesh in meshGroup.Meshes) {
+                        SetMeshAnimsDeep(child, rootMesh);
+                    }
+                }
+            }
+            /*foreach (var joint in skeleton.Joints)
+            {
+                SetAnimsDeep(joint);
+            }*/
         }
 
         private static ModelParser.GLTFData.SkeletonData? AnimGoDeeper(ModelParser.GLTFData.MeshData meshData)
@@ -205,11 +233,7 @@ namespace EliminationEngine
             {
                 foreach (var mesh in data.Meshes)
                 {
-                    var found = AnimGoDeeper(mesh);
-                    if (found != null)
-                    {
-                        PostParseAnim(ref meshGroup, found);
-                    }
+                    PostParseAnim(ref meshGroup, data);
                 }
             }
             else
@@ -225,7 +249,7 @@ namespace EliminationEngine
                 if (mesh.SkeletonData != null)
                 {
                     var meshGroup = obj.GetComponent<MeshGroupComponent>();
-                    PostParseAnim(ref meshGroup, mesh.SkeletonData);
+                    PostParseAnim(ref meshGroup, data);
                 }
             }
         }

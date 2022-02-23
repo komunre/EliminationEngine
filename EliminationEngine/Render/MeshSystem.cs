@@ -127,13 +127,13 @@ namespace EliminationEngine.Render
 
             mesh.AnimationMatrix = totalMat;
 
-            foreach (var child in mesh.TechnicalChildren)
+            /*foreach (var child in mesh.TechnicalChildren)
             {
                 if (child.IsJoint)
                 {
                     child.AnimationMatrix = totalMat;
                 }
-            }
+            }*/
         }
 
         private void SetAllAnimMatricesToIdent(Mesh mesh)
@@ -145,7 +145,7 @@ namespace EliminationEngine.Render
             }
         }
 
-        private Matrix4? GetAnimMatrixByName(int index, Mesh current)
+        private Matrix4? GetAnimMatrixByIndex(int index, Mesh current)
         {
             if (current.AssignedNode.LogicalIndex.Equals(index))
             {
@@ -153,7 +153,7 @@ namespace EliminationEngine.Render
             }
             foreach (var child in current.TechnicalChildren)
             {
-                var result = GetAnimMatrixByName(index, child);
+                var result = GetAnimMatrixByIndex(index, child);
                 if (result != null)
                 {
                     return result;
@@ -166,7 +166,7 @@ namespace EliminationEngine.Render
         {
             for (var i = 0; i < root.AssignedNode.LogicalParent.LogicalSkins[0].JointsCount; i++) {
                 var (bone, inverseBindMatrix) = root.AssignedNode.LogicalParent.LogicalSkins[0].GetJoint(i);
-                var animMatrix = GetAnimMatrixByName(bone.LogicalIndex, current);
+                var animMatrix = GetAnimMatrixByIndex(bone.LogicalIndex, current);
                 if (animMatrix == null) continue;
                 root._shader?.SetMatrix4("in_jointsTransform[" + i + "]", Matrix4.Invert(EliminationMathHelper.NumericsMatrixToMatrix(root.AssignedNode.WorldMatrix)) * (EliminationMathHelper.NumericsMatrixToMatrix(bone.WorldMatrix) * (Matrix4)animMatrix) * EliminationMathHelper.NumericsMatrixToMatrix(inverseBindMatrix));
             }
