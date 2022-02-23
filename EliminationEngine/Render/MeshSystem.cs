@@ -110,7 +110,7 @@ namespace EliminationEngine.Render
             }
         }
 
-        private void ChangeMeshChildrenAnim(ref Mesh mesh, AnimationChannel[] channels, float time)
+        private void ChangeMeshChildrenAnim(ref Mesh mesh, AnimationChannel[] channels, float time, Mesh? parent)
         {
             var decomposed = mesh.AssignedNode?.LocalTransform.GetDecomposed();
             var totalMat = Matrix4.Identity;
@@ -126,6 +126,10 @@ namespace EliminationEngine.Render
             }
 
             mesh.AnimationMatrix = totalMat;
+            if (parent != null)
+            {
+                mesh.AnimationMatrix += parent.AnimationMatrix;
+            }
 
             /*foreach (var child in mesh.TechnicalChildren)
             {
@@ -226,7 +230,7 @@ namespace EliminationEngine.Render
                                 }
 
                                 var relatedChannels = anim.Channels.Where(item => item.TargetNode.LogicalIndex == mesh.AssignedNode.LogicalIndex).ToArray();
-                                ChangeMeshChildrenAnim(ref meshVar, relatedChannels, time);
+                                ChangeMeshChildrenAnim(ref meshVar, relatedChannels, time, mesh.Parent);
                             }
                         }
 
