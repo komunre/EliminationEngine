@@ -12,6 +12,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using EliminationEngine.Render;
 using EliminationEngine.Tools;
 using EliminationEngine.Systems;
+using EliminationEngine.Render.UI;
 using SixLabors.ImageSharp.PixelFormats;
 using OpenTK.Input;
 
@@ -130,7 +131,7 @@ namespace AttackGame
 
         public override void PostLoad()
         {
-            Engine.GetSystem<SoundSystem>().PlaySound(new FileStream("res/Kevin Hartnell - Rogue Planet.mp3", FileMode.Open));
+            //Engine.GetSystem<SoundSystem>().PlaySound(new FileStream("res/Kevin Hartnell - Rogue Planet.mp3", FileMode.Open));
         }
         public override void OnUpdate()
         {

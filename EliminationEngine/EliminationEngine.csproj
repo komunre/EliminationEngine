@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="BepuPhysics" Version="2.4.0-beta9" />
     <PackageReference Include="ManagedBass" Version="3.1.0" />
-    <PackageReference Include="OpenTK" Version="4.6.7" />
+    <PackageReference Include="OpenTK" Version="4.7.1" />
     <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0023" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
   </ItemGroup>
@@ -51,6 +51,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gwen.Net\Gwen.Net.OpenTk\Gwen.Net.OpenTk.csproj" />
+    <ProjectReference Include="..\Gwen.Net\Gwen.Net\Gwen.Net.csproj" />
     <ProjectReference Include="..\SharpFont\Source\SharpFont.GDI\SharpFont.Gdi.csproj" />
     <ProjectReference Include="..\SharpFont\Source\SharpFont\SharpFont.csproj" />
   </ItemGroup>
@@ -62,6 +64,12 @@
     <None Update="freetype6.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="libgcc_s_seh-1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\DefaultSkin2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\onscreen.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -69,6 +77,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\unlit.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="zlib1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
