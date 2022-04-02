@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EliminationEngine.GameObjects;
 using EliminationEngine.Physics;
 using EliminationEngine.Render;
+using EliminationEngine.Render.UI;
 using EliminationEngine.Systems;
 using EliminationEngine.Tools;
 using OpenTK;
@@ -49,6 +50,7 @@ namespace EliminationEngine
             RegisterSystem<Raycast>();
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();
+            RegisterSystem<GwenSystem>();
             window.Run();
         }
 
