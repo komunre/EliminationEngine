@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <PackageReference Include="BepuPhysics" Version="2.4.0-beta9" />
-    <PackageReference Include="Gwen.Net.OpenTk" Version="0.2.0" />
     <PackageReference Include="ManagedBass" Version="3.1.0" />
     <PackageReference Include="OpenTK" Version="4.7.1" />
     <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0023" />
@@ -52,6 +51,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gwen.Net\Gwen.Net.OpenTk\Gwen.Net.OpenTk.csproj" />
+    <ProjectReference Include="..\Gwen.Net\Gwen.Net\Gwen.Net.csproj" />
     <ProjectReference Include="..\SharpFont\Source\SharpFont.GDI\SharpFont.Gdi.csproj" />
     <ProjectReference Include="..\SharpFont\Source\SharpFont\SharpFont.csproj" />
   </ItemGroup>
@@ -64,6 +65,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="libgcc_s_seh-1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\DefaultSkin2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\onscreen.vert">
