@@ -19,7 +19,7 @@ namespace EliminationEngine.Render.UI
             GwenGui = GwenGuiFactory.CreateFromGame(Engine.window, GwenGuiSettings.Default.From(settings =>
             {
                 settings.SkinFile = new FileInfo("res/DefaultSkin2.png");
-                settings.DrawBackground = true;
+                settings.DrawBackground = false;
             }));
 
             GwenGui.Load();

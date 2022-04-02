@@ -11,6 +11,7 @@ using EliminationEngine.GameObjects;
 using System.Globalization;
 using OpenTK.Mathematics;
 using System.Diagnostics;
+using EliminationEngine.Render.UI;
 
 namespace EliminationEngine
 {
@@ -136,6 +137,8 @@ namespace EliminationEngine
                 camera.Width = e.Width;
                 camera.Height = e.Height;
             }
+
+            Engine.GetSystem<GwenSystem>().GwenGui.Resize(new Vector2i(e.Width, e.Height));
         }
     }
 }

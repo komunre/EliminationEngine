@@ -22,6 +22,10 @@ namespace AttackGame
 
             var canvas = Engine.GetSystem<GwenSystem>().GwenGui.Root;
             var window = new Gwen.Net.Control.Window(canvas);
+            window.HorizontalAlignment = Gwen.Net.HorizontalAlignment.Left;
+            window.VerticalAlignment = Gwen.Net.VerticalAlignment.Top;
+            window.Size = new Gwen.Net.Size(200, 100);
+            window.IsDraggingEnabled = true;
             var label = new Gwen.Net.Control.Label(window);
             label.Text = "Hello World!";
         }

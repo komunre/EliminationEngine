@@ -6,14 +6,14 @@ using EliminationEngine.GameObjects;
 
 Console.WriteLine("Hello, World!");
 var engine = new Elimination(800, 600);
-var camera = new GameObject();
-camera.AddComponent<CameraComponent>();
-engine.AddGameObject(camera);
+//var camera = new GameObject();
+//camera.AddComponent<CameraComponent>();
+//engine.AddGameObject(camera);
 engine.RegisterSystem<UITestSystem>();
 //engine.RegisterSystem<GameStateSystem>();
 //engine.RegisterSystem<HowarhSystem>();
 //engine.RegisterSystem<SpawnSystem>();
 //engine.RegisterSystem<CameraSystem>();
 //engine.RegisterSystem<MouseControlsSystem>();
-//engine.RegisterSystem<GameSystem>();
+engine.RegisterSystem<GameSystem>();
 engine.Run();
