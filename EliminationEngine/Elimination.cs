@@ -46,7 +46,6 @@ namespace EliminationEngine
             if (window == null) throw new InvalidDataException("No window was opened");
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
-            RegisterSystem<UISystem>();
             RegisterSystem<Raycast>();
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();

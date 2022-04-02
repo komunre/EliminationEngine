@@ -39,19 +39,6 @@ namespace AttackGame
         {
             GameRoundWorld = Engine.CreateWorld();
 
-            var start = new GameObject();
-            var widget = start.AddComponent<UIWidget>();
-            widget.Text = "Start";
-            start.Position = new Vector3(0, 0, 0);
-            start.Scale = new Vector3(0.3f, 0.1f, 1f);
-            widget.Size = 60;
-            widget.Font = new SharpFont.Face(new SharpFont.Library(), "res/Oswald-Regular.ttf");
-            widget.OnClick += () =>
-            {
-                State = GameState.Singleplayer;
-            };
-            widget.OnScreen = true;
-            Engine.AddGameObject(start);
         }
 
         public override void OnUpdate()

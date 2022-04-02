@@ -53,8 +53,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Gwen.Net\Gwen.Net.OpenTk\Gwen.Net.OpenTk.csproj" />
     <ProjectReference Include="..\Gwen.Net\Gwen.Net\Gwen.Net.csproj" />
-    <ProjectReference Include="..\SharpFont\Source\SharpFont.GDI\SharpFont.Gdi.csproj" />
-    <ProjectReference Include="..\SharpFont\Source\SharpFont\SharpFont.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +60,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="freetype6.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libbass.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="libgcc_s_seh-1.dll">

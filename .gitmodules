@@ -1,6 +1,3 @@
-[submodule "SharpFont"]
-	path = SharpFont
-	url = https://github.com/space-wizards/SharpFont.git
 [submodule "Gwen.Net"]
 	path = Gwen.Net
 	url = https://github.com/EliminationSoftware/Gwen.Net.git
