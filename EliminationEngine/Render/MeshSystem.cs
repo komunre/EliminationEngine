@@ -45,7 +45,14 @@ namespace EliminationEngine.Render
 
                 if (mesh._shader == null)
                 {
-                    mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+                    if (mesh.OverrideShader)
+                    {
+                        mesh._shader = new Shader(mesh.ShaderVertPath, mesh.ShaderFragPath);
+                    }
+                    else
+                    {
+                        mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+                    }
                 }
 
                 GL.BindVertexArray(mesh._vertexArr);

@@ -57,6 +57,14 @@ namespace AttackGame
             misshatHitbox.AddBox(new Box3(new Vector3(-1, 0, -1), new Vector3(-1, 0, -1)), true);
             ModelHelper.AddGLTFMeshToObject(data, ref obj);
 
+            /*obj.GetComponent<MeshGroupComponent>().Meshes.All((mesh) =>
+            {
+                mesh.OverrideShader = true;
+                mesh.ShaderVertPath = "Shaders/unlit.vert";
+                mesh.ShaderFragPath = "Shaders/text.frag";
+                return true;
+            });*/
+
             var misshatData = ModelParser.ParseGLTFExternal("res/misshat.glb");
             ModelHelper.AddGLTFMeshToObject(misshatData, ref second);
 

@@ -24,5 +24,8 @@ namespace EliminationEngine.Render
         public byte[]? Image;
         public int Width = 0;
         public int Height = 0;
+        public bool OverrideShader = false;
+        public string ShaderVertPath = "Shaders/unlit.vert";
+        public string ShaderFragPath = "Shaders/text.frag";
     }
 }
