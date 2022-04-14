@@ -20,5 +20,17 @@ namespace EliminationEngine.GameObjects
         {
             
         }
+
+        public Mesh? FindByName(string name)
+        {
+            foreach (var mesh in Meshes)
+            {
+                if (mesh.Name == name)
+                {
+                    return mesh;
+                }
+            }
+            return null;
+        }
     }
 }

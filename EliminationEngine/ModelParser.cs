@@ -79,6 +79,8 @@ namespace EliminationEngine
                 renderMesh.Indices = indices.ToArray();
                 renderMesh.Normals = normals.ToArray();
 
+                renderMesh.Name = mesh.Name;
+
                 meshGroup.Meshes.Add(renderMesh);
 
                 PostParseMeshes(ref meshGroup, mesh.Children);
@@ -113,6 +115,7 @@ namespace EliminationEngine
             }
             public class MeshData
             {
+                public string Name = "Unknown";
                 public List<float> Weights = new();
                 public List<PrimitiveData> Primitives = new();
                 public List<MeshData> Children = new();
@@ -154,6 +157,7 @@ namespace EliminationEngine
             {
                 var weights = node.Mesh.MorphWeights;
                 meshData.Weights = weights.ToList();
+                meshData.Name = node.Mesh.Name;
                 foreach (var primitive in node.Mesh.Primitives)
                 {
                     var vertices = primitive.GetVertices("POSITION").AsVector3Array().ToArray();

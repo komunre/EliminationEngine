@@ -10,6 +10,7 @@ namespace EliminationEngine.Render
 {
     public class Mesh
     {
+        public string Name = "Unknown";
         public float[]? Vertices { get; set; }
         public uint[]? Indices { get; set; }
         public float[]? TexCoords { get; set; }
@@ -22,6 +23,7 @@ namespace EliminationEngine.Render
         public int _normalsBuffer = 0;
         public Shader? _shader;
         public byte[]? Image;
+        public Dictionary<string, List<ImageData>> ImageSequence = new();
         public int Width = 0;
         public int Height = 0;
         public bool OverrideShader = false;

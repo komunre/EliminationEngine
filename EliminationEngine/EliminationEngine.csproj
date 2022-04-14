@@ -35,12 +35,16 @@
 	</Target>
 
 	<ItemGroup>
+	  <Content Remove="Shaders\camera.frag" />
+	  <Content Remove="Shaders\camera.vert" />
 	  <Content Remove="Shaders\onscreen.vert" />
 	  <Content Remove="Shaders\text.frag" />
 	  <Content Remove="Shaders\unlit.vert" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ShaderFiles Remove="Shaders\camera.frag" />
+	  <ShaderFiles Remove="Shaders\camera.vert" />
 	  <ShaderFiles Remove="Shaders\onscreen.vert" />
 	  <ShaderFiles Remove="Shaders\text.frag" />
 	  <ShaderFiles Remove="Shaders\unlit.vert" />
@@ -69,6 +73,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="res\DefaultSkin2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\camera.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\camera.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\onscreen.vert">

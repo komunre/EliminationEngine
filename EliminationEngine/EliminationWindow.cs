@@ -110,6 +110,13 @@ namespace EliminationEngine
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
+            {
+                camera.BindFrameBuffer();
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            }
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
             foreach (var system in Engine.RegisteredSystems.Values)
             {
                 system.OnDraw();
