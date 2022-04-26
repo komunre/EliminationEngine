@@ -125,12 +125,17 @@ namespace EliminationEngine
         {
             if (window == null) return;
             window.CursorGrabbed = true;
+            //window.CursorVisible = false;
+            //window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Empty;
         }
 
         public void UnlockCursor()
         {
             if (window == null) return;
-            window.CursorGrabbed = false;
+            StopEngine();
+            //window.CursorGrabbed = false;
+            //window.CursorVisible = true;
+            //window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Default;
         }
 
         public void ToggleCursor()

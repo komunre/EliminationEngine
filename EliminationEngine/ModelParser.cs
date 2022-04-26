@@ -157,7 +157,7 @@ namespace EliminationEngine
             {
                 var weights = node.Mesh.MorphWeights;
                 meshData.Weights = weights.ToList();
-                meshData.Name = node.Mesh.Name;
+                meshData.Name = node.Name;
                 foreach (var primitive in node.Mesh.Primitives)
                 {
                     var vertices = primitive.GetVertices("POSITION").AsVector3Array().ToArray();

@@ -75,9 +75,12 @@ namespace EliminationEngine.Render
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
                 GL.EnableVertexAttribArray(0);
 
-                mesh._tex = GL.GenTexture();
-                GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, mesh.Width, mesh.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, mesh.Image);
+                if (mesh._tex == 0)
+                {
+                    mesh._tex = GL.GenTexture();
+                    GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, mesh.Width, mesh.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, mesh.Image);
+                }
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
@@ -114,8 +117,9 @@ namespace EliminationEngine.Render
                 if (!camera.Active && !camera.RenderToTexture) continue;
 
                 var cameraRot = camera.Owner.GlobalRotation;
-                var forward = camera.Owner.Forward();
-                var up = camera.Owner.Up();
+                var cameraPos = camera.Owner.GlobalPosition;
+                var forward = camera.Owner.DegreeForward() + camera.Owner.GlobalPosition;
+                var up = camera.Owner.DegreeUp();
 
                 var lights = Engine.GetObjectsOfType<LightComponent>();
 
@@ -131,14 +135,20 @@ namespace EliminationEngine.Render
                         GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._buffer);
                         GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsageHint.StaticDraw);
 
-                        var cameraPos = camera.Owner.GlobalPosition;
-
                         mesh._shader.Use();
                         var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition);
                         var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.GlobalRotation);
                         var scale = Matrix4.CreateScale(meshGroup.Owner.GlobalScale);
                         var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
+
+                        /*Quaternion.ToEulerAngles(in cameraRot, out var euler);
+                        euler.Z = 0;
+                        var rotLol = Quaternion.FromEulerAngles(euler);
+
+                        var lookAt = Matrix4.CreateTranslation(camera.Owner.GlobalPosition) * Matrix4.CreateFromQuaternion(rotLol);*/ // Pretty much works, but Forward still will be useless then
+
                         var lookAt = Matrix4.LookAt(cameraPos, forward, up);
+
                         mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));
                         mesh._shader.SetMatrix4("modelMatrix", matrix * trans * scale);
                         mesh._shader.SetVector3("viewPos", cameraPos);
