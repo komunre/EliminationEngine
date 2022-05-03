@@ -110,7 +110,7 @@ namespace EliminationEngine.GameObjects
 
             var forward = new Vector3(x, y, z).Normalized();
 
-            var right = Vector3.Cross(Vector3.UnitY, forward).Normalized();
+            var right = Vector3.Cross(Vector3.UnitY, forward).Normalized() * -1;
             var up = Vector3.Cross(right, forward).Normalized();
 
             Console.WriteLine(forward);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Mathematics;
 
 namespace EliminationEngine.Render
 {
@@ -29,5 +30,6 @@ namespace EliminationEngine.Render
         public bool OverrideShader = false;
         public string ShaderVertPath = "Shaders/unlit.vert";
         public string ShaderFragPath = "Shaders/text.frag";
+        public Vector3 Position = Vector3.Zero;
     }
 }

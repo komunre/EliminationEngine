@@ -80,6 +80,7 @@ namespace EliminationEngine
                 renderMesh.Normals = normals.ToArray();
 
                 renderMesh.Name = mesh.Name;
+                renderMesh.Position = new OpenTK.Mathematics.Vector3(mesh.Center.X, mesh.Center.Y, mesh.Center.Z);
 
                 meshGroup.Meshes.Add(renderMesh);
 
@@ -120,6 +121,7 @@ namespace EliminationEngine
                 public List<PrimitiveData> Primitives = new();
                 public List<MeshData> Children = new();
                 public Material? Mat;
+                public Vector3 Center = Vector3.Zero;
             }
             public List<MeshData> Meshes = new();
         }
@@ -158,6 +160,7 @@ namespace EliminationEngine
                 var weights = node.Mesh.MorphWeights;
                 meshData.Weights = weights.ToList();
                 meshData.Name = node.Name;
+                meshData.Center = node.LocalTransform.Translation;
                 foreach (var primitive in node.Mesh.Primitives)
                 {
                     var vertices = primitive.GetVertices("POSITION").AsVector3Array().ToArray();
