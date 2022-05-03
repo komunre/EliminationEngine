@@ -96,7 +96,8 @@ namespace EliminationEngine
 
         public bool TryGetSystem<EntitySystemType>(out EntitySystemType? system) where EntitySystemType : EntitySystem
         {
-            if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys)) {
+            if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys))
+            {
                 system = sys as EntitySystemType;
                 return true;
             }
@@ -175,6 +176,20 @@ namespace EliminationEngine
         public void RemoveWorld(int world)
         {
             window.RemoveWorld(world);
+        }
+
+        public void EnterFullscreen()
+        {
+            if (window == null) return;
+            window.WindowBorder = OpenTK.Windowing.Common.WindowBorder.Hidden;
+            window.WindowState = OpenTK.Windowing.Common.WindowState.Fullscreen;
+        }
+
+        public void EnterNormal()
+        {
+            if (window == null) return;
+            window.WindowBorder = OpenTK.Windowing.Common.WindowBorder.Resizable;
+            window.WindowState = OpenTK.Windowing.Common.WindowState.Normal;
         }
     }
 }

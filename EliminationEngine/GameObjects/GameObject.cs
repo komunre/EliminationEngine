@@ -27,6 +27,7 @@ namespace EliminationEngine.GameObjects
 
         public Vector3 GlobalPosition => ParentHelper.GetAddedPos(this);
         public Quaternion GlobalRotation => ParentHelper.GetAddedRot(this);
+        public Vector3 GlobalDegreeRotation => ParentHelper.GetAddedDegreeRot(this);
         public Vector3 GlobalScale => ParentHelper.GetAddedScale(this);
 
         public Vector3 Position = Vector3.Zero;
@@ -88,19 +89,47 @@ namespace EliminationEngine.GameObjects
             return front;
         }
 
+        /// Forward, Right, Up
+        public Vector3[] GetDirections() {
+            var rot = GlobalDegreeRotation;
+
+            /*var forward = new Vector3();
+            forward.X = (float)Math.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)Math.Cos(MathHelper.DegreesToRadians(rot.X));
+            forward.Y = (float)Math.Sin(MathHelper.DegreesToRadians(rot.X));
+            forward.Z = (float)Math.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)Math.Sin(MathHelper.DegreesToRadians(rot.X));
+            forward = Vector3.Normalize(forward);*/
+
+            /*var horizontal = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.X));
+            var vertical = (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
+            var stabilization = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
+            var forward = new Vector3(vertical, horizontal, stabilization);*/
+
+            var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
+            var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
+            var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));
+
+            var forward = new Vector3(x, y, z).Normalized();
+
+            var right = Vector3.Cross(Vector3.UnitY, forward).Normalized();
+            var up = Vector3.Cross(right, forward).Normalized();
+
+            Console.WriteLine(forward);
+
+            return new Vector3[]{forward, right, up};
+        }
         public Vector3 DegreeForward()
         {
-            return DegreeRotation;
+            return GetDirections()[0];
         }
 
         public Vector3 DegreeRight()
         {
-            return Vector3.Cross(DegreeForward(), Vector3.UnitY);
+            return GetDirections()[1];
         }
 
         public Vector3 DegreeUp()
         {
-            return Vector3.Cross(DegreeRight(), DegreeForward());
+            return GetDirections()[2];
         }
 
         public Vector3 RadiansForward()
@@ -138,33 +167,7 @@ namespace EliminationEngine.GameObjects
 
         public void ReRotate()
         {
-            if (_degreeRotation.Y > 165)
-            {
-                _degreeRotation.Y = 0.1f;
-                _degreeRotation.X = -_degreeRotation.X;
-                Console.WriteLine("Switch!");
-            }
-            if (_degreeRotation.X > 165)
-            {
-                _degreeRotation.X = 0.1f;
-                _degreeRotation.Y = -_degreeRotation.Y;
-                Console.WriteLine("Switch!");
-            }
-            if (_degreeRotation.Z < -180)
-            {
-                _degreeRotation.Z = -180;
-                _degreeRotation.X = -_degreeRotation.X;
-                InvertedRotation = !InvertedRotation;
-                Console.WriteLine("Switch!");
-            }
-            if (_degreeRotation.Z > 180)
-            {
-                _degreeRotation.Z = 180;
-                _degreeRotation.X = -_degreeRotation.X;
-                InvertedRotation = !InvertedRotation;
-                Console.WriteLine("Switch!");
-            }
-            Console.WriteLine(_degreeRotation);
+            
         }
 
         public void LookAt(Vector3 target)

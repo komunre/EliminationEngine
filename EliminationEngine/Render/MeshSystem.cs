@@ -118,8 +118,9 @@ namespace EliminationEngine.Render
 
                 var cameraRot = camera.Owner.GlobalRotation;
                 var cameraPos = camera.Owner.GlobalPosition;
-                var forward = camera.Owner.DegreeForward() + camera.Owner.GlobalPosition;
-                var up = camera.Owner.DegreeUp();
+                var directions = camera.Owner.GetDirections();
+                var forward = directions[0] + cameraPos;
+                var up = directions[2];
 
                 var lights = Engine.GetObjectsOfType<LightComponent>();
 
@@ -147,6 +148,7 @@ namespace EliminationEngine.Render
 
                         var lookAt = Matrix4.CreateTranslation(camera.Owner.GlobalPosition) * Matrix4.CreateFromQuaternion(rotLol);*/ // Pretty much works, but Forward still will be useless then
 
+                        
                         var lookAt = Matrix4.LookAt(cameraPos, forward, up);
 
                         mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));

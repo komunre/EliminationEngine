@@ -30,6 +30,14 @@ namespace EliminationEngine.Tools
             return result;
         }
 
+        public static Vector3 GetAddedDegreeRot(GameObject obj) {
+            var result = obj.DegreeRotation;
+            if (obj.Parent != null) {
+                result += GetAddedDegreeRot(obj.Parent);
+            }
+            return result;
+        }
+
         public static Vector3 GetAddedScale(GameObject obj)
         {
             var result = obj.Scale;
