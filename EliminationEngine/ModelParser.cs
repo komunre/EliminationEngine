@@ -47,7 +47,7 @@ namespace EliminationEngine
                 var indices = new List<uint>();
                 var normals = new List<float>();
                 foreach (var primitive in mesh.Primitives) {
-                    vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X, e.Y, e.Z }));
+                    vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X + mesh.Center.X, e.Y + mesh.Center.Y, e.Z + mesh.Center.Z }));
                     uvData.AddRange(primitive.UVs.SelectMany(e => new[] { e.X, e.Y }));
                     indices.AddRange(primitive.Indices.Select(e => e));
                     normals.AddRange(primitive.Normals.SelectMany(e => new[] { e.X, e.Y, e.Z }));
@@ -148,7 +148,7 @@ namespace EliminationEngine
 
         public static GLTFData.MeshData? ParseMesh(Node node)
         {
-            Console.WriteLine(node.Name);
+            Console.WriteLine("Loading mesh: " + node.Name);
 
             var meshData = new GLTFData.MeshData();
             if (node.IsSkinSkeleton)

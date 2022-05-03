@@ -14,6 +14,7 @@ namespace EliminationEngine.GameObjects
         public static int TexCoordBuff = 0;
         public static int VertexArray = 0;
         public static int IndicesBuff = 0;
+        public static Shader Shader = new Shader("Shaders/camera.vert", "Shaders/camera.frag");
 
         public static void InitValues()
         {
@@ -65,7 +66,7 @@ namespace EliminationEngine.GameObjects
         protected int DepthFrameBuffer = 0;
         protected int RenderTexture = 0;
         public bool RenderToTexture = false;
-        public Shader CameraShader = new Shader("Shaders/camera.vert", "Shaders/camera.frag");
+        public Shader CameraShader = DefaultCameraBuffers.Shader;
         public bool UseDefaultShape = true;
         protected int RBO = 0;
 

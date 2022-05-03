@@ -43,6 +43,7 @@ namespace EliminationEngine.Tools
 
         public RayHit[] RaycastFromPos(Vector3 pos, Vector3 dir, float maxDist = 1000, uint maxHits = 2)
         {
+
             var delta = dir;
 
             var hitboxes = Engine.GetObjectsOfType<HitBox>();
@@ -54,7 +55,6 @@ namespace EliminationEngine.Tools
             {
                 foreach (var box in hitbox.GetBoxes())
                 {
-
                     float x1;
                     float x2;
                     if (delta.X >= 0)
@@ -67,8 +67,8 @@ namespace EliminationEngine.Tools
                         x1 = box.Bounds.Max.X;
                         x2 = box.Bounds.Min.X;
                     }
-                    float tmin = (x1 + hitbox.Owner.Position.X - pos.X) / delta.X;
-                    float tmax = (x2 + hitbox.Owner.Position.X - pos.X) / delta.X;
+                    float tmin = (x1 + hitbox.Owner.GlobalPosition.X - pos.X) / delta.X;
+                    float tmax = (x2 + hitbox.Owner.GlobalPosition.X - pos.X) / delta.X;
 
                     var prevx = tmin;
 
@@ -85,8 +85,8 @@ namespace EliminationEngine.Tools
                         y2 = box.Bounds.Min.Y;
                     }
 
-                    float tymin = (y1 + hitbox.Owner.Position.Y - pos.Y) / delta.Y;
-                    float tymax = (y2 + hitbox.Owner.Position.Y - pos.Y) / delta.Y;
+                    float tymin = (y1 + hitbox.Owner.GlobalPosition.Y - pos.Y) / delta.Y;
+                    float tymax = (y2 + hitbox.Owner.GlobalPosition.Y - pos.Y) / delta.Y;
 
                     if ((tmin > tymax) || (tymin > tmax))
                         continue;
@@ -108,8 +108,8 @@ namespace EliminationEngine.Tools
                         z2 = box.Bounds.Min.Z;
                     }
 
-                    float tzmin = (z1 + hitbox.Owner.Position.Z - pos.Z) / delta.Z;
-                    float tzmax = (z2 + hitbox.Owner.Position.Z - pos.Z) / delta.Z;
+                    float tzmin = (z1 + hitbox.Owner.GlobalPosition.Z - pos.Z) / delta.Z;
+                    float tzmax = (z2 + hitbox.Owner.GlobalPosition.Z - pos.Z) / delta.Z;
 
                     if ((tmin > tzmax) || (tzmin > tmax))
                         continue;
@@ -140,9 +140,10 @@ namespace EliminationEngine.Tools
 
         public RayHit[] RaycastFromObject(GameObject obj, float maxDist = 1000)
         {
-            var dir = obj.ForwardIsolated();
-            dir.Normalize();
-            return RaycastFromPos(obj.Position, dir, maxDist);
+            var dir = obj.DegreeForward();
+            dir.Y = dir.Y / 2;
+            dir.X = dir.X / 2;
+            return RaycastFromPos(obj.GlobalPosition, dir, maxDist);
         }
 
         public RayHit[] RaycastFromCameraCenter(float maxDist = 1000)

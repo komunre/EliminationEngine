@@ -19,6 +19,7 @@ namespace EliminationEngine.GameObjects
     public class GameObject
     {
         public string Name = "Default";
+        public List<string> Layers = new();
         public GameObject? Parent = null;
         public List<GameObject> Children = new List<GameObject>();
         public Color BaseColor = new Color(255, 255, 255, 255);
@@ -112,8 +113,6 @@ namespace EliminationEngine.GameObjects
 
             var right = Vector3.Cross(Vector3.UnitY, forward).Normalized() * -1;
             var up = Vector3.Cross(right, forward).Normalized();
-
-            Console.WriteLine(forward);
 
             return new Vector3[]{forward, right, up};
         }

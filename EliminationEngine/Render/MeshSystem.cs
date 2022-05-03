@@ -105,16 +105,8 @@ namespace EliminationEngine.Render
             }
         }
 
-        public override void OnDraw()
-        {
-            base.OnUpdate();
-
-            var cameras = Engine.GetObjectsOfType<CameraComponent>().Select(x => { if (x.Active) { return x; } return null; });
-            var activeCamera = cameras.First();
-
-            foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
-            {
-                if (!camera.Active && !camera.RenderToTexture) continue;
+        private void RenderEverything(CameraComponent camera) {
+            GL.Viewport(0, 0, camera.Width, camera.Height);
 
                 var cameraRot = camera.Owner.GlobalRotation;
                 var cameraPos = camera.Owner.GlobalPosition;
@@ -166,10 +158,14 @@ namespace EliminationEngine.Render
                                 {
                                     continue;
                                 }
+                                if (light.IgnoredLayers.Any(x => meshGroup.Owner.Layers.Contains(x))) {
+                                    continue;
+                                }
                                 if (counter >= 20) break;
                                 mesh._shader.SetVector3("pointLights[" + counter + "].pos", light.Owner.GlobalPosition);
                                 mesh._shader.SetFloat("pointLights[" + counter + "].constant", light.Constant);
                                 mesh._shader.SetFloat("pointLights[" + counter + "].linear", light.Diffuse);
+                                mesh._shader.SetFloat("pointLights[" + counter + "].quadratic", light.Qudratic);
                                 mesh._shader.SetVector3("pointLights[" + counter + "].diffuse", new Vector3(light.Color.R, light.Color.G, light.Color.B));
                                 counter++;
                             }
@@ -179,10 +175,10 @@ namespace EliminationEngine.Render
                         var col = meshGroup.Owner.BaseColor;
                         mesh._shader.SetVector3("addColor", new Vector3(col.R, col.G, col.B));
 
+                        GL.BindFramebuffer(FramebufferTarget.Framebuffer, camera.GetFrameBuffer());
                         GL.Enable(EnableCap.DepthTest);
                         GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
                         GL.BindVertexArray(mesh._vertexArr);
-                        GL.BindFramebuffer(FramebufferTarget.Framebuffer, camera.GetFrameBuffer());
                         GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh._indicesBuffer);
                         GL.DrawElements(PrimitiveType.Triangles, mesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
                     }
@@ -208,6 +204,24 @@ namespace EliminationEngine.Render
                     GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                     GL.Enable(EnableCap.DepthTest);
                 }
+        }
+
+        public override void OnDraw()
+        {
+            base.OnUpdate();
+
+            foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
+            {
+                if (!camera.RenderToTexture) continue;
+
+                RenderEverything(camera);
+            }
+
+            foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
+            {
+                if (!camera.Active) continue;
+
+                RenderEverything(camera);
             }
         }
     }

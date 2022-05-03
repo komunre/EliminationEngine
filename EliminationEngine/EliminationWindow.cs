@@ -138,13 +138,7 @@ namespace EliminationEngine
             base.OnResize(e);
 
             GL.Viewport(0, 0, e.Width, e.Height);
-
-            foreach (var camera in GetObjectsOfType<CameraComponent>())
-            {
-                camera.Width = e.Width;
-                camera.Height = e.Height;
-            }
-
+            
             Engine.GetSystem<GwenSystem>().GwenGui.Resize(new Vector2i(e.Width, e.Height));
         }
     }

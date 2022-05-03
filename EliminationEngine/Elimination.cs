@@ -50,6 +50,8 @@ namespace EliminationEngine
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();
             RegisterSystem<GwenSystem>();
+            RegisterSystem<CameraResizeSystem>();
+            RegisterSystem<DebugRenderSystem>();
             window.Run();
         }
 
