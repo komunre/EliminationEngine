@@ -129,9 +129,9 @@ namespace EliminationEngine.GameObjects
             var stabilization = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
             var forward = new Vector3(vertical, horizontal, stabilization);*/
 
-            var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
-            var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
-            var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));
+            var x = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeCos(rot.Y);
+            var y = EliminationMathHelper.DegreeSin(rot.X);
+            var z = (EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.Y));
 
             var forward = new Vector3(x, y, z).Normalized();
 
@@ -195,13 +195,13 @@ namespace EliminationEngine.GameObjects
 
         public void LookAt(Vector3 target)
         {
-            var rot = Rotation.ToEulerAngles();
+            /*var rot = Rotation.ToEulerAngles();
 
             Vector3 forwardVector = Vector3.Normalize(target - Position);
 
             float dot = Vector3.Dot(-Vector3.UnitZ, forwardVector);
 
-            /*if (Math.Abs(dot - (-1.0f)) < 0.000001f)
+            if (Math.Abs(dot - (-1.0f)) < 0.000001f)
             {
                 Rotation = new Quaternion(Vector3.UnitY.X, Vector3.UnitY.Y, Vector3.UnitY.Z, 3.1415926535897932f);
                 return;
@@ -210,14 +210,50 @@ namespace EliminationEngine.GameObjects
             {
                 Rotation = Quaternion.Identity;
                 return;
-            }*/
+            }
 
             float rotAngle = (float)Math.Acos(dot);
             Vector3 rotAxis = Vector3.Cross(-Vector3.UnitZ, forwardVector);
             rotAxis = Vector3.Normalize(rotAxis);
 
             var desired = Quaternion.FromAxisAngle(rotAxis, rotAngle);
-            Rotation = desired;
+            Rotation = desired;*/
+            Vector3 forwardVector = Vector3.Normalize(target - GlobalPosition);
+            Rotation = RotationBetweenVectors(Vector3.UnitZ, forwardVector);
+        }
+
+        Quaternion RotationBetweenVectors(Vector3 start, Vector3 dest)
+        {
+            start = Vector3.Normalize(start);
+            dest = Vector3.Normalize(dest);
+
+            float cosTheta = Vector3.Dot(start, dest);
+            Vector3 rotationAxis;
+
+            if (cosTheta < -1 + 0.001f)
+            {
+                // special case when vectors in opposite directions:
+                // there is no "ideal" rotation axis
+                // So guess one; any will do as long as it's perpendicular to start
+                rotationAxis = Vector3.Cross(new Vector3(0.0f, 0.0f, 1.0f), start);
+                if (rotationAxis.Length < 0.01) // bad luck, they were parallel, try again!
+                    rotationAxis = Vector3.Cross(new Vector3(1.0f, 0.0f, 0.0f), start);
+
+                rotationAxis = Vector3.Normalize(rotationAxis);
+                return Quaternion.FromAxisAngle(rotationAxis, MathHelper.DegreesToRadians(180.0f));
+            }
+
+            rotationAxis = Vector3.Cross(start, dest);
+
+            float s = (float)MathHelper.Sqrt((1 + cosTheta) * 2);
+            float invs = 1 / s;
+
+            return new Quaternion(
+                s * 0.5f,
+                rotationAxis.X * invs,
+                rotationAxis.Y * invs,
+                rotationAxis.Z * invs
+            );
         }
 
         public CompType AddComponent<CompType>() where CompType : EntityComponent

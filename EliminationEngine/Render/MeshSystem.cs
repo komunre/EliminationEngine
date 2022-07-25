@@ -104,10 +104,10 @@ namespace EliminationEngine.Render
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
 
-            var cameraRot = camera.Owner.GlobalRotation;
-            var cameraPos = camera.Owner.GlobalPosition;
+            var cameraRot = camera.Owner.Rotation;
+            var cameraPos = camera.Owner.Position;
             var directions = camera.Owner.GetDirections();
-            var forward = directions[0] + cameraPos;
+            var forward = directions[0];
             var up = directions[2];
 
             var lights = Engine.GetObjectsOfType<LightComponent>();

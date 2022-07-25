@@ -5,7 +5,7 @@ using EliminationEngine;
 using EliminationEngine.GameObjects;
 
 Console.WriteLine("Hello, World!");
-var engine = new Elimination(800, 600);
+var engine = new Elimination();
 //var camera = new GameObject();
 //camera.AddComponent<CameraComponent>();
 //engine.AddGameObject(camera);

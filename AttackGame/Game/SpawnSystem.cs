@@ -7,7 +7,7 @@ using EliminationEngine.Tools;
 
 namespace AttackGame.Game
 {
-    public class SpawnSystem : EntitySystem
+    /*public class SpawnSystem : EntitySystem
     {
         public SpawnSystem(Elimination e) : base(e)
         {
@@ -48,5 +48,5 @@ namespace AttackGame.Game
                 }
             }
         }
-    }
+    }*/
 }

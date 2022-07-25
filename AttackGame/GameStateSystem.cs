@@ -10,7 +10,7 @@ using OpenTK.Mathematics;
 
 namespace AttackGame
 {
-    public enum GameState
+    /*public enum GameState
     {
         Menu,
         Singleplayer,
@@ -86,5 +86,5 @@ namespace AttackGame
                 Started = true;
             }
         }
-    }
+    }*/
 }
