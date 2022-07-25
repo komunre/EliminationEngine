@@ -1,4 +1,6 @@
-﻿namespace EliminationEngine.GameObjects
+﻿using OpenTK.Windowing.Common;
+
+namespace EliminationEngine.GameObjects
 {
     public class EntitySystem
     {
@@ -23,6 +25,11 @@
         }
 
         public virtual void OnDraw()
+        {
+
+        }
+
+        public virtual void OnTextInput(TextInputEventArgs e)
         {
 
         }

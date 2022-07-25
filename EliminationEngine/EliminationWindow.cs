@@ -125,5 +125,15 @@ namespace EliminationEngine
 
             Engine.GetSystem<GwenSystem>()?.GwenGui?.Resize(new Vector2i(e.Width, e.Height));
         }
+
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            foreach (var system in Engine.RegisteredSystems.Values)
+            {
+                system.OnTextInput(e);
+            }
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace EliminationEngine.Render
     {
         protected int lightsBuffer = 0;
 
+        public bool ForceWiremode = false;
+
         public MeshSystem(Elimination e) : base(e)
         {
 
@@ -178,12 +180,17 @@ namespace EliminationEngine.Render
                     var col = meshGroup.Owner.BaseColor;
                     mesh._shader.SetVector3("addColor", new Vector3(col.R, col.G, col.B));
 
+                    if (ForceWiremode)
+                    {
+                        GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
+                    }
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, camera.GetFrameBuffer());
                     GL.Enable(EnableCap.DepthTest);
                     GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
                     GL.BindVertexArray(mesh._vertexArr);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh._indicesBuffer);
                     GL.DrawElements(PrimitiveType.Triangles, mesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
+                    GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
                 }
             }
 

@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace EliminationEngine.Render.UI
 {
+    [Obsolete("Use ImGuiSystem instead")]
     public class GwenSystem : EntitySystem
     {
         public IGwenGui? GwenGui;

@@ -55,6 +55,7 @@ namespace EliminationEngine
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();
             RegisterSystem<GwenSystem>();
+            RegisterSystem<ImGuiSystem>();
             RegisterSystem<CameraResizeSystem>();
             RegisterSystem<DebugRenderSystem>();
             RegisterSystem<NetworkManager>();

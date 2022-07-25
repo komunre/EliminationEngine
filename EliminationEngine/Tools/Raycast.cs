@@ -141,7 +141,7 @@ namespace EliminationEngine.Tools
 
         public RayHit[] RaycastFromCameraCenter(float maxDist = 1000)
         {
-            var cameras = Engine.GetObjectsOfType<CameraComponent>()?.Select(e => { if (e.Active) return e; else return null; });
+            var cameras = Engine.GetObjectsOfType<CameraComponent>().Select(e => { if (e.Active) return e; else return null; });
             if (cameras == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
             var camera = cameras.ElementAt(0);
             if (camera == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
