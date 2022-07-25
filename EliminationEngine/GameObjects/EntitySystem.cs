@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EliminationEngine.GameObjects
+﻿namespace EliminationEngine.GameObjects
 {
     public class EntitySystem
     {
@@ -15,7 +9,7 @@ namespace EliminationEngine.GameObjects
         }
         public virtual void OnLoad()
         {
-            
+
         }
 
         public virtual void PostLoad()
@@ -25,7 +19,7 @@ namespace EliminationEngine.GameObjects
 
         public virtual void OnUpdate()
         {
-            
+
         }
 
         public virtual void OnDraw()

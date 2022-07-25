@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EliminationEngine.Tools;
-using EliminationEngine.GameObjects;
+﻿using EliminationEngine.GameObjects;
 using OpenTK.Mathematics;
 
 namespace EliminationEngine.Physics

@@ -1,20 +1,21 @@
-using EliminationEngine;
-using EliminationEngine.GameObjects;
-
-namespace EliminationEngine.GameObjects {
-    public class DebugRenderSystem : EntitySystem {
+namespace EliminationEngine.GameObjects
+{
+    public class DebugRenderSystem : EntitySystem
+    {
         public bool DebugActive = false;
-        public DebugRenderSystem(Elimination e) : base(e) {
+        public DebugRenderSystem(Elimination e) : base(e)
+        {
 
         }
 
         public override void OnDraw()
         {
             base.OnDraw();
-            
+
         }
 
-        public void DrawLine() {
+        public void DrawLine()
+        {
 
         }
     }

@@ -1,10 +1,4 @@
-﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 
 namespace EliminationEngine.GameObjects
 {
@@ -69,6 +63,7 @@ namespace EliminationEngine.GameObjects
         public Shader CameraShader = DefaultCameraBuffers.Shader;
         public bool UseDefaultShape = true;
         protected int RBO = 0;
+        public bool Perspective = true;
 
         public void GenerateFrameBuffers()
         {

@@ -1,8 +1,8 @@
-﻿using System.Numerics;
+﻿using EliminationEngine.GameObjects;
 using SharpGLTF.Schema2;
-using EliminationEngine.GameObjects;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Numerics;
 
 namespace EliminationEngine
 {
@@ -23,14 +23,14 @@ namespace EliminationEngine
             {
                 foreach (var prim in meshData.Primitives)
                 {
-                    data.Vertices.AddRange(prim.Vertices.SelectMany(e => new []{e.X, e.Y, e.Z}));
-                    data.UVs.AddRange(prim.UVs.SelectMany(e => new []{e.X, e.Y}));
+                    data.Vertices.AddRange(prim.Vertices.SelectMany(e => new[] { e.X, e.Y, e.Z }));
+                    data.UVs.AddRange(prim.UVs.SelectMany(e => new[] { e.X, e.Y }));
 
                     uint indexCopy = indexOffset;
                     data.Indices.AddRange(prim.Indices.Select(e => e + indexCopy));
                     indexOffset += (uint)prim.Vertices.Length;
                 }
-                
+
                 PostParseMesh(meshData.Children, ref indexOffset, data);
             }
 
@@ -46,7 +46,8 @@ namespace EliminationEngine
                 var uvData = new List<float>();
                 var indices = new List<uint>();
                 var normals = new List<float>();
-                foreach (var primitive in mesh.Primitives) {
+                foreach (var primitive in mesh.Primitives)
+                {
                     vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X + mesh.Center.X, e.Y + mesh.Center.Y, e.Z + mesh.Center.Z }));
                     uvData.AddRange(primitive.UVs.SelectMany(e => new[] { e.X, e.Y }));
                     indices.AddRange(primitive.Indices.Select(e => e));

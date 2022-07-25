@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EliminationEngine.GameObjects;
-using EliminationEngine;
-
-namespace EliminationEngine.GameObjects
+﻿namespace EliminationEngine.GameObjects
 {
     public class RemovalSystem : EntitySystem
     {

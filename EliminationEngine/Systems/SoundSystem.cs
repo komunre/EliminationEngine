@@ -1,13 +1,8 @@
 ﻿using EliminationEngine.GameObjects;
+using EliminationEngine.Tools;
+using ManagedBass;
 using OpenTK.Audio.OpenAL;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ManagedBass;
-using EliminationEngine.Tools;
 
 namespace EliminationEngine.Systems
 {

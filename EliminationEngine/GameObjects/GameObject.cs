@@ -1,12 +1,9 @@
-﻿using EliminationEngine.Tools;
+﻿using EliminationEngine.Network;
+using EliminationEngine.Tools;
+using Newtonsoft.Json;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EliminationEngine.GameObjects
 {
@@ -16,13 +13,32 @@ namespace EliminationEngine.GameObjects
         public float Roll = 0;
         public float Yaw = 0;
     }
+
+    public struct NetworkData
+    {
+        public string Name;
+        public INetworkSerialize Value;
+
+        public NetworkData(string name, INetworkSerialize value)
+        {
+            Name = name;
+            Value = value;
+        }
+    }
+
     public class GameObject
     {
+        public static GameObject InvalidObject = new GameObject();
+
+        public int Id = -1;
         public string Name = "Default";
         public List<string> Layers = new();
         public GameObject? Parent = null;
         public List<GameObject> Children = new List<GameObject>();
         public Color BaseColor = new Color(255, 255, 255, 255);
+
+        public List<string> ObjectData = new(); // JSON Data
+        public object[] DeserializedObjectData = new string[0];
 
         public bool InvertedRotation = false;
 
@@ -35,6 +51,12 @@ namespace EliminationEngine.GameObjects
         private Quaternion _rotation = Quaternion.Identity;
         private Vector3 _degreeRotation = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
+
+        public void AddObjectData(object data)
+        {
+            ObjectData.Add(JsonConvert.SerializeObject(data));
+        }
+
         public void UpdateQuatRot()
         {
             _rotation = EliminationMathHelper.QuaternionFromEuler(_degreeRotation);
@@ -55,7 +77,8 @@ namespace EliminationEngine.GameObjects
         public Vector3 DegreeRotation
         {
             get => _degreeRotation;
-            set {
+            set
+            {
                 _degreeRotation = value;
                 UpdateQuatRot();
             }
@@ -73,7 +96,7 @@ namespace EliminationEngine.GameObjects
 
         public GameObject()
         {
-            
+
         }
 
         public Vector3 Forward()
@@ -91,7 +114,8 @@ namespace EliminationEngine.GameObjects
         }
 
         /// Forward, Right, Up
-        public Vector3[] GetDirections() {
+        public Vector3[] GetDirections()
+        {
             var rot = GlobalDegreeRotation;
 
             /*var forward = new Vector3();
@@ -114,7 +138,7 @@ namespace EliminationEngine.GameObjects
             var right = Vector3.Cross(Vector3.UnitY, forward).Normalized() * -1;
             var up = Vector3.Cross(right, forward).Normalized();
 
-            return new Vector3[]{forward, right, up};
+            return new Vector3[] { forward, right, up };
         }
         public Vector3 DegreeForward()
         {
@@ -166,7 +190,7 @@ namespace EliminationEngine.GameObjects
 
         public void ReRotate()
         {
-            
+
         }
 
         public void LookAt(Vector3 target)
@@ -223,6 +247,20 @@ namespace EliminationEngine.GameObjects
         public bool HasComponent<CompType>() where CompType : EntityComponent
         {
             return Components.ContainsKey(typeof(CompType));
+        }
+
+        public EntityComponent[] GetAllComponents()
+        {
+            return Components.Values.ToArray();
+        }
+
+        public void InsertComponentsData(EntityComponent[] components)
+        {
+            Components.Clear();
+            foreach (var comp in components)
+            {
+                Components.Add(comp.GetType(), comp);
+            }
         }
     }
 }

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using BepuPhysics;
+﻿using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
 using BepuUtilities;
+using System.Numerics;
 
 namespace EliminationEngine.Physics
 {
@@ -25,7 +20,7 @@ namespace EliminationEngine.Physics
 
         public void Initialize(Simulation simulation)
         {
-            
+
         }
 
         public void IntegrateVelocity(Vector<int> bodyIndices, Vector3Wide position, QuaternionWide orientation, BodyInertiaWide localInertia, Vector<int> integrationMask, int workerIndex, Vector<float> dt, ref BodyVelocityWide velocity)

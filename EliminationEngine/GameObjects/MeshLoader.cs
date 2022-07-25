@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EliminationEngine.GameObjects
+﻿namespace EliminationEngine.GameObjects
 {
     public static class MeshLoader
     {

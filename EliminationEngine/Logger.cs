@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EliminationEngine
+﻿namespace EliminationEngine
 {
     public enum LogLevel
     {
@@ -17,7 +11,8 @@ namespace EliminationEngine
         public static void MakeLog(LogLevel level, string message)
         {
             string prefix = "[INFO]";
-            switch (level) {
+            switch (level)
+            {
                 case LogLevel.Info:
                     prefix = "[INFO]";
                     break;

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EliminationEngine.GameObjects;
+﻿using EliminationEngine.GameObjects;
 using OpenTK.Mathematics;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
 
 namespace EliminationEngine.Tools
 {
@@ -18,7 +11,7 @@ namespace EliminationEngine.Tools
         public Vector3 StartPos = Vector3.Zero;
         public Vector3 EndPos = Vector3.Zero;
 
-        public RayHit(bool hit, GameObject obj, float dist, Vector3 start, Vector3 end)
+        public RayHit(bool hit, GameObject? obj, float dist, Vector3 start, Vector3 end)
         {
             Hit = hit;
             HitObject = obj;
@@ -158,6 +151,11 @@ namespace EliminationEngine.Tools
 
         public RayHit[] RaycastFromCameraCursor(float maxDist = 1000)
         {
+            if (Engine.Headless)
+            {
+                Logger.Warn("Headless, no need to raycast from camera");
+                return new RayHit[0];
+            }
             var cameras = Engine.GetObjectsOfType<CameraComponent>()?.Select(e => { if (e.Active) return e; else return null; });
             if (cameras == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
             var camera = cameras.ElementAt(0);

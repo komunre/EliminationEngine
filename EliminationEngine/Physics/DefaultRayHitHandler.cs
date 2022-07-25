@@ -6,7 +6,8 @@ using System.Numerics;
 
 namespace EliminationEngine.Physics
 {
-    public class RayHitData {
+    public class RayHitData
+    {
         public Vector3 OriginPos;
         public Vector3 HitPos;
         public float Distance;

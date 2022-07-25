@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EliminationEngine.GameObjects;
+﻿using EliminationEngine.GameObjects;
+using EliminationEngine.Network;
 using EliminationEngine.Physics;
 using EliminationEngine.Render;
 using EliminationEngine.Render.UI;
 using EliminationEngine.Systems;
 using EliminationEngine.Tools;
-using OpenTK;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Diagnostics;
 
 namespace EliminationEngine
 {
@@ -23,27 +18,37 @@ namespace EliminationEngine
         public Dictionary<Type, EntitySystem> RegisteredSystems = new();
         public float DeltaTime = 0;
         public TimeSpan Elapsed = new TimeSpan(0);
-        public KeyboardState KeyState;
-        public MouseState MouseState;
+        public KeyboardState? KeyState;
+        public MouseState? MouseState;
 
         public delegate void ObjectCreateEvent(GameObject obj, int world);
-        public event ObjectCreateEvent OnObjectCreate;
+        public event ObjectCreateEvent? OnObjectCreate;
 
-        public Elimination(int width, int height)
+        public string[] ProgramArgs = new string[0];
+        public bool Headless = false;
+        public bool IsRunning = false;
+
+        public Elimination()
         {
-            var settings = new GameWindowSettings();
-            //settings.IsMultiThreaded = true;
-            var native = new NativeWindowSettings();
-            native.Size = new OpenTK.Mathematics.Vector2i(width, height);
-            native.Title = Title;
-            native.Flags = OpenTK.Windowing.Common.ContextFlags.ForwardCompatible;
-            window = new EliminationWindow(settings, native, this);
-            KeyState = window.KeyboardState;
-            MouseState = window.MouseState;
+
         }
         public void Run()
         {
-            if (window == null) throw new InvalidDataException("No window was opened");
+            IsRunning = true;
+            var settings = new GameWindowSettings();
+            //settings.IsMultiThreaded = true;
+            var native = new NativeWindowSettings();
+            native.Size = new OpenTK.Mathematics.Vector2i(800, 600);
+            native.Title = Title;
+            native.Flags = OpenTK.Windowing.Common.ContextFlags.ForwardCompatible;
+            window = new EliminationWindow(settings, native, this);
+            if (Headless)
+            {
+                window.IsVisible = false;
+            }
+            KeyState = window.KeyboardState;
+            MouseState = window.MouseState;
+            if (window == null) throw new InvalidDataException("No window was opened, no headless flag was specified");
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
             RegisterSystem<Raycast>();
@@ -52,6 +57,7 @@ namespace EliminationEngine
             RegisterSystem<GwenSystem>();
             RegisterSystem<CameraResizeSystem>();
             RegisterSystem<DebugRenderSystem>();
+            RegisterSystem<NetworkManager>();
             window.Run();
         }
 
@@ -67,7 +73,26 @@ namespace EliminationEngine
                 var meshSys = GetSystem<MeshSystem>();
                 meshSys?.LoadMeshGroup(comp);
             }
-            window.GameObjects.Add(obj);
+            window.GameObjects.Add(window.MaxObjectId, obj);
+            window.MaxObjectId++;
+            if (OnObjectCreate != null)
+            {
+                OnObjectCreate.Invoke(obj, window.CurrentWorld);
+            }
+        }
+
+        public void AddGameObjectNoId(GameObject obj)
+        {
+            if (window == null)
+            {
+                Logger.Warn("Start the engine before accessing gameobjects");
+                return;
+            }
+            if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
+            {
+                var meshSys = GetSystem<MeshSystem>();
+                meshSys?.LoadMeshGroup(comp);
+            }
             if (OnObjectCreate != null)
             {
                 OnObjectCreate.Invoke(obj, window.CurrentWorld);
@@ -81,7 +106,13 @@ namespace EliminationEngine
                 Logger.Warn("Start the engine before accessing gameobjects");
                 return;
             }
-            window.GameObjects.Remove(obj);
+            window.GameObjects.Remove(obj.Id);
+        }
+
+        public void RemoveGameObject(int id)
+        {
+            if (window == null) return;
+            window.GameObjects.Remove(id);
         }
 
         public void RegisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem
@@ -107,14 +138,20 @@ namespace EliminationEngine
             return false;
         }
 
-        public CompType[]? GetObjectsOfType<CompType>() where CompType : EntityComponent
+        public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
             if (window == null)
             {
                 Logger.Warn("Start the engine before accessing gameobjects");
-                return null;
+                return new CompType[0];
             }
             return window.GetObjectsOfType<CompType>();
+        }
+
+        public GameObject GetObjectById(int id)
+        {
+            if (window == null) return GameObject.InvalidObject;
+            return window.GameObjects[id];
         }
 
         public void AddChildTo(GameObject parent, GameObject child)
@@ -155,17 +192,19 @@ namespace EliminationEngine
 
         public void StopEngine()
         {
+            IsRunning = false;
             if (window == null) return;
             window.Close();
         }
 
-        public GameObject[]? GetAllObjects()
+        public GameObject[] GetAllObjects()
         {
-            if (window == null) return null;
-            return window.GameObjects.ToArray();
+            if (window == null) return new GameObject[0];
+            return window.GameObjects.Values.ToArray();
         }
 
-        public int CreateWorld()
+        // Not supported anymore
+        /*public int CreateWorld()
         {
             return window.CreateWorld();
         }
@@ -178,7 +217,7 @@ namespace EliminationEngine
         public void RemoveWorld(int world)
         {
             window.RemoveWorld(world);
-        }
+        }*/
 
         public void EnterFullscreen()
         {
