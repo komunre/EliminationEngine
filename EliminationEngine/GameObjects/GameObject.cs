@@ -116,7 +116,7 @@ namespace EliminationEngine.GameObjects
         /// Forward, Right, Up
         public Vector3[] GetDirections()
         {
-            var rot = GlobalDegreeRotation;
+            var rot = DegreeRotation;
 
             /*var forward = new Vector3();
             forward.X = (float)Math.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)Math.Cos(MathHelper.DegreesToRadians(rot.X));
@@ -129,9 +129,9 @@ namespace EliminationEngine.GameObjects
             var stabilization = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
             var forward = new Vector3(vertical, horizontal, stabilization);*/
 
-            var x = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeCos(rot.Y);
-            var y = EliminationMathHelper.DegreeSin(rot.X);
-            var z = (EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.Y));
+            var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
+            var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
+            var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));
 
             var forward = new Vector3(x, y, z).Normalized();
 

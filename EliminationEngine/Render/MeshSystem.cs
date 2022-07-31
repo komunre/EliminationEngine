@@ -107,7 +107,7 @@ namespace EliminationEngine.Render
             var cameraRot = camera.Owner.Rotation;
             var cameraPos = camera.Owner.Position;
             var directions = camera.Owner.GetDirections();
-            var forward = directions[0];
+            var forward = directions[0] + camera.Owner.Position;
             var up = directions[2];
 
             var lights = Engine.GetObjectsOfType<LightComponent>();
@@ -135,7 +135,7 @@ namespace EliminationEngine.Render
                     }
                     else
                     {
-                        fovMatrix = Matrix4.CreateOrthographic(camera.Width, camera.Height, camera.ClipNear, camera.ClipFar);
+                        fovMatrix = Matrix4.CreateOrthographic(camera.OrthoWidth, camera.OrthoHeight, camera.ClipNear, camera.ClipFar);
                     }
 
                     /*Quaternion.ToEulerAngles(in cameraRot, out var euler);
@@ -182,7 +182,7 @@ namespace EliminationEngine.Render
 
                     if (ForceWiremode)
                     {
-                        GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
+                        GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
                     }
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, camera.GetFrameBuffer());
                     GL.Enable(EnableCap.DepthTest);
@@ -190,7 +190,7 @@ namespace EliminationEngine.Render
                     GL.BindVertexArray(mesh._vertexArr);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh._indicesBuffer);
                     GL.DrawElements(PrimitiveType.Triangles, mesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
-                    GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
+                    GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
                 }
             }
 

@@ -65,6 +65,9 @@ namespace EliminationEngine.GameObjects
         protected int RBO = 0;
         public bool Perspective = true;
 
+        public float OrthoWidth = 5;
+        public float OrthoHeight = 5;
+
         public void GenerateFrameBuffers()
         {
             FrameBuffer = GL.GenFramebuffer();
