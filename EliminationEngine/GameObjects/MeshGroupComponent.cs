@@ -1,14 +1,4 @@
 ﻿using EliminationEngine.Render;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EliminationEngine.GameObjects
 {
@@ -18,7 +8,7 @@ namespace EliminationEngine.GameObjects
 
         public MeshGroupComponent(GameObject o) : base(o)
         {
-            
+
         }
 
         public Mesh? FindByName(string name)

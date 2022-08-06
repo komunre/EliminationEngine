@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
+﻿using EliminationEngine.GameObjects;
+using EliminationEngine.Render.UI;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using EliminationEngine.GameObjects;
-using System.Globalization;
-using OpenTK.Mathematics;
 using System.Diagnostics;
-using EliminationEngine.Render.UI;
 
 namespace EliminationEngine
 {
@@ -20,7 +13,8 @@ namespace EliminationEngine
         public int WorldCounter = 0;
         public int CurrentWorld = 0;
         public Dictionary<int, List<GameObject>> WorldObjects = new();
-        public List<GameObject> GameObjects = new();
+        public int MaxObjectId = 0;
+        public Dictionary<int, GameObject> GameObjects = new();
         public Elimination Engine;
         protected Stopwatch stopwatch = new();
         public EliminationWindow(GameWindowSettings settings, NativeWindowSettings nativeSettings, Elimination engine) : base(settings, nativeSettings)
@@ -35,16 +29,6 @@ namespace EliminationEngine
             return WorldCounter++;
         }
 
-        public void SwitchWorld(int world)
-        {
-            if (!WorldObjects.ContainsKey(world))
-            {
-                Logger.Error("Can not load world (does not exist): " + world);
-            }
-            CurrentWorld = world;
-            GameObjects = WorldObjects[world];
-        }
-
         public void RemoveWorld(int world)
         {
             WorldObjects.Remove(world);
@@ -53,7 +37,7 @@ namespace EliminationEngine
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
             var compsList = new List<CompType>();
-            foreach (var obj in GameObjects)
+            foreach (var obj in GameObjects.Values)
             {
                 if (obj.TryGetComponent<CompType>(out var comp))
                 {
@@ -138,8 +122,18 @@ namespace EliminationEngine
             base.OnResize(e);
 
             GL.Viewport(0, 0, e.Width, e.Height);
-            
-            Engine.GetSystem<GwenSystem>().GwenGui.Resize(new Vector2i(e.Width, e.Height));
+
+            Engine.GetSystem<GwenSystem>()?.GwenGui?.Resize(new Vector2i(e.Width, e.Height));
+        }
+
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            foreach (var system in Engine.RegisteredSystems.Values)
+            {
+                system.OnTextInput(e);
+            }
         }
     }
 }

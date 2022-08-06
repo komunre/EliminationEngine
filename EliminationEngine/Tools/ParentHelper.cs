@@ -1,10 +1,5 @@
 ﻿using EliminationEngine.GameObjects;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EliminationEngine.Tools
 {
@@ -30,9 +25,11 @@ namespace EliminationEngine.Tools
             return result;
         }
 
-        public static Vector3 GetAddedDegreeRot(GameObject obj) {
+        public static Vector3 GetAddedDegreeRot(GameObject obj)
+        {
             var result = obj.DegreeRotation;
-            if (obj.Parent != null) {
+            if (obj.Parent != null)
+            {
                 result += GetAddedDegreeRot(obj.Parent);
             }
             return result;

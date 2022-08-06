@@ -39,9 +39,10 @@ namespace AttackGame
             _soundSystem = Engine.GetSystem<SoundSystem>();
 
             var camera = new GameObject();
-            camera.AddComponent<CameraComponent>();
+            var cam = camera.AddComponent<CameraComponent>();
             camera.Position = new Vector3(0.1f, 1, -5);
             camera.LookAt(new Vector3(0, 0, 0));
+            cam.Active = true;
 
             Engine.AddGameObject(camera);
             _camera = camera;
@@ -144,7 +145,7 @@ namespace AttackGame
         public override void OnUpdate()
         {
             base.OnUpdate();
-            var dir = Vector3.Zero;
+            /*var dir = Vector3.Zero;
             if (Engine.KeyState.IsKeyDown(Keys.D)) {
                 dir += _camera.Right();
             }
@@ -168,7 +169,7 @@ namespace AttackGame
             {
                 dir += -_camera.Up();
             }
-            _camera.Position += dir * 2f * Engine.DeltaTime;
+            _camera.Position += dir * 2f * Engine.DeltaTime;*/
 
             if (redLight != null)
             {
@@ -182,7 +183,10 @@ namespace AttackGame
             //_camera.Rotation = EliminationMathHelper.QuaternionFromEuler(new Vector3(90, 0, 0)); // WORKS!
             if (_camera != null)
             {
-                //_camera.LookAt(new Vector3(0, 0, 0)); // works too
+                _camera.Position.X = (float)MathHelper.Sin(Engine.Elapsed.TotalSeconds) * -5f;
+                _camera.Position.Z = (float)MathHelper.Cos(Engine.Elapsed.TotalSeconds) * -5f;
+                _camera.LookAt(new Vector3(0, 0, 0)); // works too
+                Console.WriteLine(_camera.DegreeRotation.X + ":" + _camera.DegreeRotation.Y + ":" + _camera.DegreeRotation.Z);
                 //_camera.Rotation *= EliminationMathHelper.QuaternionFromEuler(new Vector3(0, 1f, 0));
             }
 
@@ -198,11 +202,11 @@ namespace AttackGame
                 _soundSystem.GenSound(1046, SoundType.Noise, 100, 1);
             }
 
-            if (Engine.MouseState.PreviousPosition != Engine.MouseState.Position)
+            /*if (Engine.MouseState.PreviousPosition != Engine.MouseState.Position)
             {
                 var delta = (Engine.MouseState.Position - Engine.MouseState.PreviousPosition) * 0.2f;
                 _camera.Rotation *= EliminationMathHelper.QuaternionFromEuler(new Vector3(delta.Y, delta.X, 0));
-            }
+            }*/
 
             if (Engine.KeyState.IsKeyDown(Keys.L))
             {

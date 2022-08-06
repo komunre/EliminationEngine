@@ -1,21 +1,26 @@
-﻿using EliminationEngine;
-using EliminationEngine.GameObjects;
-using Gwen.Net.Control;
-using Gwen.Net.Renderer;
-using Gwen.Net;
-using Gwen.Net.Platform;
+﻿using EliminationEngine.GameObjects;
 using Gwen.Net.OpenTk;
 using OpenTK.Graphics.OpenGL4;
 
 namespace EliminationEngine.Render.UI
 {
+    [Obsolete("Use ImGuiSystem instead")]
     public class GwenSystem : EntitySystem
     {
-        public IGwenGui GwenGui;
+        public IGwenGui? GwenGui;
 
         private bool Initialized = false;
         public GwenSystem(Elimination e) : base(e)
         {
+
+        }
+
+        public override void OnLoad()
+        {
+            base.OnLoad();
+
+            if (Engine.Headless) return;
+
             GwenGui = GwenGuiFactory.CreateFromGame(Engine.window, GwenGuiSettings.Default.From(settings =>
             {
                 settings.SkinFile = new FileInfo("res/DefaultSkin2.png");
@@ -23,13 +28,6 @@ namespace EliminationEngine.Render.UI
             }));
 
             GwenGui.Load();
-        }
-
-        public override void OnLoad()
-        {
-            base.OnLoad();
-
-            
         }
 
         public override void PostLoad()
@@ -41,6 +39,8 @@ namespace EliminationEngine.Render.UI
         {
             base.OnDraw();
 
+            if (GwenGui == null) return;
+
             GL.Disable(EnableCap.CullFace);
             GwenGui.Render();
             GL.Enable(EnableCap.CullFace);
@@ -50,7 +50,7 @@ namespace EliminationEngine.Render.UI
         {
             base.OnUpdate();
 
-            
+
         }
     }
 }

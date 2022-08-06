@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EliminationEngine.GameObjects;
-using OpenTK.Mathematics;
-using BepuPhysics;
-using System.Numerics;
-
-namespace EliminationEngine.Extensions
+﻿namespace EliminationEngine.Extensions
 {
     public static class PhysicsHelper
     {

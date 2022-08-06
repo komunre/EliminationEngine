@@ -1,19 +1,11 @@
 ﻿using EliminationEngine.GameObjects;
-using EliminationEngine;
-using BepuPhysics;
-using BepuPhysics.CollisionDetection;
-using BepuPhysics.Collidables;
-using BepuUtilities.Memory;
-using EliminationEngine.Extensions;
-using BepuPhysics.Constraints;
-using System.Numerics;
 
 namespace EliminationEngine.Physics
 {
     public class PhysicsSystem : EntitySystem
     {
-        public Simulation Sim;
-        public float CurrentTimestep = 0.1f;
+        /*public Simulation Sim;
+        public float CurrentTimestep = 0.1f;*/
         public PhysicsSystem(Elimination e) : base(e)
         {
 

@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,10 @@
 
   <ItemGroup>
     <PackageReference Include="BepuPhysics" Version="2.4.0-beta9" />
+    <PackageReference Include="ImGui.NET" Version="1.87.3" />
+    <PackageReference Include="Lidgren.Network" Version="1.0.2" />
     <PackageReference Include="ManagedBass" Version="3.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
     <PackageReference Include="OpenTK" Version="4.7.1" />
     <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0023" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
@@ -51,10 +55,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <Folder Include="res\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Gwen.Net\Gwen.Net.OpenTk\Gwen.Net.OpenTk.csproj" />
     <ProjectReference Include="..\Gwen.Net\Gwen.Net\Gwen.Net.csproj" />
   </ItemGroup>
@@ -73,6 +73,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="res\DefaultSkin2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\imgui.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\imgui.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\camera.frag">
