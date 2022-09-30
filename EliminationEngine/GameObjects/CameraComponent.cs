@@ -53,7 +53,7 @@ namespace EliminationEngine.GameObjects
         public int FoV = 80;
         public bool Active = true;
         public int Width = 800;
-        public int Height = 600;
+        public int Height = 800;
         public float ClipNear = 0.1f;
         public float ClipFar = 1000f;
         protected int FrameBuffer = 0;
@@ -65,10 +65,43 @@ namespace EliminationEngine.GameObjects
         protected int RBO = 0;
         public bool Perspective = true;
 
-        public float OrthoWidth = 5;
-        public float OrthoHeight = 5;
+        public bool Protected = true;
 
-        public void GenerateFrameBuffers()
+        private float _orthoWidth = 5;
+        private float _orthoHeight = 5;
+        private float _orthoVis = 5;
+
+        public float OrthoWidth
+        {
+            get => _orthoWidth;
+            private set => _orthoWidth = value;
+        }
+
+        public float OrthoHeight
+        {
+            get => _orthoHeight;
+            private set => _orthoHeight = value;
+        }
+
+        public float OrthoVisibility
+        {
+            get => _orthoVis;
+            private set => _orthoVis = value;
+        }
+
+        public void SetOrthoVisibility(float visibility)
+        {
+            _orthoWidth = 5;
+            _orthoHeight = 5;
+            //_orthoWidth = visibility;
+            //_orthoHeight = visibility / ((float)Height / (float)Width);
+            //_orthoVis = visibility;
+
+            //Console.WriteLine("Window: " + Width + ":" + Height);
+            //Console.WriteLine("Render:" + OrthoWidth + ":" + OrthoHeight);
+        }
+
+        protected void GenerateFrameBuffers()
         {
             FrameBuffer = GL.GenFramebuffer();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, FrameBuffer);
@@ -97,7 +130,7 @@ namespace EliminationEngine.GameObjects
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, FrameBuffer);
         }
 
-        public void GenerateRenderTexture()
+        protected void GenerateRenderTexture()
         {
             RenderTexture = GL.GenTexture();
             BindFrameBuffer();
@@ -120,7 +153,7 @@ namespace EliminationEngine.GameObjects
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
         }
 
-        public void ConfigureFrameBuffers()
+        protected void ConfigureFrameBuffers()
         {
             BindFrameBuffer();
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, RenderTexture, 0);
@@ -132,12 +165,22 @@ namespace EliminationEngine.GameObjects
             GenerateFrameBuffers();
             GenerateRenderTexture();
             ConfigureFrameBuffers();
+            Protected = false;
         }
 
         public void RemoveFrameBuffers()
         {
             GL.DeleteFramebuffer(FrameBuffer);
             GL.DeleteFramebuffer(DepthFrameBuffer);
+        }
+
+        public void ClearTextureTools()
+        {
+            GL.DeleteFramebuffer(FrameBuffer);
+            GL.DeleteFramebuffer(DepthFrameBuffer);
+            GL.DeleteTexture(RenderTexture);
+            GL.DeleteRenderbuffer(RBO);
+            Protected = true;
         }
 
         public int GetTexture()

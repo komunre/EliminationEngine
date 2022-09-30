@@ -1,4 +1,5 @@
 ﻿using EliminationEngine.GameObjects;
+using EliminationEngine.Render;
 using EliminationEngine.Render.UI;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -121,9 +122,9 @@ namespace EliminationEngine
         {
             base.OnResize(e);
 
-            GL.Viewport(0, 0, e.Width, e.Height);
+            GL.Viewport(0, 0, Size.X, Size.Y);
 
-            Engine.GetSystem<GwenSystem>()?.GwenGui?.Resize(new Vector2i(e.Width, e.Height));
+            Engine.GetSystem<CameraResizeSystem>().WindowResized = true;
         }
 
         protected override void OnTextInput(TextInputEventArgs e)
