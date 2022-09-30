@@ -38,7 +38,7 @@ namespace EliminationEngine
             var settings = new GameWindowSettings();
             //settings.IsMultiThreaded = true;
             var native = new NativeWindowSettings();
-            native.Size = new OpenTK.Mathematics.Vector2i(800, 600);
+            native.Size = new OpenTK.Mathematics.Vector2i(800, 800);
             native.Title = Title;
             native.Flags = OpenTK.Windowing.Common.ContextFlags.ForwardCompatible;
             window = new EliminationWindow(settings, native, this);
