@@ -104,7 +104,6 @@ namespace EliminationEngine.Render
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
 
-            var cameraRot = camera.Owner.Rotation;
             var cameraPos = camera.Owner.Position;
             var directions = camera.Owner.GetDirections();
             var forward = directions[0] + camera.Owner.Position;

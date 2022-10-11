@@ -11,52 +11,21 @@ out vec2 texCoord;
 out vec3 fragPos;
 out vec3 normal;
 out vec4 fragAddColor;
-
-struct PointLight {
-    vec3 pos;
-    float constant;
-    float linear;
-    float quadratic;
-    float ambient;
-    float shine;
-    vec3 diffuse;
-};
-
-#define NR_POINT_LIGHTS 20 
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform int lightsNum = 0;
-
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-    vec3 lightDir = normalize(light.pos - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), light.shine);
-    // attenuation
-    float distance    = length(light.pos - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + 
-  			     light.quadratic * (distance * distance));    
-    // combine results
-    //vec3 ambient  = light.ambient  * light.diffuse;
-    vec3 diffuse  = light.diffuse  * diff;
-    //vec3 specular = light.specular * spec * light.diffuse;
-    //ambient  *= attenuation;
-    diffuse  *= attenuation;
-    //specular *= attenuation;
-    return (diffuse);
-} 
+out vec3 _aNormal;
+out vec3 NewPos;
+out vec3 FragNormal;
+out mat3 normalMat;
 
 void main(void)
 {
     vec3 newPos = vec3(vec4(aPosition, 1.0) * modelMatrix);
+    NewPos = newPos;
     vec3 result = vec3(0, 0, 0);
-    for(int i = 0; i < lightsNum; i++)
-        result += CalcPointLight(pointLights[i], mat3(transpose(inverse(modelMatrix))) * aNormal, newPos, normalize(viewPos - newPos));
     fragAddColor = vec4(result, 1.0);
     normal = aNormal;
-    fragPos = aPosition;
+    fragPos = vec3(modelMatrix * vec4(aPosition, 1.0));
     texCoord = aTexCoord;
     gl_Position = vec4(aPosition, 1.0) * mvpMatrix;
+    _aNormal = aNormal;
+    normalMat = mat3(transpose(inverse(modelMatrix)));
 }

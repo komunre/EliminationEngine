@@ -7,11 +7,22 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EliminationEngine.GameObjects
 {
-    public class SimpleRotation
+    public struct SimpleRotation
     {
         public float Pitch = 0;
         public float Roll = 0;
         public float Yaw = 0;
+
+        public SimpleRotation()
+        {
+        }
+
+        public SimpleRotation(float pitch, float roll, float yaw)
+        {
+            Pitch = pitch;
+            Roll = roll;
+            Yaw = yaw;
+        }
     }
 
     public struct NetworkData
@@ -129,13 +140,17 @@ namespace EliminationEngine.GameObjects
             var stabilization = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
             var forward = new Vector3(vertical, horizontal, stabilization);*/
 
-            var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
+            /*var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
             var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
-            var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));
+            var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));*/
+
+            var x = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeCos(rot.Y);
+            var y = EliminationMathHelper.DegreeSin(rot.X);
+            var z = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeSin(rot.Y);
 
             var forward = new Vector3(x, y, z).Normalized();
 
-            var right = Vector3.Cross(Vector3.UnitY, forward).Normalized() * -1;
+            var right = Vector3.Cross(forward, Vector3.UnitY).Normalized();
             var up = Vector3.Cross(right, forward).Normalized();
 
             return new Vector3[] { forward, right, up };

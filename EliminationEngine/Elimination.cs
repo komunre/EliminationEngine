@@ -28,9 +28,9 @@ namespace EliminationEngine
         public bool Headless = false;
         public bool IsRunning = false;
 
-        public Elimination()
+        public Elimination(string[] args)
         {
-
+            ProgramArgs = args;
         }
         public void Run()
         {
@@ -54,7 +54,6 @@ namespace EliminationEngine
             RegisterSystem<Raycast>();
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();
-            RegisterSystem<GwenSystem>();
             RegisterSystem<ImGuiSystem>();
             RegisterSystem<CameraResizeSystem>();
             RegisterSystem<DebugRenderSystem>();

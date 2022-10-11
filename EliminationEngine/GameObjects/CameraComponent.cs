@@ -50,6 +50,9 @@ namespace EliminationEngine.GameObjects
         {
             RunFullFrameBufferConfig();
         }
+
+        public SimpleRotation Rotation = new SimpleRotation();
+
         public int FoV = 80;
         public bool Active = true;
         public int Width = 800;
