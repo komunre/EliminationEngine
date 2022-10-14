@@ -31,6 +31,15 @@ namespace EliminationEngine
         public Elimination(string[] args)
         {
             ProgramArgs = args;
+            RegisterSystem<MeshSystem>();
+            RegisterSystem<SoundSystem>();
+            RegisterSystem<Raycast>();
+            RegisterSystem<CollisionSystem>();
+            RegisterSystem<RemovalSystem>();
+            RegisterSystem<ImGuiSystem>();
+            RegisterSystem<CameraResizeSystem>();
+            RegisterSystem<DebugRenderSystem>();
+            RegisterSystem<NetworkManager>();
         }
         public void Run()
         {
@@ -49,15 +58,6 @@ namespace EliminationEngine
             KeyState = window.KeyboardState;
             MouseState = window.MouseState;
             if (window == null) throw new InvalidDataException("No window was opened, no headless flag was specified");
-            RegisterSystem<MeshSystem>();
-            RegisterSystem<SoundSystem>();
-            RegisterSystem<Raycast>();
-            RegisterSystem<CollisionSystem>();
-            RegisterSystem<RemovalSystem>();
-            RegisterSystem<ImGuiSystem>();
-            RegisterSystem<CameraResizeSystem>();
-            RegisterSystem<DebugRenderSystem>();
-            RegisterSystem<NetworkManager>();
             window.Run();
         }
 
@@ -120,6 +120,11 @@ namespace EliminationEngine
             var system = Activator.CreateInstance(typeof(EntitySystemType), new object[] { this }) as EntitySystemType;
             Debug.Assert(system != null, "System is null after creation during registration");
             RegisteredSystems.Add(typeof(EntitySystemType), system);
+        }
+
+        public EntitySystem[] GetAllSystems()
+        {
+            return RegisteredSystems.Values.ToArray();
         }
 
         public EntitySystemType? GetSystem<EntitySystemType>() where EntitySystemType : EntitySystem

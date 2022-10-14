@@ -54,7 +54,7 @@ namespace EliminationEngine.GameObjects
         public SimpleRotation Rotation = new SimpleRotation();
 
         public int FoV = 80;
-        public bool Active = true;
+        public bool Active = false;
         public int Width = 800;
         public int Height = 800;
         public float ClipNear = 0.1f;

@@ -48,11 +48,15 @@ namespace EliminationEngine.Render.UI
         private GameObject DebugCameraObject;
         private CameraComponent DebugCamera;
 
+        private DebugRenderSystem _debugRender;
+
         /// <summary>
         /// Constructs a new ImGuiController.
         /// </summary>
         public override void OnLoad()
         {
+            _debugRender = Engine.GetSystem<DebugRenderSystem>();
+
             _windowWidth = Engine.window.Bounds.Size.X;
             _windowHeight = Engine.window.Bounds.Size.Y;
 
@@ -82,10 +86,10 @@ namespace EliminationEngine.Render.UI
             Engine.AddGameObject(DebugCameraObject);
         }
 
-        public void WindowResized(int width, int height)
+        public void WindowResized()
         {
-            _windowWidth = width;
-            _windowHeight = height;
+            _windowWidth = Engine.window.Size.X;
+            _windowHeight = Engine.window.Size.Y;
         }
 
         public void DestroyDeviceObjects()
@@ -241,8 +245,11 @@ void main()
             if (!DebugOpened)
             {
                 var cameras = Engine.GetObjectsOfType<CameraComponent>().Select(e => { if (e.Active) return e; else return null; });
-                var cam = cameras.ElementAt(0);
-                DebugCameraObject.Position = cam.Owner.Position;
+                if (cameras != null && cameras.ElementAt(0) != null)
+                {
+                    var cam = cameras.ElementAt(0);
+                    DebugCameraObject.Position = cam.Owner.Position;
+                }
             }
             else
             {
@@ -292,10 +299,9 @@ void main()
                 ImGui.Begin("DEBUG MENU");
                 ImGui.Checkbox("Wiremode", ref renderSystem.ForceWiremode);
                 ImGui.Checkbox("FreeCam", ref FreeCam);
+                ImGui.Checkbox("Debug render", ref _debugRender.DebugActive);
                 ImGui.End();
             }
-
-            Render();
         }
 
         /// <summary>

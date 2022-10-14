@@ -103,6 +103,13 @@ namespace EliminationEngine.GameObjects
                 UpdateDegreeRot();
             }
         }
+
+        public void ClampVerticalTo90()
+        {
+            _degreeRotation.X = Math.Clamp(_degreeRotation.X, -89, 89);
+            UpdateQuatRot();
+        }
+
         protected Dictionary<Type, EntityComponent> Components { get; private set; } = new();
 
         public GameObject()
@@ -135,20 +142,21 @@ namespace EliminationEngine.GameObjects
             forward.Z = (float)Math.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)Math.Sin(MathHelper.DegreesToRadians(rot.X));
             forward = Vector3.Normalize(forward);*/
 
-            /*var horizontal = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.X));
-            var vertical = (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
-            var stabilization = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
-            var forward = new Vector3(vertical, horizontal, stabilization);*/
+            /*var x = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.X));
+            var y = (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
+            var z = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));*/
 
             /*var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
             var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
             var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));*/
 
-            var x = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeCos(rot.Y);
+            /*var x = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeCos(rot.Y);
             var y = EliminationMathHelper.DegreeSin(rot.X);
-            var z = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeSin(rot.Y);
+            var z = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeSin(rot.Y);*/
 
-            var forward = new Vector3(x, y, z).Normalized();
+            //var forward = new Vector3(x, y, z).Normalized();
+
+            var forward = _rotation * new Vector3(1, 0, 0);
 
             var right = Vector3.Cross(forward, Vector3.UnitY).Normalized();
             var up = Vector3.Cross(right, forward).Normalized();

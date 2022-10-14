@@ -24,5 +24,6 @@ namespace EliminationEngine.Render
         public string ShaderVertPath = "Shaders/unlit.vert";
         public string ShaderFragPath = "Shaders/text.frag";
         public Vector3 Position = Vector3.Zero;
+        public Vector3 OffsetPosition = Vector3.Zero;
     }
 }

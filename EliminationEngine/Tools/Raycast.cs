@@ -1,4 +1,5 @@
 ﻿using EliminationEngine.GameObjects;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace EliminationEngine.Tools
@@ -22,6 +23,7 @@ namespace EliminationEngine.Tools
     }
     public class Raycast : EntitySystem
     {
+
         public Raycast(Elimination e) : base(e)
         {
         }
@@ -29,13 +31,21 @@ namespace EliminationEngine.Tools
         public override void OnLoad()
         {
             base.OnLoad();
-
-
         }
 
 
         public RayHit[] RaycastFromPos(Vector3 pos, Vector3 dir, float maxDist = 1000, uint maxHits = 2)
         {
+            var debugRender = Engine.GetSystem<DebugRenderSystem>();
+            if (debugRender.DebugActive)
+            {
+                var lineDraw = new float[]
+                {
+                    pos.X, pos.Y, pos.Z,
+                    pos.X + dir.X * maxDist, pos.Y + dir.Y * maxDist, pos.Z + dir.Z * maxDist
+                };
+                debugRender.AddLine(lineDraw);
+            }
 
             var delta = dir;
 
@@ -133,9 +143,9 @@ namespace EliminationEngine.Tools
 
         public RayHit[] RaycastFromObject(GameObject obj, float maxDist = 1000)
         {
-            var dir = obj.DegreeForward();
-            dir.Y = dir.Y / 2;
-            dir.X = dir.X / 2;
+            var dir = obj.GetDirections()[0];
+            //dir.Y = dir.Y / 2;
+            //dir.X = dir.X / 2;
             return RaycastFromPos(obj.GlobalPosition, dir, maxDist);
         }
 
@@ -162,16 +172,17 @@ namespace EliminationEngine.Tools
             if (camera == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };
 
             var camPos = camera.Owner.Position;
-            var forward = camera.Owner.Forward();
-            var up = camera.Owner.Up();
+            var directions = camera.Owner.GetDirections();
+            var forward = directions[0];
+            var up = directions[2];
 
             var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
             var lookAt = Matrix4.LookAt(camera.Owner.GlobalPosition, forward, up);
             var viewMatrix = lookAt * (fovMatrix);
             var mousePos = Engine.MouseState.Position;
             var newMousePos = mousePos;
-            newMousePos.X = 2f * mousePos.X / camera.Width - 1;
-            newMousePos.Y = 2f * mousePos.Y / camera.Height - 1;
+            newMousePos.X = 2f * mousePos.X / Engine.window.Size.X - 1;
+            newMousePos.Y = 2f * mousePos.Y / Engine.window.Size.Y - 1;
             newMousePos.Y *= -1;
             var coords = new Vector4(newMousePos.X, newMousePos.Y, -1, 1);
 

@@ -13,7 +13,7 @@ namespace EliminationEngine
     {
         public int WorldCounter = 0;
         public int CurrentWorld = 0;
-        public Dictionary<int, List<GameObject>> WorldObjects = new();
+        public Dictionary<int, Dictionary<int, GameObject>> WorldObjects = new();
         public int MaxObjectId = 0;
         public Dictionary<int, GameObject> GameObjects = new();
         public Elimination Engine;
@@ -26,13 +26,24 @@ namespace EliminationEngine
 
         public int CreateWorld()
         {
-            WorldObjects.Add(WorldCounter, new List<GameObject>());
+            WorldObjects.Add(WorldCounter, new Dictionary<int, GameObject>());
             return WorldCounter++;
+        }
+
+        public void SwitchWorld(int world)
+        {
+            WorldObjects[CurrentWorld] = GameObjects;
+            GameObjects = WorldObjects[world];
         }
 
         public void RemoveWorld(int world)
         {
             WorldObjects.Remove(world);
+        }
+
+        public void DeleteAllObjects()
+        {
+            GameObjects.Clear();
         }
 
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
@@ -107,6 +118,8 @@ namespace EliminationEngine
                 system.OnDraw();
             }
 
+            Engine.GetSystem<ImGuiSystem>().Render();
+
 
             SwapBuffers();
 
@@ -125,6 +138,7 @@ namespace EliminationEngine
             GL.Viewport(0, 0, Size.X, Size.Y);
 
             Engine.GetSystem<CameraResizeSystem>().WindowResized = true;
+            Engine.GetSystem<ImGuiSystem>().WindowResized();
         }
 
         protected override void OnTextInput(TextInputEventArgs e)

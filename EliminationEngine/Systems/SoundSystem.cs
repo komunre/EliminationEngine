@@ -34,20 +34,47 @@ namespace EliminationEngine.Systems
             }
         }
 
-        public int PlaySound(Stream stream)
+        public int CacheSound(Stream stream, bool loop = false)
         {
-            var handle = Bass.CreateStream(StreamHelper.ReadFully(stream), 0, stream.Length, BassFlags.Default);
+            var handle = Bass.CreateStream(StreamHelper.ReadFully(stream), 0, stream.Length, loop ? BassFlags.Loop : BassFlags.Default);
             if (handle == 0)
             {
                 Logger.Warn("Sound handle creation error: " + Bass.LastError);
                 return 0;
             }
             Handles.Add(handle);
+            return handle;
+        }
+
+        public int PlaySound(Stream stream, bool loop = false)
+        {
+            var handle = CacheSound(stream, loop);
             if (!Bass.ChannelPlay(handle))
             {
                 Logger.Warn("No sound was played: " + Bass.LastError);
             }
             return handle;
+        }
+
+        public void StopSound(int handle)
+        {
+            Bass.ChannelStop(handle);
+            Handles.Remove(handle);
+        }
+
+        public void PauseSound(int handle)
+        {
+            Bass.ChannelPause(handle);
+        }
+
+        public void ResumeSound(int handle)
+        {
+            Bass.ChannelPlay(handle);
+        }
+
+        public void PlayCached(int handle)
+        {
+            Bass.ChannelPlay(handle, true);
         }
 
         public void GenSound(int freq, SoundType type, float ampl, float length)

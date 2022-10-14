@@ -26,6 +26,6 @@ void main(void)
     fragPos = vec3(modelMatrix * vec4(aPosition, 1.0));
     texCoord = aTexCoord;
     gl_Position = vec4(aPosition, 1.0) * mvpMatrix;
-    _aNormal = aNormal;
     normalMat = mat3(transpose(inverse(modelMatrix)));
+    _aNormal = aNormal * normalMat;
 }

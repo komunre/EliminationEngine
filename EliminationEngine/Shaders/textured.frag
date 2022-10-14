@@ -23,6 +23,9 @@ struct PointLight {
     float ambient;
     float shine;
     vec3 diffuse;
+    int directional;
+    vec3 direction;
+    float cutoff;
 };
 
 #define NR_POINT_LIGHTS 20 
@@ -32,10 +35,18 @@ uniform int lightsNum = 0;
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.pos - fragPos);
+    //float diff = max(dot(lightDir, normal), 0.0); // broken. TODO: make actually working protection from light on the opposite side.
     float distance    = length(light.pos - fragPos);
     float attenuation = light.linear / distance;
-    vec3 diffuse  = light.diffuse;
-    diffuse  *= attenuation;
+    vec3 diffuse = light.diffuse;
+    diffuse = diffuse * attenuation;
+    if (light.directional == 1) {
+        float theta = dot(lightDir, -light.direction);
+        if (theta < light.cutoff) {
+            theta = 0;
+        }
+        diffuse *= theta;
+    }
     return (diffuse);
 } 
 
@@ -43,6 +54,6 @@ void main()
 {
     vec3 result = vec3(0, 0, 0);
     for(int i = 0; i < lightsNum; i++)
-        result += CalcPointLight(pointLights[i], normalMat * _aNormal, fragPos, normalize(viewPos - fragPos));
+        result += CalcPointLight(pointLights[i], _aNormal, fragPos, normalize(viewPos - fragPos));
     outputColor = vec4(result, 1.0) * texture(texture0, texCoord);
 }
