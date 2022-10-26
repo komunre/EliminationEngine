@@ -10,7 +10,13 @@ namespace EliminationEngine.GameObjects
         {
         }
 
-        public void GenerateMesh(Image<Rgba32> image, bool onScreen = false)
+        public static void AddMeshToObject(GameObject gameObject, Image<Rgba32> image, ImageFilter filter)
+        {
+            var generator = gameObject.AddComponent<SpriteGenerator>();
+            generator.GenerateMesh(image, filter, false);
+        }
+
+        public void GenerateMesh(Image<Rgba32> image, ImageFilter filter, bool onScreen = false)
         {
             MeshGroupComponent? meshGroup = null;
             if (!Owner.TryGetComponent<MeshGroupComponent>(out meshGroup))
@@ -39,10 +45,7 @@ namespace EliminationEngine.GameObjects
                 0.0f, 1.0f,
             };
 
-            mesh.Width = image.Width;
-            mesh.Height = image.Height;
-
-            mesh.Image = ImageLoader.LoadTextureFromImage(image, true).Pixels.ToArray();
+            mesh._tex = ImageLoader.CreateTextureFromImage(image, filter, true).Item1;
 
             var vertShader = "Shaders/unlit.vert";
             if (onScreen)

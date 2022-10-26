@@ -8,6 +8,7 @@ using EliminationEngine.Tools;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EliminationEngine
 {
