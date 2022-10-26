@@ -54,10 +54,38 @@
 	  <ShaderFiles Remove="Shaders\unlit.vert" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Gwen.Net\Gwen.Net.OpenTk\Gwen.Net.OpenTk.csproj" />
-    <ProjectReference Include="..\Gwen.Net\Gwen.Net\Gwen.Net.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Content Update="Shaders\textured.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shaders\textured.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+		<Content Update="res\DefaultSkin2.png">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="res\imgui.frag">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="res\imgui.vert">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shaders\camera.frag">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shaders\camera.vert">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shaders\onscreen.vert">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shaders\text.frag">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shaders\unlit.vert">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
   <ItemGroup>
     <None Update="bass.dll">
@@ -72,7 +100,7 @@
     <None Update="libgcc_s_seh-1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="res\DefaultSkin2.png">
+    <None Update="res\CubePlaceholder.glb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="res\imgui.frag">

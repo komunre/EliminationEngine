@@ -104,7 +104,6 @@ namespace EliminationEngine.Render
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
 
-            var cameraRot = camera.Owner.Rotation;
             var cameraPos = camera.Owner.Position;
             var directions = camera.Owner.GetDirections();
             var forward = directions[0] + camera.Owner.Position;
@@ -125,7 +124,7 @@ namespace EliminationEngine.Render
                     GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsageHint.StaticDraw);
 
                     mesh._shader.Use();
-                    var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition);
+                    var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition + mesh.OffsetPosition);
                     var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.GlobalRotation);
                     var scale = Matrix4.CreateScale(meshGroup.Owner.GlobalScale);
                     Matrix4 fovMatrix;
@@ -152,6 +151,8 @@ namespace EliminationEngine.Render
                     mesh._shader.SetVector3("viewPos", cameraPos);
                     mesh._shader.SetVector3("worldPos", meshGroup.Owner.GlobalPosition);
 
+                    mesh._shader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
+
                     var counter = 0;
                     if (lights != null && lights.Length > 0)
                     {
@@ -172,6 +173,9 @@ namespace EliminationEngine.Render
                             mesh._shader.SetFloat("pointLights[" + counter + "].linear", light.Diffuse);
                             mesh._shader.SetFloat("pointLights[" + counter + "].quadratic", light.Qudratic);
                             mesh._shader.SetVector3("pointLights[" + counter + "].diffuse", new Vector3(light.Color.R, light.Color.G, light.Color.B));
+                            mesh._shader.SetInt("pointLights[" + counter + "].directional", light.Directional ? 1 : 0);
+                            mesh._shader.SetVector3("pointLights[" + counter + "].direction", light.Owner.GetDirections()[0]);
+                            mesh._shader.SetFloat("pointLights[" + counter + "].cutoff", (float)MathHelper.Cos(MathHelper.DegreesToRadians(light.DirectionalCutoffAngle)));
                             counter++;
                         }
                     }
@@ -206,7 +210,7 @@ namespace EliminationEngine.Render
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());
                 camera.CameraShader.Use();
-                camera.CameraShader.SetFloat("time", (float)Engine.Elapsed.TotalMilliseconds);
+                camera.CameraShader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
                 GL.BindBuffer(BufferTarget.ArrayBuffer, DefaultCameraBuffers.VertexBuff);
                 GL.BindTexture(TextureTarget.Texture2D, camera.GetTexture());
                 GL.BindVertexArray(DefaultCameraBuffers.VertexArray);
