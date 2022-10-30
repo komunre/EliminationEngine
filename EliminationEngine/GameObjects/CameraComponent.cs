@@ -26,8 +26,6 @@ namespace EliminationEngine.GameObjects
         protected int RBO = 0;
         public bool Perspective = true;
 
-        public bool Protected = true;
-
         private float _orthoWidth = 5;
         private float _orthoHeight = 5;
         private float _orthoVis = 5;
@@ -90,6 +88,8 @@ namespace EliminationEngine.GameObjects
             RenderTexture = GL.GenTexture();
             BindFrameBuffer();
             GL.BindTexture(TextureTarget.Texture2D, RenderTexture);
+            Width = Width % 2 == 0 ? Width : Width - 1;
+            Height = Height % 2 == 0 ? Height : Height - 1;
             var data = new byte[Width * Height * 3];
             for (int y = 0; y < Height * 3; y++)
             {
@@ -130,13 +130,11 @@ namespace EliminationEngine.GameObjects
 
         public void ClearTextureTools()
         {
-            Protected = true;
             GL.DeleteFramebuffer(FrameBuffer);
             GL.DeleteFramebuffer(DepthFrameBuffer);
             GL.DeleteTexture(RenderTexture);
             GL.DeleteRenderbuffer(RBO);
             Thread.Sleep(200);
-            Protected = false;
         }
 
         public int GetTexture()

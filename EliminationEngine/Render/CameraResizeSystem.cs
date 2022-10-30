@@ -7,7 +7,7 @@ namespace EliminationEngine.Render
     {
         public bool WindowResized = false;
         protected bool ResizeBlocked = false;
-        protected Timer timer = new Timer(TimeSpan.FromMilliseconds(2500));
+        protected EngineTimer timer = new EngineTimer(TimeSpan.FromMilliseconds(2500));
 
         public CameraResizeSystem(Elimination e) : base(e)
         {
@@ -32,9 +32,10 @@ namespace EliminationEngine.Render
             }
             if (!WindowResized) return;
 
+            Logger.Info("Resizing");
             foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
             {
-                if (camera.Protected) continue;
+                if (!camera.Active) continue;
                 camera.ClearTextureTools();
                 camera.Width = Engine.window.Size.X;
                 camera.Height = Engine.window.Size.Y;

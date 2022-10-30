@@ -34,10 +34,10 @@ namespace EliminationEngine
 
         public float[] TexCoords = new float[4 * 2] // Horizontally flipped due to some bug. TODO: Figure out why
         {
-                1.0f, 0.0f,
                 0.0f, 0.0f,
-                0.0f, 1.0f,
+                1.0f, 0.0f,
                 1.0f, 1.0f,
+                0.0f, 1.0f,
         };
 
         public int VertexArray = 0;
@@ -80,6 +80,10 @@ namespace EliminationEngine
                 1.0f, 0.0f,
                 1.0f, 1.0f,
                 0.0f, 1.0f,
+            };
+            Indices = new uint[]
+            {
+                0, 1, 2, 0, 2, 3
             };
             Shader = new Shader("Shaders/camera.vert", "Shaders/camera.frag");
         }

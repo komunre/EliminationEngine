@@ -113,9 +113,9 @@ namespace EliminationEngine.Render
             {
                 fovMatrix = Matrix4.CreateOrthographic(camera.OrthoWidth, camera.OrthoHeight, camera.ClipNear, camera.ClipFar);
             }
-            var cameraPos = camera.Owner.GlobalPosition;
+            var cameraPos = camera.Owner.Position;
             var directions = camera.Owner.GetDirections();
-            var forward = directions[0];
+            var forward = directions[0] + camera.Owner.Position;
             var up = directions[2];
             var lookAt = Matrix4.LookAt(cameraPos, forward, up);
             shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));

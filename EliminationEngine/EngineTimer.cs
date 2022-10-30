@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace EliminationEngine
 {
-    public class Timer
+    public class EngineTimer
     {
         protected TimeSpan _timeSpan;
         protected DateTime _startTime;
 
-        public Timer(TimeSpan span)
+        public EngineTimer(TimeSpan span)
         {
             _timeSpan = span;
             _startTime = DateTime.Now;
@@ -32,6 +32,11 @@ namespace EliminationEngine
         {
             if (DateTime.Now > _startTime + _timeSpan) return true;
             return false;
+        }
+
+        public TimeSpan GetTimeSpan()
+        {
+            return _timeSpan;
         }
     }
 }
