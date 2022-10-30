@@ -2,48 +2,6 @@
 
 namespace EliminationEngine.GameObjects
 {
-    public static class DefaultCameraBuffers
-    {
-        public static int VertexBuff = 0;
-        public static int TexCoordBuff = 0;
-        public static int VertexArray = 0;
-        public static int IndicesBuff = 0;
-        public static Shader Shader = new Shader("Shaders/camera.vert", "Shaders/camera.frag");
-
-        public static void InitValues()
-        {
-            VertexBuff = GL.GenBuffer();
-            VertexArray = GL.GenVertexArray();
-            IndicesBuff = GL.GenBuffer();
-
-            GL.BindVertexArray(VertexArray);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBuff);
-            GL.BufferData(BufferTarget.ArrayBuffer, 4 * 3 * sizeof(float), new float[] {
-                -1.0f, -1.0f, 0.0f,
-                1.0f, -1.0f, 0.0f,
-                1.0f, 1.0f, 0.0f,
-                -1.0f, 1.0f, 0.0f,
-            }, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(0);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, IndicesBuff);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, 6 * sizeof(uint), new uint[] { 0, 1, 2, 0, 2, 3 }, BufferUsageHint.StaticDraw);
-
-            TexCoordBuff = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, TexCoordBuff);
-            GL.BufferData(BufferTarget.ArrayBuffer, 4 * 2 * sizeof(float), new float[] {
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-            }, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(1);
-        }
-    }
     public class CameraComponent : EntityComponent
     {
         public CameraComponent(GameObject o) : base(o)
@@ -63,7 +21,7 @@ namespace EliminationEngine.GameObjects
         protected int DepthFrameBuffer = 0;
         protected int RenderTexture = 0;
         public bool RenderToTexture = false;
-        public Shader CameraShader = DefaultCameraBuffers.Shader;
+        public Shader CameraShader = EngineStatics.CameraStatics.Shader;
         public bool UseDefaultShape = true;
         protected int RBO = 0;
         public bool Perspective = true;
@@ -94,14 +52,8 @@ namespace EliminationEngine.GameObjects
 
         public void SetOrthoVisibility(float visibility)
         {
-            _orthoWidth = 5;
-            _orthoHeight = 5;
-            //_orthoWidth = visibility;
-            //_orthoHeight = visibility / ((float)Height / (float)Width);
-            //_orthoVis = visibility;
-
-            //Console.WriteLine("Window: " + Width + ":" + Height);
-            //Console.WriteLine("Render:" + OrthoWidth + ":" + OrthoHeight);
+            _orthoWidth = visibility;
+            _orthoHeight = visibility;
         }
 
         protected void GenerateFrameBuffers()
@@ -168,7 +120,6 @@ namespace EliminationEngine.GameObjects
             GenerateFrameBuffers();
             GenerateRenderTexture();
             ConfigureFrameBuffers();
-            Protected = false;
         }
 
         public void RemoveFrameBuffers()
@@ -179,11 +130,13 @@ namespace EliminationEngine.GameObjects
 
         public void ClearTextureTools()
         {
+            Protected = true;
             GL.DeleteFramebuffer(FrameBuffer);
             GL.DeleteFramebuffer(DepthFrameBuffer);
             GL.DeleteTexture(RenderTexture);
             GL.DeleteRenderbuffer(RBO);
-            Protected = true;
+            Thread.Sleep(200);
+            Protected = false;
         }
 
         public int GetTexture()

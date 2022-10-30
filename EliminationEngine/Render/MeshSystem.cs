@@ -17,8 +17,6 @@ namespace EliminationEngine.Render
         public override void OnLoad()
         {
             base.OnLoad();
-
-            DefaultCameraBuffers.InitValues();
         }
         public override void PostLoad()
         {
@@ -100,6 +98,33 @@ namespace EliminationEngine.Render
             }
         }
 
+        public void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera)
+        {
+            shader.Use();
+            var trans = Matrix4.CreateTranslation(position + positionOffset);
+            var matrix = Matrix4.CreateFromQuaternion(rotation);
+            var scale = Matrix4.CreateScale(Scale);
+            Matrix4 fovMatrix;
+            if (camera.Perspective)
+            {
+                fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
+            }
+            else
+            {
+                fovMatrix = Matrix4.CreateOrthographic(camera.OrthoWidth, camera.OrthoHeight, camera.ClipNear, camera.ClipFar);
+            }
+            var cameraPos = camera.Owner.GlobalPosition;
+            var directions = camera.Owner.GetDirections();
+            var forward = directions[0];
+            var up = directions[2];
+            var lookAt = Matrix4.LookAt(cameraPos, forward, up);
+            shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));
+            shader.SetMatrix4("modelMatrix", matrix * trans * scale);
+            shader.SetVector3("viewPos", cameraPos);
+            shader.SetVector3("worldPos", position);
+            shader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
+        }
+
         private void RenderEverything(CameraComponent camera)
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
@@ -120,38 +145,8 @@ namespace EliminationEngine.Render
                     if (mesh.Vertices == null) continue;
                     if (mesh.Indices == null) continue;
                     if (mesh._shader == null) continue;
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._buffer);
-                    GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsageHint.StaticDraw);
 
-                    mesh._shader.Use();
-                    var trans = Matrix4.CreateTranslation(meshGroup.Owner.GlobalPosition + mesh.OffsetPosition);
-                    var matrix = Matrix4.CreateFromQuaternion(meshGroup.Owner.GlobalRotation);
-                    var scale = Matrix4.CreateScale(meshGroup.Owner.GlobalScale);
-                    Matrix4 fovMatrix;
-                    if (camera.Perspective)
-                    {
-                        fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
-                    }
-                    else
-                    {
-                        fovMatrix = Matrix4.CreateOrthographic(camera.OrthoWidth, camera.OrthoHeight, camera.ClipNear, camera.ClipFar);
-                    }
-
-                    /*Quaternion.ToEulerAngles(in cameraRot, out var euler);
-                    euler.Z = 0;
-                    var rotLol = Quaternion.FromEulerAngles(euler);
-
-                    var lookAt = Matrix4.CreateTranslation(camera.Owner.GlobalPosition) * Matrix4.CreateFromQuaternion(rotLol);*/ // Pretty much works, but Forward still will be useless then
-
-
-                    var lookAt = Matrix4.LookAt(cameraPos, forward, up);
-
-                    mesh._shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));
-                    mesh._shader.SetMatrix4("modelMatrix", matrix * trans * scale);
-                    mesh._shader.SetVector3("viewPos", cameraPos);
-                    mesh._shader.SetVector3("worldPos", meshGroup.Owner.GlobalPosition);
-
-                    mesh._shader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
+                    CreateShaderData(mesh._shader, meshGroup.Owner.GlobalPosition, mesh.OffsetPosition, meshGroup.Owner.GlobalRotation, meshGroup.Owner.GlobalScale, camera);
 
                     var counter = 0;
                     if (lights != null && lights.Length > 0)
@@ -211,10 +206,10 @@ namespace EliminationEngine.Render
                 GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());
                 camera.CameraShader.Use();
                 camera.CameraShader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
-                GL.BindBuffer(BufferTarget.ArrayBuffer, DefaultCameraBuffers.VertexBuff);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, EngineStatics.CameraStatics.VertexBuffer);
                 GL.BindTexture(TextureTarget.Texture2D, camera.GetTexture());
-                GL.BindVertexArray(DefaultCameraBuffers.VertexArray);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, DefaultCameraBuffers.IndicesBuff);
+                GL.BindVertexArray(EngineStatics.CameraStatics.VertexArray);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, EngineStatics.CameraStatics.IndicesBuffer);
                 GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 GL.Enable(EnableCap.DepthTest);
             }

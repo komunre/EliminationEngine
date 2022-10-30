@@ -32,6 +32,7 @@ namespace EliminationEngine
         public Elimination(string[] args)
         {
             ProgramArgs = args;
+            RegisterSystem<EngineStaticsInitSystem>();
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
             RegisterSystem<Raycast>();

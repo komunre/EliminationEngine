@@ -7,7 +7,7 @@ namespace EliminationEngine.Render
     {
         public bool WindowResized = false;
         protected bool ResizeBlocked = false;
-        protected Timer timer = new Timer(TimeSpan.FromMilliseconds(2500));
+        protected Timer timer = new Timer(TimeSpan.FromMilliseconds(4500));
 
         public CameraResizeSystem(Elimination e) : base(e)
         {
