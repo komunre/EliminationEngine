@@ -8,7 +8,6 @@ using EliminationEngine.Tools;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
-using OpenTK;
 
 namespace EliminationEngine
 {
@@ -34,6 +33,7 @@ namespace EliminationEngine
         public Elimination(string[] args)
         {
             ProgramArgs = args;
+            RegisterSystem<EngineStaticsInitSystem>();
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
             RegisterSystem<Raycast>();
