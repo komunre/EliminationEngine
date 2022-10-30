@@ -8,6 +8,7 @@ using EliminationEngine.Tools;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
+using OpenTK;
 
 namespace EliminationEngine
 {
@@ -27,6 +28,8 @@ namespace EliminationEngine
         public string[] ProgramArgs = new string[0];
         public bool Headless = false;
         public bool IsRunning = false;
+
+        public bool DefaultBorderless = true;
 
         public Elimination(string[] args)
         {
@@ -224,8 +227,39 @@ namespace EliminationEngine
             window.RemoveWorld(world);
         }*/
 
+        public void ToggleFullscreen()
+        {
+            if (window.WindowBorder == OpenTK.Windowing.Common.WindowBorder.Hidden)
+            {
+                EnterNormal();
+                return;
+            }
+            if (DefaultBorderless)
+            {
+                EnterBorderless();
+            }
+            else
+            {
+                EnterFullscreen();
+            }
+        }
+
+        public void EnterBorderless()
+        {
+            if (window == null) return;
+            window.WindowBorder = OpenTK.Windowing.Common.WindowBorder.Hidden;
+            var monitor = Monitors.GetPrimaryMonitor();
+            window.CurrentMonitor = monitor.Handle;
+            window.Size = new OpenTK.Mathematics.Vector2i(monitor.HorizontalResolution, monitor.VerticalResolution);
+        }
+
         public void EnterFullscreen()
         {
+            if (DefaultBorderless)
+            {
+                EnterBorderless();
+                return;
+            }
             if (window == null) return;
             window.WindowBorder = OpenTK.Windowing.Common.WindowBorder.Hidden;
             window.WindowState = OpenTK.Windowing.Common.WindowState.Fullscreen;
