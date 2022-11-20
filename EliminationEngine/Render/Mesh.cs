@@ -28,6 +28,6 @@ namespace EliminationEngine.Render
         public Vector3 Position = Vector3.Zero;
         public Vector3 OffsetPosition = Vector3.Zero;
         public string MaterialName = "placeholder";
-        public float DisplaceValue = 0.05f;
+        public float DisplaceValue = 0.03f;
     }
 }

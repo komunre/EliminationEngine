@@ -41,6 +41,7 @@ namespace EliminationEngine
             RegisterSystem<Raycast>();
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();
+            RegisterSystem<EditorSystem>();
             RegisterSystem<ImGuiSystem>();
             RegisterSystem<CameraResizeSystem>();
             RegisterSystem<DebugRenderSystem>();

@@ -45,10 +45,8 @@ namespace EliminationEngine.Render.UI
 
         private static bool KHRDebugAvailable = false;
 
-        private GameObject DebugCameraObject;
-        private CameraComponent DebugCamera;
-
         private DebugRenderSystem _debugRender;
+        private EditorSystem _editorSystem;
 
         /// <summary>
         /// Constructs a new ImGuiController.
@@ -56,6 +54,7 @@ namespace EliminationEngine.Render.UI
         public override void OnLoad()
         {
             _debugRender = Engine.GetSystem<DebugRenderSystem>();
+            _editorSystem = Engine.GetSystem<EditorSystem>();
 
             _windowWidth = Engine.window.Bounds.Size.X;
             _windowHeight = Engine.window.Bounds.Size.Y;
@@ -79,11 +78,6 @@ namespace EliminationEngine.Render.UI
 
             ImGui.NewFrame();
             _frameBegun = true;
-
-            DebugCameraObject = new GameObject();
-            DebugCamera = DebugCameraObject.AddComponent<CameraComponent>();
-            DebugCamera.Active = false;
-            Engine.AddGameObject(DebugCameraObject);
         }
 
         public void WindowResized()
@@ -241,47 +235,6 @@ void main()
             {
                 DebugOpened = !DebugOpened;
             }
-
-            if (!DebugOpened)
-            {
-                var cameras = Engine.GetObjectsOfType<CameraComponent>().Select(e => { if (e.Active) return e; else return null; });
-                if (cameras != null && cameras.ElementAt(0) != null)
-                {
-                    var cam = cameras.ElementAt(0);
-                    DebugCameraObject.Position = cam.Owner.Position;
-                }
-            }
-            else
-            {
-                if (Engine.KeyState.IsKeyDown(Keys.W))
-                {
-                    DebugCameraObject.Position += DebugCameraObject.DegreeForward() * 15 * Engine.DeltaTime;
-                }
-                if (Engine.KeyState.IsKeyDown(Keys.S))
-                {
-                    DebugCameraObject.Position += -DebugCameraObject.DegreeForward() * 15 * Engine.DeltaTime;
-                }
-                if (Engine.KeyState.IsKeyDown(Keys.A))
-                {
-                    DebugCameraObject.Position += -DebugCameraObject.DegreeRight() * 15 * Engine.DeltaTime;
-                }
-                if (Engine.KeyState.IsKeyDown(Keys.D))
-                {
-                    DebugCameraObject.Position += DebugCameraObject.DegreeRight() * 15 * Engine.DeltaTime;
-                }
-
-                if (Engine.KeyState.IsKeyDown(Keys.Q))
-                {
-                    DebugCameraObject.Position += DebugCameraObject.DegreeUp() * 15 * Engine.DeltaTime;
-                }
-                if (Engine.KeyState.IsKeyDown(Keys.E))
-                {
-                    DebugCameraObject.Position += -DebugCameraObject.DegreeUp() * 15 * Engine.DeltaTime;
-                }
-
-                var delta = Engine.MouseState.Delta;
-                DebugCameraObject.DegreeRotation += new Vector3(delta.Y, delta.X, 0) * 3;
-            }
         }
 
         public override void OnDraw()
@@ -298,7 +251,7 @@ void main()
                 var renderSystem = Engine.GetSystem<MeshSystem>();
                 ImGui.Begin("DEBUG MENU");
                 ImGui.Checkbox("Wiremode", ref renderSystem.ForceWiremode);
-                ImGui.Checkbox("FreeCam", ref FreeCam);
+                ImGui.Checkbox("Editor", ref _editorSystem.EditorActive);
                 ImGui.Checkbox("Debug render", ref _debugRender.DebugActive);
                 ImGui.End();
             }

@@ -115,6 +115,9 @@
     <None Update="res\normaldef.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="res\Plane.glb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\camera.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -63,7 +63,6 @@ void main()
     float layerDepth = 1.0f / numLayers;
     float currentDepth = 0.0f;
 
-    // remove z division for "less aberated results"
     vec2 S = viewDir.xy / viewDir.z * heightScale;
     vec2 deltaUVs = S / numLayers;
     
@@ -94,5 +93,5 @@ void main()
         result += CalcPointLight(pointLights[i], _aNormal, fragPos, normalize(viewPos - fragPos));
     
     // output
-    outputColor = vec4(result, 1.0) * texture(texture0, texCoord);
+    outputColor = vec4(result, 1.0) * texture(texture0, UVs);
 }
