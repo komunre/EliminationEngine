@@ -30,15 +30,6 @@ namespace EliminationEngine.GameObjects
 
         public List<BoxData> GetBoxes()
         {
-            /*var boxes = Boxes;
-            var boxesCopy = new List<BoxData>();
-            foreach (var box in boxes) {
-                var newBox = new BoxData(new Box3(), false);
-                newBox.Bounds.Min = new Vector3(box.Bounds.Min.X + Owner.GlobalPosition.X, box.Bounds.Min.Y + Owner.GlobalPosition.Y, box.Bounds.Min.Z + Owner.GlobalPosition.Z);
-                newBox.Bounds.Max = new Vector3(box.Bounds.Max.X + Owner.GlobalPosition.X, box.Bounds.Max.Y + Owner.GlobalPosition.Y, box.Bounds.Max.Z + Owner.GlobalPosition.Z);
-                boxesCopy.Add(newBox);
-            }
-            return boxesCopy;*/
             return Boxes;
         }
     }

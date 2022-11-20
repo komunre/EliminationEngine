@@ -103,10 +103,16 @@
     <None Update="res\CubePlaceholder.glb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="res\displacedef.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="res\imgui.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="res\imgui.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\normaldef.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\camera.frag">

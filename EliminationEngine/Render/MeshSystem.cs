@@ -1,6 +1,7 @@
 ﻿using EliminationEngine.GameObjects;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace EliminationEngine.Render
 {
@@ -10,6 +11,9 @@ namespace EliminationEngine.Render
 
         public bool ForceWiremode = false;
 
+        public int NormalPlaceholder = 0;
+        public int DisplacementPlaceholer = 0;
+
         public MeshSystem(Elimination e) : base(e)
         {
 
@@ -17,6 +21,9 @@ namespace EliminationEngine.Render
         public override void OnLoad()
         {
             base.OnLoad();
+
+            NormalPlaceholder = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/normaldef.png"), ImageFilter.Linear, false, false).Item1;
+            DisplacementPlaceholer = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/displacedef.png"), ImageFilter.Linear, false, false).Item1;
         }
         public override void PostLoad()
         {
@@ -80,6 +87,15 @@ namespace EliminationEngine.Render
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Nearest);
                 }
 
+                if (mesh._normalTex == 0)
+                {
+                    mesh._normalTex = NormalPlaceholder;
+                }
+                if (mesh._displacementTex == 0)
+                {
+                    mesh._displacementTex = DisplacementPlaceholer;
+                }
+
                 if (mesh.TexCoords == null) continue;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh._texCoordBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, mesh.TexCoords.Length * sizeof(float), mesh.TexCoords.ToArray(), BufferUsageHint.StaticDraw);
@@ -113,9 +129,9 @@ namespace EliminationEngine.Render
             {
                 fovMatrix = Matrix4.CreateOrthographic(camera.OrthoWidth, camera.OrthoHeight, camera.ClipNear, camera.ClipFar);
             }
-            var cameraPos = camera.Owner.Position;
+            var cameraPos = camera.Owner.GlobalPosition;
             var directions = camera.Owner.GetDirections();
-            var forward = directions[0] + camera.Owner.Position;
+            var forward = directions[0] + camera.Owner.GlobalPosition;
             var up = directions[2];
             var lookAt = Matrix4.LookAt(cameraPos, forward, up);
             shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));
@@ -176,6 +192,8 @@ namespace EliminationEngine.Render
                     }
                     mesh._shader.SetInt("lightsNum", counter);
 
+                    mesh._shader.SetFloat("heightScale", mesh.DisplaceValue);
+
                     var col = meshGroup.Owner.BaseColor;
                     mesh._shader.SetVector3("addColor", new Vector3(col.R, col.G, col.B));
 
@@ -183,13 +201,29 @@ namespace EliminationEngine.Render
                     {
                         GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
                     }
+
+                    // camera framebuffer!
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, camera.GetFrameBuffer());
                     GL.Enable(EnableCap.DepthTest);
-                    GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
+
+                    // geometry
                     GL.BindVertexArray(mesh._vertexArr);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh._indicesBuffer);
+
+                    // textures
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture2D, mesh._normalTex);
+                    GL.ActiveTexture(TextureUnit.Texture2);
+                    GL.BindTexture(TextureTarget.Texture2D, mesh._displacementTex);
+
+                    // render
                     GL.DrawElements(PrimitiveType.Triangles, mesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
+                   
+                    // reset
                     GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+                    GL.ActiveTexture(TextureUnit.Texture0);
                 }
             }
 
@@ -201,6 +235,7 @@ namespace EliminationEngine.Render
                 //GL.BlitFramebuffer(0, 0, camera.Width, camera.Height, 0, 0, activeCamera.Width, activeCamera.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
 
                 // Object draw
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.Disable(EnableCap.DepthTest);
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());

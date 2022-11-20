@@ -1,4 +1,4 @@
-﻿#version 330
+﻿#version 420
 
 out vec4 outputColor;
 
@@ -13,7 +13,11 @@ uniform mat4 modelMatrix;
 uniform vec3 viewPos;
 uniform vec3 worldPos;
 
-uniform sampler2D texture0;
+uniform float heightScale;
+
+layout(binding=0) uniform sampler2D texture0;
+layout(binding=1) uniform sampler2D normal0;
+layout(binding=2) uniform sampler2D displacement0;
 
 struct PointLight {
     vec3 pos;
@@ -35,10 +39,10 @@ uniform int lightsNum = 0;
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.pos - fragPos);
-    //float diff = max(dot(lightDir, normal), 0.0); // broken. TODO: make actually working protection from light on the opposite side.
+    float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
     float distance    = length(light.pos - fragPos);
     float attenuation = light.linear / distance;
-    vec3 diffuse = light.diffuse;
+    vec3 diffuse = light.diffuse * diff;
     diffuse = diffuse * attenuation;
     if (light.directional == 1) {
         float theta = dot(lightDir, -light.direction);
@@ -50,10 +54,45 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (diffuse);
 } 
 
+const float numLayers = 32.0f;
+
 void main()
 {
+    // displacement vars
+    vec3 viewDir = normalize(viewPos - fragPos);
+    float layerDepth = 1.0f / numLayers;
+    float currentDepth = 0.0f;
+
+    // remove z division for "less aberated results"
+    vec2 S = viewDir.xy / viewDir.z * heightScale;
+    vec2 deltaUVs = S / numLayers;
+    
+    vec2 UVs = texCoord;
+    float currentDepthMapValue = 1.0f - texture(displacement0, UVs).r;
+
+    // loop until hit
+    while (currentDepth < currentDepthMapValue) {
+        UVs -= deltaUVs;
+        currentDepthMapValue = 1.0f - texture(displacement0, UVs).r;
+        currentDepth += layerDepth;
+    }
+
+    // average out (interpolate)
+    vec2 prevTexCoords = UVs + deltaUVs;
+    float afterDepth = currentDepthMapValue - currentDepth;
+    float beforeDepth = 1.0f - texture(displacement0, prevTexCoords).r - currentDepth + layerDepth;
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    UVs = prevTexCoords * weight + UVs * (1.0f - weight);
+
+    // get normal
+    vec3 normal = normalize(texture(normal0, UVs).xyz * 2.0f - 1.0f) * normalMat;
+
+
+    // calc lights affection
     vec3 result = vec3(0, 0, 0);
     for(int i = 0; i < lightsNum; i++)
         result += CalcPointLight(pointLights[i], _aNormal, fragPos, normalize(viewPos - fragPos));
+    
+    // output
     outputColor = vec4(result, 1.0) * texture(texture0, texCoord);
 }

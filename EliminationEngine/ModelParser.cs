@@ -81,6 +81,14 @@ namespace EliminationEngine
                 renderMesh.Normals = normals.ToArray();
 
                 renderMesh.Name = mesh.Name;
+                if (mesh.Mat != null)
+                {
+                    renderMesh.MaterialName = mesh.Mat.Name;
+                }
+                else
+                {
+                    renderMesh.MaterialName = "placeholder";
+                }
                 renderMesh.Position = new OpenTK.Mathematics.Vector3(mesh.Center.X, mesh.Center.Y, mesh.Center.Z);
 
                 meshGroup.Meshes.Add(renderMesh);

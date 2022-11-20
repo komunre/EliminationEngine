@@ -25,6 +25,19 @@ namespace EliminationEngine.GameObjects
             return null;
         }
 
+        public List<Mesh> FindByMaterial(string materialName)
+        {
+            var found = new List<Mesh>();
+            foreach (var mesh in Meshes)
+            {
+                if (mesh.MaterialName == materialName)
+                {
+                    found.Add(mesh);
+                }
+            }
+            return found;
+        }
+
         /// <summary>
         /// Creates collision box for an entire group of meshes
         /// </summary>

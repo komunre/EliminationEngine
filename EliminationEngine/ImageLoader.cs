@@ -98,11 +98,16 @@ namespace EliminationEngine
             return data;
         }
 
-        public static (int, ImageData) CreateTextureFromImage(Image<Rgba32> image, ImageFilter filter, bool flip = false)
+        public static (int, ImageData) CreateTextureFromImage(Image<Rgba32> image, ImageFilter filter, bool flip = false, bool invert = false)
         {
             if (flip)
             {
                 image.Mutate(x => x.Flip(FlipMode.Vertical));
+            }
+
+            if (invert)
+            {
+                image.Mutate(x => x.Invert());
             }
 
             var pixels = new List<byte>(4 * image.Width * image.Height);

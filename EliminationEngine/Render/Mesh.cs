@@ -14,6 +14,8 @@ namespace EliminationEngine.Render
         public int _indicesBuffer = 0;
         public int _texCoordBuffer = 0;
         public int _tex = 0;
+        public int _normalTex = 0;
+        public int _displacementTex = 0;
         public int _normalsBuffer = 0;
         public Shader? _shader;
         public byte[]? Image;
@@ -25,5 +27,7 @@ namespace EliminationEngine.Render
         public string ShaderFragPath = "Shaders/text.frag";
         public Vector3 Position = Vector3.Zero;
         public Vector3 OffsetPosition = Vector3.Zero;
+        public string MaterialName = "placeholder";
+        public float DisplaceValue = 0.05f;
     }
 }
