@@ -150,13 +150,13 @@ namespace EliminationEngine.GameObjects
             var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
             var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));*/
 
-            /*var x = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeCos(rot.Y);
-            var y = EliminationMathHelper.DegreeSin(rot.X);
-            var z = EliminationMathHelper.DegreeCos(rot.X) * EliminationMathHelper.DegreeSin(rot.Y);*/
+            var x = EliminationMathHelper.DegreeRadCos(rot.X) * EliminationMathHelper.DegreeRadCos(rot.Y);
+            var y = EliminationMathHelper.DegreeRadSin(rot.X);
+            var z = EliminationMathHelper.DegreeRadCos(rot.X) * EliminationMathHelper.DegreeRadSin(rot.Y);
 
-            //var forward = new Vector3(x, y, z).Normalized();
+            var forward = new Vector3(x, y, z).Normalized();
 
-            var forward = _rotation * new Vector3(1, 0, 0);
+            //var forward = _rotation * new Vector3(1, 0, 0);
 
             var right = Vector3.Cross(forward, Vector3.UnitY).Normalized();
             var up = Vector3.Cross(right, forward).Normalized();

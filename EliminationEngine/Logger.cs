@@ -1,4 +1,6 @@
-﻿namespace EliminationEngine
+﻿using OpenTK.Mathematics;
+
+namespace EliminationEngine
 {
     public enum LogLevel
     {
@@ -38,6 +40,11 @@
         public static void Error(string msg)
         {
             MakeLog(LogLevel.Error, msg);
+        }
+
+        public static void LogVector(Vector3 vec, string msg = "")
+        {
+            MakeLog(LogLevel.Info, msg + " --- " + vec.X + ":" + vec.Y + ":" + vec.Z);
         }
     }
 }

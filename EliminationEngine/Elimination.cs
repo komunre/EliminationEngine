@@ -30,6 +30,8 @@ namespace EliminationEngine
 
         public bool DefaultBorderless = true;
 
+        private EngineTimer _cursorToggleTimer = new EngineTimer(TimeSpan.FromSeconds(1)); 
+
         public Elimination(string[] args)
         {
             ProgramArgs = args;
@@ -62,6 +64,8 @@ namespace EliminationEngine
             MouseState = window.MouseState;
             if (window == null) throw new InvalidDataException("No window was opened, no headless flag was specified");
             window.Run();
+
+            window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Crosshair;
         }
 
         public void AddGameObject(GameObject obj)
@@ -76,6 +80,7 @@ namespace EliminationEngine
                 var meshSys = GetSystem<MeshSystem>();
                 meshSys?.LoadMeshGroup(comp);
             }
+            obj.Id = window.MaxObjectId;
             window.GameObjects.Add(window.MaxObjectId, obj);
             window.MaxObjectId++;
             if (OnObjectCreate != null)
@@ -173,23 +178,33 @@ namespace EliminationEngine
         {
             if (window == null) return;
             window.CursorGrabbed = true;
-            //window.CursorVisible = false;
-            //window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Empty;
+            window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Empty;
         }
 
         public void UnlockCursor()
         {
             if (window == null) return;
-            StopEngine();
-            //window.CursorGrabbed = false;
-            //window.CursorVisible = true;
-            //window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Default;
+            window.CursorVisible = true;
+            window.CursorGrabbed = false;
+            window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Crosshair;
         }
 
         public void ToggleCursor()
         {
             if (window == null) return;
-            window.CursorGrabbed = !window.CursorGrabbed;
+
+            if (!_cursorToggleTimer.TestTimer()) return;
+
+            if (window.CursorGrabbed)
+            {
+                UnlockCursor();
+            }
+            else
+            {
+                LockCursor();
+            }
+
+            _cursorToggleTimer.ResetTimer();
         }
 
         public bool GetCursorLockState()

@@ -75,6 +75,14 @@ namespace EliminationEngine.GameObjects
                     if (ImGui.CollapsingHeader(obj.Id + " - " + obj.Name))
                     {
                         ImGui.Text("Position: " + obj.GlobalPosition.X + ":" + obj.GlobalPosition.Y + ":" + obj.GlobalPosition.Z);
+                        ImGui.Text("Rotation: " + obj.DegreeRotation.X + ":" + obj.DegreeRotation.Y + ":" + obj.DegreeRotation.Z);
+                        if (ImGui.CollapsingHeader("Directions"))
+                        {
+                            var dir = obj.GetDirections();
+                            ImGui.Text("Forward: " + dir[0].X + ":" + dir[0].Y + ":" + dir[0].Z);
+                            ImGui.Text("Right: " + dir[1].X + ":" + dir[1].Y + ":" + dir[1].Z);
+                            ImGui.Text("Up: " + dir[2].X + ":" + dir[2].Y + ":" + dir[2].Z);
+                        }
                         foreach (var comp in obj.GetAllComponents())
                         {
                             var type = comp.GetType();

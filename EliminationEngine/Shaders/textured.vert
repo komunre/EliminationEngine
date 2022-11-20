@@ -5,6 +5,8 @@ layout(location = 1) in vec2 aTexCoord;
 layout(location = 2) in vec3 aNormal;
 uniform mat4 mvpMatrix;
 uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 uniform vec3 worldPos;
 out vec2 texCoord;

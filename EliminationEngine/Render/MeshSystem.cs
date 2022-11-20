@@ -131,10 +131,12 @@ namespace EliminationEngine.Render
             }
             var cameraPos = camera.Owner.GlobalPosition;
             var directions = camera.Owner.GetDirections();
-            var forward = directions[0] + camera.Owner.GlobalPosition;
+            var forward = cameraPos + directions[0];
             var up = directions[2];
             var lookAt = Matrix4.LookAt(cameraPos, forward, up);
-            shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * (fovMatrix));
+            shader.SetMatrix4("viewMatrix", lookAt);
+            shader.SetMatrix4("projectionMatrix", fovMatrix);
+            shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * fovMatrix);
             shader.SetMatrix4("modelMatrix", matrix * trans * scale);
             shader.SetVector3("viewPos", cameraPos);
             shader.SetVector3("worldPos", position);

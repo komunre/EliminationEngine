@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Newtonsoft.Json.Linq;
+using OpenTK.Mathematics;
 
 namespace EliminationEngine
 {
@@ -21,6 +22,16 @@ namespace EliminationEngine
         public static float DegreeSin(float value)
         {
             return (float)MathHelper.RadiansToDegrees(MathHelper.Sin(MathHelper.DegreesToRadians(value)));
+        }
+
+        public static float DegreeRadCos(float value)
+        {
+            return (float)MathHelper.Cos(MathHelper.DegreesToRadians(value));
+        }
+
+        public static float DegreeRadSin(float value)
+        {
+            return (float)MathHelper.Sin(MathHelper.DegreesToRadians(value));
         }
 
         public static Matrix4 LookAt(Vector3 eye, Vector3 target, Vector3 up)
