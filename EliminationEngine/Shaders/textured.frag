@@ -84,13 +84,13 @@ void main()
     UVs = prevTexCoords * weight + UVs * (1.0f - weight);
 
     // get normal
-    vec3 normal = normalize(texture(normal0, UVs).xyz * 2.0f - 1.0f) * normalMat;
+    vec3 normal = _aNormal * normalize(texture(normal0, UVs).xyz * 2.0f - 1.0f);
 
 
     // calc lights affection
     vec3 result = vec3(0, 0, 0);
     for(int i = 0; i < lightsNum; i++)
-        result += CalcPointLight(pointLights[i], _aNormal, fragPos, normalize(viewPos - fragPos));
+        result += CalcPointLight(pointLights[i], normal, fragPos, normalize(viewPos - fragPos));
     
     // output
     outputColor = vec4(result, 1.0) * texture(texture0, UVs);
