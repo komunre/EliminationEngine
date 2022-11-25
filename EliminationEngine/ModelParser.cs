@@ -59,7 +59,7 @@ namespace EliminationEngine
                     var image = (Image<Rgba32>)SixLabors.ImageSharp.Image.Load(mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Open());
                     renderMesh.Width = image.Width;
                     renderMesh.Height = image.Height;
-                    renderMesh.Image = ImageLoader.LoadTextureFromImage(image).Pixels.ToArray();
+                    renderMesh.Image = ImageLoader.LoadImageData(image).Pixels.ToArray();
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace EliminationEngine
                     }
                     renderMesh.Width = image.Width;
                     renderMesh.Height = image.Height;
-                    renderMesh.Image = ImageLoader.LoadTextureFromImage(image).Pixels.ToArray();
+                    renderMesh.Image = ImageLoader.LoadImageData(image).Pixels.ToArray();
                 }
                 renderMesh.Vertices = vertsData.ToArray();
                 renderMesh.TexCoords = uvData.ToArray();

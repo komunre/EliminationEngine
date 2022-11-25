@@ -23,8 +23,8 @@ namespace EliminationEngine.Render
         public int Width = 0;
         public int Height = 0;
         public bool OverrideShader = false;
-        public string ShaderVertPath = "Shaders/unlit.vert";
-        public string ShaderFragPath = "Shaders/text.frag";
+        public string ShaderVertPath = "Shaders/textured.vert";
+        public string ShaderFragPath = "Shaders/textured.frag";
         public Vector3 Position = Vector3.Zero;
         public Vector3 OffsetPosition = Vector3.Zero;
         public string MaterialName = "placeholder";

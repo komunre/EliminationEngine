@@ -33,7 +33,7 @@ namespace EliminationEngine.GameObjects
 
         public DebugRenderSystem(Elimination e) : base(e)
         {
-
+            RunsWhilePaused = true;
         }
 
         public override void OnLoad()

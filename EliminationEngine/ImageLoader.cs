@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 using OpenTK.Graphics.OpenGL4;
+using EliminationEngine.Render;
 
 namespace EliminationEngine
 {
@@ -69,7 +70,7 @@ namespace EliminationEngine
             return im;
         }
 
-        public static ImageData LoadTextureFromImage(Image<Rgba32> image, bool flip = false)
+        public static ImageData LoadImageData(Image<Rgba32> image, bool flip = false)
         {
             if (flip)
             {
@@ -98,7 +99,12 @@ namespace EliminationEngine
             return data;
         }
 
-        public static (int, ImageData) CreateTextureFromImage(Image<Rgba32> image, ImageFilter filter, bool flip = false, bool invert = false)
+        public static TextureData CreateTextureFromImage(string imagePath, ImageFilter filter, bool flip = false, bool invert = false)
+        {
+            return CreateTextureFromImage(Image.Load<Rgba32>(imagePath), filter, flip, invert);
+        }
+
+        public static TextureData CreateTextureFromImage(Image<Rgba32> image, ImageFilter filter, bool flip = false, bool invert = false)
         {
             if (flip)
             {
@@ -158,7 +164,10 @@ namespace EliminationEngine
 
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            return (texture, data);
+            var tdata = new TextureData(texture);
+            tdata.ImageData = data;
+
+            return tdata;
         }
     }
 }

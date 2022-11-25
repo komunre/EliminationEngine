@@ -14,16 +14,19 @@ namespace EliminationEngine.Render
         public int NormalPlaceholder = 0;
         public int DisplacementPlaceholer = 0;
 
+        public static Shader DefaultTexturedShader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+
         public MeshSystem(Elimination e) : base(e)
         {
-
+            RunsWhilePaused = true;
         }
+
         public override void OnLoad()
         {
             base.OnLoad();
 
-            NormalPlaceholder = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/normaldef.png"), ImageFilter.Linear, false, false).Item1;
-            DisplacementPlaceholer = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/displacedef.png"), ImageFilter.Linear, false, false).Item1;
+            NormalPlaceholder = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/normaldef.png"), ImageFilter.Linear, false, false).TextureID;
+            DisplacementPlaceholer = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/displacedef.png"), ImageFilter.Linear, false, false).TextureID;
         }
         public override void PostLoad()
         {
@@ -269,6 +272,36 @@ namespace EliminationEngine.Render
 
                 RenderEverything(camera);
             }
+        }
+
+
+        /// <summary>
+        /// Modifies texture by rendering itself using override shaders.
+        /// </summary>
+        /// <param name="texture">Texture data itself.</param>
+        /// <param name="over">Override shaders. Recommended to use camera.vert as vertex shader.</param>
+        public void ModifyTexture(TextureData texture, Shader over)
+        {
+            if (texture.ImageData == null) return; // due to need in knowing width and height.
+            if (texture.FBO == 0)
+            {
+                texture.GenerateFBO();
+            }
+            over.Use();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, texture.FBO);
+            GL.Viewport(0, 0, texture.ImageData.Width, texture.ImageData.Height);
+
+            // render
+            GL.Disable(EnableCap.DepthTest);
+            GL.BindVertexArray(EngineStatics.CameraStatics.VertexArray);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, EngineStatics.CameraStatics.VertexBuffer);
+            GL.BindTexture(TextureTarget.Texture2D, texture.TextureID);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EngineStatics.CameraStatics.IndicesBuffer);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+
+            // cleanup
+            GL.Enable(EnableCap.DepthTest);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
     }
 }

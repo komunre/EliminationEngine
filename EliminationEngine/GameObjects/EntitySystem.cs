@@ -5,6 +5,7 @@ namespace EliminationEngine.GameObjects
     public class EntitySystem
     {
         public Elimination Engine;
+        public bool RunsWhilePaused = false;
         public EntitySystem(Elimination e)
         {
             Engine = e;

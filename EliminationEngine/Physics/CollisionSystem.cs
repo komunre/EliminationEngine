@@ -21,5 +21,14 @@ namespace EliminationEngine.Physics
             }
             return list;
         }
+
+        public bool CheckBoxIntersection(BoxData box1, BoxData box2)
+        {
+            if ((box1.Bounds.Min.X > box2.Bounds.Min.X && box1.Bounds.Min.Y > box2.Bounds.Min.Y && box1.Bounds.Min.Z > box2.Bounds.Min.Z) && (box1.Bounds.Max.X < box2.Bounds.Max.X && box1.Bounds.Max.Y < box2.Bounds.Max.Y && box1.Bounds.Max.Z < box2.Bounds.Max.Z))
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

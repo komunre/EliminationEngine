@@ -126,7 +126,7 @@ namespace EliminationEngine
             stopwatch.Stop();
 
             Engine.Elapsed = Engine.Elapsed.Add(stopwatch.Elapsed);
-            Engine.DeltaTime = stopwatch.ElapsedTicks / 10000000f;
+            Engine.DeltaTime = (float)stopwatch.Elapsed.TotalMilliseconds / 1000f;
 
             stopwatch.Reset();
         }

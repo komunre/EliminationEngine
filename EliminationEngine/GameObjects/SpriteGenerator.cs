@@ -30,7 +30,7 @@ namespace EliminationEngine.GameObjects
             mesh.Indices = EngineStatics.SpriteStatics.Indices;
             mesh.TexCoords = EngineStatics.SpriteStatics.TexCoords;
 
-            mesh._tex = ImageLoader.CreateTextureFromImage(image, filter, true).Item1;
+            mesh._tex = ImageLoader.CreateTextureFromImage(image, filter, true).TextureID;
 
             var vertShader = "Shaders/unlit.vert";
             if (onScreen)

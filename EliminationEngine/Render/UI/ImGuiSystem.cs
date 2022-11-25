@@ -16,7 +16,7 @@ namespace EliminationEngine.Render.UI
     {
         public ImGuiSystem(Elimination e) : base(e)
         {
-
+            RunsWhilePaused = true;
         }
 
         public bool DebugOpened = false;
@@ -250,6 +250,7 @@ void main()
             {
                 var renderSystem = Engine.GetSystem<MeshSystem>();
                 ImGui.Begin("DEBUG MENU");
+                ImGui.Text("FPS: " + 60 / Engine.DeltaTime);
                 ImGui.Checkbox("Wiremode", ref renderSystem.ForceWiremode);
                 ImGui.Checkbox("Editor", ref _editorSystem.EditorActive);
                 ImGui.Checkbox("Debug render", ref _debugRender.DebugActive);
@@ -348,6 +349,8 @@ void main()
 
         private void RenderImDrawData(ImDrawDataPtr draw_data)
         {
+            GL.Viewport(0, 0, Engine.window.Size.X, Engine.window.Size.Y);
+
             if (draw_data.CmdListsCount == 0)
             {
                 return;
