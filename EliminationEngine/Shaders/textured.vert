@@ -29,5 +29,5 @@ void main(void)
     texCoord = aTexCoord;
     gl_Position = vec4(aPosition, 1.0) * mvpMatrix;
     normalMat = mat3(transpose(inverse(modelMatrix)));
-    _aNormal = aNormal * normalMat;
+    _aNormal = aNormal;
 }
