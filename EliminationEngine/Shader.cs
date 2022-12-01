@@ -7,7 +7,7 @@ namespace EliminationEngine
     {
         public readonly int Handle;
 
-        public Shader(string vertPath, string fragPath)
+        public Shader(string vertPath, string fragPath, string geomPath = "null")
         {
             // There are several different types of shaders, but the only two you need for basic rendering are the vertex and fragment shaders.
             // The vertex shader is responsible for moving around vertices, and uploading that data to the fragment shader.
@@ -21,6 +21,15 @@ namespace EliminationEngine
             GL.ShaderSource(vertexShader, shaderSource);
             CompileShader(vertexShader);
 
+            var geomShader = 0;
+            if (geomPath != "null")
+            {
+                shaderSource = File.ReadAllText(geomPath);
+                geomShader = GL.CreateShader(ShaderType.GeometryShader);
+                GL.ShaderSource(geomShader, shaderSource);
+                CompileShader(geomShader);
+            }
+
 
             shaderSource = File.ReadAllText(fragPath);
             var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
@@ -31,6 +40,10 @@ namespace EliminationEngine
             Handle = GL.CreateProgram();
 
             GL.AttachShader(Handle, vertexShader);
+            if (geomShader != 0)
+            {
+                GL.AttachShader(Handle, geomShader);
+            }
             GL.AttachShader(Handle, fragmentShader);
 
             LinkProgram(Handle);

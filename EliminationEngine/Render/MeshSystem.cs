@@ -14,7 +14,7 @@ namespace EliminationEngine.Render
         public int NormalPlaceholder = 0;
         public int DisplacementPlaceholer = 0;
 
-        public static Shader DefaultTexturedShader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+        public static Shader DefaultTexturedShader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
 
         public MeshSystem(Elimination e) : base(e)
         {
@@ -60,7 +60,7 @@ namespace EliminationEngine.Render
                     }
                     else
                     {
-                        mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag");
+                        mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
                     }
                 }
 
@@ -142,6 +142,7 @@ namespace EliminationEngine.Render
             shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * fovMatrix);
             shader.SetMatrix4("modelMatrix", matrix * trans * scale);
             shader.SetVector3("viewPos", cameraPos);
+            shader.SetVector3("cameraForwar", camera.Owner.GetDirections()[0]);
             shader.SetVector3("worldPos", position);
             shader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
         }

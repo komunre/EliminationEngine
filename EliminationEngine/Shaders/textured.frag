@@ -8,10 +8,16 @@ in vec4 fragAddColor;
 in vec3 _aNormal;
 in vec3 NewPos;
 in mat3 normalMat;
+in mat3 TBN;
+in vec3 T;
+in vec3 B;
+in vec3 N;
+in vec3 TBNFragPos;
 uniform mat4 mvpMatrix;
 uniform mat4 modelMatrix;
 uniform vec3 viewPos;
 uniform vec3 worldPos;
+uniform vec3 cameraForward;
 
 uniform float heightScale;
 
@@ -38,9 +44,10 @@ uniform int lightsNum = 0;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    vec3 lightDir = normalize(light.pos - fragPos);
+    vec3 lightpos = light.pos;
+    vec3 lightDir = normalize(lightpos - fragPos);
     float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
-    float distance    = length(light.pos - fragPos);
+    float distance    = length(lightpos - fragPos);
     float attenuation = light.linear / distance;
     vec3 diffuse = light.diffuse * diff;
     diffuse = diffuse * attenuation;
@@ -59,11 +66,22 @@ const float numLayers = 32.0f;
 void main()
 {
     // displacement vars
-    vec3 viewDir = normalize(viewPos - fragPos);
+    vec3 fragToCameraPos = viewPos - fragPos;
+    vec3 viewDir = normalize(fragToCameraPos);
     float layerDepth = 1.0f / numLayers;
     float currentDepth = 0.0f;
 
-    vec2 S = viewDir.xy / viewDir.z * heightScale;
+    vec3 displaceViewDir = viewDir;
+
+    vec3 unreadyNormal = -N * _aNormal;
+
+    vec2 S = vec2(0, 0);
+    if (unreadyNormal.y > unreadyNormal.x && unreadyNormal.y > unreadyNormal.z) {
+        S = displaceViewDir.xz / displaceViewDir.y * heightScale;
+    }
+    else {
+        S = displaceViewDir.xy / displaceViewDir.z * heightScale;
+    }
     vec2 deltaUVs = S / numLayers;
     
     vec2 UVs = texCoord;
@@ -83,14 +101,17 @@ void main()
     float weight = afterDepth / (afterDepth - beforeDepth);
     UVs = prevTexCoords * weight + UVs * (1.0f - weight);
 
+    //if(UVs.x > 1.0 || UVs.y > 1.0 || UVs.x < 0.0 || UVs.y < 0.0)
+    //    discard;
+
     // get normal
-    vec3 normal = _aNormal * normalize(texture(normal0, UVs).xyz * 2.0f - 1.0f);
+    vec3 normal = -N * normalize(texture(normal0, UVs).xyz);
 
 
     // calc lights affection
     vec3 result = vec3(0, 0, 0);
     for(int i = 0; i < lightsNum; i++)
-        result += CalcPointLight(pointLights[i], normal, fragPos, normalize(viewPos - fragPos));
+        result += CalcPointLight(pointLights[i], normal, fragPos, viewDir);
     
     // output
     outputColor = vec4(result, 1.0) * texture(texture0, UVs);

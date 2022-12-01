@@ -9,25 +9,29 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 uniform vec3 worldPos;
-out vec2 texCoord;
-out vec3 fragPos;
-out vec3 normal;
-out vec4 fragAddColor;
-out vec3 _aNormal;
-out vec3 NewPos;
-out vec3 FragNormal;
-out mat3 normalMat;
+
+out DATA
+{
+	vec2 texCoord;
+    vec3 fragPos;
+    vec3 normal;
+    vec4 fragAddColor;
+    vec3 _aNormal;
+    vec3 NewPos;
+    vec3 FragNormal;
+    mat3 normalMat;
+} geom_data;
 
 void main(void)
 {
     vec3 newPos = vec3(vec4(aPosition, 1.0) * modelMatrix);
-    NewPos = newPos;
+    geom_data.NewPos = newPos;
     vec3 result = vec3(0, 0, 0);
-    fragAddColor = vec4(result, 1.0);
-    normal = aNormal;
-    fragPos = vec3(modelMatrix * vec4(aPosition, 1.0));
-    texCoord = aTexCoord;
-    gl_Position = vec4(aPosition, 1.0) * mvpMatrix;
-    normalMat = mat3(transpose(inverse(modelMatrix)));
-    _aNormal = aNormal;
+    geom_data.fragAddColor = vec4(result, 1.0);
+    geom_data.normal = aNormal;
+    geom_data.fragPos = vec3(modelMatrix * vec4(aPosition, 1.0));
+    geom_data.texCoord = aTexCoord;
+    gl_Position = vec4(aPosition, 1.0);  //* mvpMatrix;
+    geom_data.normalMat = mat3(transpose(inverse(modelMatrix)));
+    geom_data._aNormal = aNormal;
 }

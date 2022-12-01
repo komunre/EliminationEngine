@@ -47,10 +47,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Shaders\textured.geom" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ShaderFiles Remove="Shaders\camera.frag" />
 	  <ShaderFiles Remove="Shaders\camera.vert" />
 	  <ShaderFiles Remove="Shaders\onscreen.vert" />
 	  <ShaderFiles Remove="Shaders\text.frag" />
+	  <ShaderFiles Remove="Shaders\textured.geom" />
 	  <ShaderFiles Remove="Shaders\unlit.vert" />
 	</ItemGroup>
 

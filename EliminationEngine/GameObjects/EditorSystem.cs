@@ -78,7 +78,7 @@ namespace EliminationEngine.GameObjects
         public bool EditorActive = false;
         public float EditorCameraSpeed = 4.5f;
 
-        public static float MouseSensitivity = 0.6f;
+        public static float MouseSensitivity = 25f;
 
         protected CameraComponent EditorCamera;
         protected bool _lastActive = false;
@@ -89,6 +89,7 @@ namespace EliminationEngine.GameObjects
         private int _selectedPreset = 0;
         private bool _placeObjects = false;
 
+        public List<ObjectPreset> LoadedPresets = new();
         public Dictionary<int, TexturePresetLoaded> LoadedTextures = new();
         private Dictionary<GameObject, ObjectPreset> AddedPresets = new();
 
@@ -104,7 +105,7 @@ namespace EliminationEngine.GameObjects
             var editCamObj = new GameObject();
             EditorCamera = editCamObj.AddComponent<CameraComponent>();
             var light = editCamObj.AddComponent<LightComponent>();
-            light.Diffuse = 0.01f;
+            light.Diffuse = 0.005f;
 
             foreach (var file in Directory.GetFiles("res/presets/"))
             {
@@ -215,6 +216,25 @@ namespace EliminationEngine.GameObjects
             preset.PresetName = path;
             preset.Components = comps.ToArray();
             return preset;
+        }
+
+        public void LoadAllPresets()
+        {
+            foreach (var preset in _objectPresets)
+            {
+                var p = ParsePreset(preset);
+                if (!LoadedTextures.ContainsKey(p.Texture.ID))
+                {
+                    var texpreset = new TexturePresetLoaded();
+                    texpreset.ID = p.Texture.ID;
+                    texpreset.Name = p.Texture.Name;
+                    texpreset.Diffuse = ImageLoader.CreateTextureFromImage(p.Texture.DiffusePath, ImageFilter.Linear);
+                    texpreset.Normal = ImageLoader.CreateTextureFromImage(p.Texture.NormalPath, ImageFilter.Linear);
+                    texpreset.Displace = ImageLoader.CreateTextureFromImage(p.Texture.DisplacePath, ImageFilter.Linear);
+                    LoadedTextures.Add(texpreset.ID, texpreset);
+                }
+                LoadedPresets.Add(p);
+            }
         }
 
         public override void OnDraw()
@@ -363,7 +383,7 @@ namespace EliminationEngine.GameObjects
 
             var mouseDelta = Engine.MouseState.Delta;
 
-            var rotation = new Vector3(-mouseDelta.Y, mouseDelta.X, 0) * MouseSensitivity;
+            var rotation = new Vector3(-mouseDelta.Y, mouseDelta.X, 0) * MouseSensitivity * Engine.DeltaTime;
 
             if (Engine.GetCursorLockState())
             {
