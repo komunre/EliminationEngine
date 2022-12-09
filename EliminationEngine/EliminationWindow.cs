@@ -1,6 +1,7 @@
 ﻿using EliminationEngine.GameObjects;
 using EliminationEngine.Render;
 using EliminationEngine.Render.UI;
+using EliminationEngine.Tools;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -18,6 +19,8 @@ namespace EliminationEngine
         public Dictionary<int, GameObject> GameObjects = new();
         public Elimination Engine;
         protected Stopwatch stopwatch = new();
+        public Color ClearColor = new Color(0, 0, 0, 1);
+
         public EliminationWindow(GameWindowSettings settings, NativeWindowSettings nativeSettings, Elimination engine) : base(settings, nativeSettings)
         {
             Engine = engine;
@@ -62,11 +65,16 @@ namespace EliminationEngine
             return compsList.ToArray();
         }
 
+        public void SetWindowClearColor()
+        {
+            GL.ClearColor(ClearColor.R, ClearColor.G, ClearColor.B, ClearColor.A);
+        }
+
         protected override void OnLoad()
         {
             base.OnLoad();
 
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            SetWindowClearColor();
 
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less); // Doesn't work properly without CullFace? (Draws only back side) // I don't remember

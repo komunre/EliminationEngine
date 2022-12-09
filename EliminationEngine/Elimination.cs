@@ -47,6 +47,14 @@ namespace EliminationEngine
             RegisterSystem<EditorSystem>();
             RegisterSystem<NetworkManager>();
         }
+
+        public void SetClearColor(Tools.Color color)
+        {
+            color.ConvertToFloat();
+            window.ClearColor = color;
+            window.SetWindowClearColor();
+        }
+
         public void Run()
         {
             IsRunning = true;
