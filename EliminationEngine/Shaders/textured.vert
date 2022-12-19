@@ -14,7 +14,6 @@ out DATA
 {
 	vec2 texCoord;
     vec3 fragPos;
-    vec3 normal;
     vec4 fragAddColor;
     vec3 _aNormal;
     vec3 NewPos;
@@ -28,7 +27,6 @@ void main(void)
     geom_data.NewPos = newPos;
     vec3 result = vec3(0, 0, 0);
     geom_data.fragAddColor = vec4(result, 1.0);
-    geom_data.normal = aNormal;
     geom_data.fragPos = vec3(modelMatrix * vec4(aPosition, 1.0));
     geom_data.texCoord = aTexCoord;
     gl_Position = vec4(aPosition, 1.0);  //* mvpMatrix;

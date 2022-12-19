@@ -4,6 +4,7 @@ using EliminationEngine.Physics;
 using EliminationEngine.Render;
 using EliminationEngine.Render.UI;
 using EliminationEngine.Systems;
+using EliminationEngine.Systems.Tiles;
 using EliminationEngine.Tools;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -46,7 +47,16 @@ namespace EliminationEngine
             RegisterSystem<DebugRenderSystem>();
             RegisterSystem<EditorSystem>();
             RegisterSystem<NetworkManager>();
+            RegisterSystem<TileSystem>();
         }
+
+        public void SetClearColor(Tools.Color color)
+        {
+            color.ConvertToFloat();
+            window.ClearColor = color;
+            window.SetWindowClearColor();
+        }
+
         public void Run()
         {
             IsRunning = true;
@@ -63,7 +73,7 @@ namespace EliminationEngine
             }
             KeyState = window.KeyboardState;
             MouseState = window.MouseState;
-            if (window == null) throw new InvalidDataException("No window was opened, no headless flag was specified");
+            if (window == null) throw new InvalidDataException("No window was created.");
             window.Run();
 
             window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Crosshair;
@@ -73,13 +83,17 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Error("Engine not started. Aborted adding gameobject.");
                 return;
             }
             if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
             {
                 var meshSys = GetSystem<MeshSystem>();
                 meshSys?.LoadMeshGroup(comp);
+            }
+            while (window.GameObjects.ContainsKey(window.MaxObjectId))
+            {
+                window.MaxObjectId++;
             }
             obj.Id = window.MaxObjectId;
             window.GameObjects.Add(window.MaxObjectId, obj);
@@ -90,11 +104,11 @@ namespace EliminationEngine
             }
         }
 
-        public void AddGameObjectNoId(GameObject obj)
+        public void AddGameObjectBypassID(GameObject obj)
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Error("Engine not started. Aborted adding gameobject.");
                 return;
             }
             if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
@@ -102,6 +116,7 @@ namespace EliminationEngine
                 var meshSys = GetSystem<MeshSystem>();
                 meshSys?.LoadMeshGroup(comp);
             }
+            window.GameObjects.Add(obj.Id, obj);
             if (OnObjectCreate != null)
             {
                 OnObjectCreate.Invoke(obj, window.CurrentWorld);
@@ -112,7 +127,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Warn("Engine not started. Aborted removing gameobject.");
                 return;
             }
             window.GameObjects.Remove(obj.Id);
