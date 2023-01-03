@@ -38,6 +38,7 @@ namespace EliminationEngine
             RegisterSystem<EngineStaticsInitSystem>();
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
+            RegisterSystem<PhysicsSystem>();
             RegisterSystem<Raycast>();
             RegisterSystem<CollisionSystem>();
             RegisterSystem<RemovalSystem>();

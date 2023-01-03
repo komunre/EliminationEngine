@@ -123,6 +123,12 @@
     <None Update="res\Plane.glb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="res\satellite-placeholder.glb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\UV-placeholder.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\camera.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
