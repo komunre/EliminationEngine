@@ -25,6 +25,14 @@ namespace EliminationEngine.GameObjects
             return null;
         }
 
+        public void SetTextureForEvery(TextureData texture)
+        {
+            foreach (var mesh in Meshes)
+            {
+                mesh._tex = texture.TextureID;
+            }
+        }
+
         public List<Mesh> FindByMaterial(string materialName)
         {
             var found = new List<Mesh>();
@@ -36,6 +44,36 @@ namespace EliminationEngine.GameObjects
                 }
             }
             return found;
+        }
+
+        public Mesh CombineMeshes()
+        {
+            var vertices = new List<float>();
+            var verticesFull = new List<float>();
+            var verticesFullFlipped = new List<float>();
+            var indices = new List<uint>();
+            var normals = new List<float>();
+
+            var texture = Meshes[0]._tex;
+
+            foreach (var mesh in Meshes)
+            {
+                vertices.AddRange(mesh.Vertices);
+                verticesFull.AddRange(mesh.VerticesFull);
+                verticesFullFlipped.AddRange(mesh.VerticesFullFlipped);
+                indices.AddRange(mesh.Indices);
+                normals.AddRange(mesh.Normals);
+            }
+
+            var newMesh = new Mesh();
+            newMesh.Vertices = vertices.ToArray();
+            newMesh.VerticesFull = verticesFull.ToArray();
+            newMesh.VerticesFullFlipped = verticesFullFlipped.ToArray();
+            newMesh.Indices = indices.ToArray();
+            newMesh.Normals = normals.ToArray();
+            newMesh._tex = texture;
+            
+            return newMesh;
         }
 
         /// <summary>

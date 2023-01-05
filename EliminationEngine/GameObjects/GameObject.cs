@@ -216,6 +216,10 @@ namespace EliminationEngine.GameObjects
 
         }
 
+        /// <summary>
+        /// NO LONGER SUPPORTED
+        /// </summary>
+        /// <param name="target"></param>
         public void LookAt(Vector3 target)
         {
             /*var rot = Rotation.ToEulerAngles();
@@ -241,8 +245,9 @@ namespace EliminationEngine.GameObjects
 
             var desired = Quaternion.FromAxisAngle(rotAxis, rotAngle);
             Rotation = desired;*/
-            Vector3 forwardVector = Vector3.Normalize(target - GlobalPosition);
-            Rotation = RotationBetweenVectors(Vector3.UnitZ, forwardVector);
+            //Vector3 forwardVector = Vector3.Normalize(target - GlobalPosition);
+            //DegreeRotation = Vector3.Cross(DegreeForward(), forwardVector);
+            //Rotation = RotationBetweenVectors(Vector3.UnitX, forwardVector);
         }
 
         Quaternion RotationBetweenVectors(Vector3 start, Vector3 dest)
@@ -253,7 +258,7 @@ namespace EliminationEngine.GameObjects
             float cosTheta = Vector3.Dot(start, dest);
             Vector3 rotationAxis;
 
-            if (cosTheta < -1 + 0.001f)
+            /*if (cosTheta < -1 + 0.001f)
             {
                 // special case when vectors in opposite directions:
                 // there is no "ideal" rotation axis
@@ -264,7 +269,7 @@ namespace EliminationEngine.GameObjects
 
                 rotationAxis = Vector3.Normalize(rotationAxis);
                 return Quaternion.FromAxisAngle(rotationAxis, MathHelper.DegreesToRadians(180.0f));
-            }
+            }*/
 
             rotationAxis = Vector3.Cross(start, dest);
 

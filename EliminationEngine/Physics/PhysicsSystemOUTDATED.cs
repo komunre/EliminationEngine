@@ -2,11 +2,12 @@
 
 namespace EliminationEngine.Physics
 {
-    public class PhysicsSystem : EntitySystem
+    public class PhysicsSystemOUTDATED : EntitySystem
     {
+
         /*public Simulation Sim;
-        public float CurrentTimestep = 0.1f;*/
-        public PhysicsSystem(Elimination e) : base(e)
+public float CurrentTimestep = 0.1f;*/
+        public PhysicsSystemOUTDATED(Elimination e) : base(e)
         {
 
         }
