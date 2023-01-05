@@ -40,7 +40,7 @@ namespace EliminationEngine.GameObjects
         {
             base.OnLoad();
             _vertexArr = GL.GenVertexArray();
-            _placeholder = ModelParser.ParseGLTFExternal("res/CubePlaceholder.glb");
+            _placeholder = ModelParser.ParseGLTFExternal("res/cube-placeholder.glb");
         }
 
         public override void OnUpdate()

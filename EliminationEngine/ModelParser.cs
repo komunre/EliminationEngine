@@ -43,16 +43,56 @@ namespace EliminationEngine
             {
                 var renderMesh = new Render.Mesh();
                 var vertsData = new List<float>();
+                var verticesFull = new List<float>();
                 var uvData = new List<float>();
                 var indices = new List<uint>();
                 var normals = new List<float>();
                 foreach (var primitive in mesh.Primitives)
                 {
                     vertsData.AddRange(primitive.Vertices.SelectMany(e => new[] { e.X + mesh.Center.X, e.Y + mesh.Center.Y, e.Z + mesh.Center.Z }));
+                    var ind = primitive.Indices.Select(e => e);
+                    var indFirst = ind.Min();
+                    var indOrder = ind;
                     uvData.AddRange(primitive.UVs.SelectMany(e => new[] { e.X, e.Y }));
-                    indices.AddRange(primitive.Indices.Select(e => e));
+                    indices.AddRange(ind);
                     normals.AddRange(primitive.Normals.SelectMany(e => new[] { e.X, e.Y, e.Z }));
                 }
+
+                var final = new float[indices.Count() * 3];
+                var index = 0;
+                for (var i = 0; i < indices.Count(); i++)
+                {
+                    var indice = (int)indices.ElementAt(i);
+                    final[index] = vertsData[indice * 3];
+                    final[index + 1] = vertsData[indice * 3 + 1];
+                    final[index + 2] = vertsData[indice * 3 + 2];
+                    index += 3;
+                }
+
+                verticesFull.AddRange(final);
+
+                // FLIPPING NORMALS HERE!!!
+                var flippedIndices = new uint[indices.Count];
+                for (var i = 0; i < indices.Count; i += 3)
+                {
+                    flippedIndices[i] = indices[i + 2];
+                    flippedIndices[i + 1] = indices[i + 1];
+                    flippedIndices[i + 2] = indices[i];
+                }
+
+                index = 0;
+                var verticesFullFlipped = new float[verticesFull.Count()];
+
+                for (var i = 0; i < flippedIndices.Count(); i++)
+                {
+                    var indice = (int)flippedIndices.ElementAt(i);
+                    final[index] = vertsData[indice * 3];
+                    final[index + 1] = vertsData[indice * 3 + 1];
+                    final[index + 2] = vertsData[indice * 3 + 2];
+                    index += 3;
+                }
+
+                verticesFullFlipped = final;
 
                 if (mesh.Mat != null && mesh.Mat.Channels.ElementAt(0).Texture != null)
                 {
@@ -76,6 +116,8 @@ namespace EliminationEngine
                     renderMesh.Image = ImageLoader.LoadImageData(image).Pixels.ToArray();
                 }
                 renderMesh.Vertices = vertsData.ToArray();
+                renderMesh.VerticesFull = verticesFull.ToArray();
+                renderMesh.VerticesFullFlipped = verticesFullFlipped;
                 renderMesh.TexCoords = uvData.ToArray();
                 renderMesh.Indices = indices.ToArray();
                 renderMesh.Normals = normals.ToArray();
@@ -97,11 +139,13 @@ namespace EliminationEngine
             }
         }
 
-        public static void AddGLTFMeshToObject(ModelParser.GLTFData data, ref GameObject obj)
+        public static MeshGroupComponent AddGLTFMeshToObject(ModelParser.GLTFData data, ref GameObject obj)
         {
             var mesh = obj.AddComponent<GameObjects.MeshGroupComponent>();
 
             PostParseMeshes(ref mesh, data.Meshes);
+
+            return mesh;
         }
     }
     public static class ModelParser

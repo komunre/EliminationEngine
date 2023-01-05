@@ -49,6 +49,8 @@ namespace EliminationEngine.GameObjects
         public Mesh CombineMeshes()
         {
             var vertices = new List<float>();
+            var verticesFull = new List<float>();
+            var verticesFullFlipped = new List<float>();
             var indices = new List<uint>();
             var normals = new List<float>();
 
@@ -57,12 +59,16 @@ namespace EliminationEngine.GameObjects
             foreach (var mesh in Meshes)
             {
                 vertices.AddRange(mesh.Vertices);
+                verticesFull.AddRange(mesh.VerticesFull);
+                verticesFullFlipped.AddRange(mesh.VerticesFullFlipped);
                 indices.AddRange(mesh.Indices);
                 normals.AddRange(mesh.Normals);
             }
 
             var newMesh = new Mesh();
             newMesh.Vertices = vertices.ToArray();
+            newMesh.VerticesFull = verticesFull.ToArray();
+            newMesh.VerticesFullFlipped = verticesFullFlipped.ToArray();
             newMesh.Indices = indices.ToArray();
             newMesh.Normals = normals.ToArray();
             newMesh._tex = texture;

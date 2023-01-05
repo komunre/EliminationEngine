@@ -21,6 +21,11 @@ namespace EliminationEngine.Systems
         /// </summary>
         public bool Initialized = false;
 
+        /// <summary>
+        /// Allow Physics System to automatically update object position and rotation according to simulation data.
+        /// </summary>
+        public bool AutoUpdateObjects = true;
+
         public delegate void PhysicsInit(PhysicsSystem sys);
         /// <summary>
         /// Initialize function. Use custom function as a value to override simulation init values.
@@ -32,9 +37,11 @@ namespace EliminationEngine.Systems
         /// </summary>
         public float CurrentTimeStep = 0.01f;
 
+        protected Dictionary<GameObject, BodyHandle> ObjectBodies = new();
+
         public static void DefaultPhysicsInit(PhysicsSystem sys)
         {
-            sys.PhysicsSimulation = Simulation.Create(sys.Pool, new DefaultNarrowPhase(), new DefaultPoseIntegrator(), new SolveDescription(1));
+            sys.PhysicsSimulation = Simulation.Create(sys.Pool, new DefaultNarrowPhase(), new DefaultPoseIntegrator(), new SolveDescription(6));
         }
 
         public PhysicsSystem(Elimination e) : base(e)
@@ -44,11 +51,7 @@ namespace EliminationEngine.Systems
         public override void OnLoad()
         {
             base.OnLoad();
-        }
 
-        public override void PostLoad()
-        {
-            base.PostLoad();
             if (InitFunc == null)
             {
                 Logger.Warn("No physics system init function declared. Physics system is disabled.");
@@ -63,6 +66,12 @@ namespace EliminationEngine.Systems
             }
         }
 
+        public override void PostLoad()
+        {
+            base.PostLoad();
+            
+        }
+
         public override void OnUpdate()
         {
             base.OnUpdate();
@@ -73,20 +82,80 @@ namespace EliminationEngine.Systems
             }
 
             PhysicsSimulation.Timestep(CurrentTimeStep);
+
+            if (!AutoUpdateObjects) return;
+
+            foreach (var pair in ObjectBodies)
+            {
+                UpdateObjectFromSimulationInfo(pair.Value, pair.Key);
+            }
         }
 
-        public void AddPhysicsObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh, float mass)
+        public BodyHandle AddPhysicsObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh, float mass)
         {
-            if (!Initialized) return;
+            if (!Initialized) return new BodyHandle(-1);
             mesh.ComputeClosedInertia(mass, out var inertia);
             var meshIndex = PhysicsSimulation.Shapes.Add(mesh);
-            PhysicsSimulation.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(obj.GlobalPosition.ToNumerics(), obj.Rotation.ToNumerics()), inertia, new CollidableDescription(meshIndex), new BodyActivityDescription()));
+            var handle = PhysicsSimulation.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(obj.GlobalPosition.ToNumerics(), obj.Rotation.ToNumerics()), inertia, new CollidableDescription(meshIndex), new BodyActivityDescription(0.001f)));
+            ObjectBodies.Add(obj, handle);
+            return handle;
         }
 
-        public void AddPhysicsObject(GameObject obj, Render.Mesh mesh, float mass)
+        public StaticHandle AddStaticObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh)
+        {
+            if (!Initialized) return new StaticHandle(-1);
+            var meshIndex = PhysicsSimulation.Shapes.Add(mesh);
+            var handle = PhysicsSimulation.Statics.Add(new StaticDescription(new RigidPose(obj.GlobalPosition.ToNumerics(), obj.Rotation.ToNumerics()), new CollidableDescription(meshIndex)));
+            return handle;
+        }
+
+        public BodyHandle AddPhysicsObject(GameObject obj, Render.Mesh mesh, float mass)
+        {
+            if (!Initialized) return new BodyHandle(-1);
+            return AddPhysicsObject(obj, EliminationMeshToBepuMesh.Convert(mesh, PhysicsSimulation.BufferPool), mass);
+        }
+
+        public StaticHandle AddStaticObject(GameObject obj, Render.Mesh mesh)
+        {
+            if (!Initialized) return new StaticHandle(-1);
+            return AddStaticObject(obj, EliminationMeshToBepuMesh.Convert(mesh, PhysicsSimulation.BufferPool));
+        }
+
+        public void UpdateObjectFromSimulationInfo(BodyHandle handle, GameObject obj)
         {
             if (!Initialized) return;
-            AddPhysicsObject(obj, EliminationMeshToBepuMesh.Convert(mesh, PhysicsSimulation.BufferPool), mass);
+            var bodyRef = PhysicsSimulation.Bodies.GetBodyReference(handle);
+            var pose = bodyRef.Pose;
+            if (float.IsNaN(pose.Position.X) || float.IsNaN(pose.Position.Y) || float.IsNaN(pose.Position.Z))
+            {
+                Logger.Error("Simulation returned NaN as an object position! Aborting object position update to avoid render issues.");
+                return;
+            }
+            obj.Position = pose.Position.ToOpenTK();
+            obj.Rotation = pose.Orientation.ToOpenTK();
+        }
+
+        public void UpdateObjectFromSimulationInfo(GameObject obj)
+        {
+            if (!Initialized) return;
+            var bodyRef = PhysicsSimulation.Bodies.GetBodyReference(GetObjectHandle(obj));
+            var pose = bodyRef.Pose;
+            obj.Position = pose.Position.ToOpenTK();
+            obj.Rotation = pose.Orientation.ToOpenTK();
+        }
+
+        public void OverrideObjectPose(BodyHandle handle, GameObject obj)
+        {
+            if (!Initialized) return;
+            var bodyRef = PhysicsSimulation.Bodies.GetBodyReference(handle);
+            var pose = bodyRef.Pose;
+            pose.Position = obj.Position.ToNumerics();
+            pose.Orientation = obj.Rotation.ToNumerics();
+        }
+
+        public BodyHandle GetObjectHandle(GameObject obj)
+        {
+            return ObjectBodies[obj];
         }
     }
 }

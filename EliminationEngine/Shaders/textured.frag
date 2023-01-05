@@ -58,7 +58,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         }
         diffuse *= theta;
     }
-    return (diffuse);
+    return (diffuse + (vec3(1, 1, 1) * light.constant));
 } 
 
 const float numLayers = 32.0f;
