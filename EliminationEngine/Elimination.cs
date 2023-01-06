@@ -8,30 +8,69 @@ using EliminationEngine.Tools;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace EliminationEngine
 {
     public class Elimination
     {
         public string Title { get; set; } = "Elimination";
+        /// <summary>
+        /// Window of an engine. Direct access is not recommended.
+        /// </summary>
         public EliminationWindow? window = null;
+        /// <summary>
+        /// List of registered system. Direct access is not recommended, use engine functions like `GetSystem` and `TryGetSystem` instead.
+        /// </summary>
         public Dictionary<Type, EntitySystem> RegisteredSystems = new();
+        /// <summary>
+        /// Seconds past last frame.
+        /// </summary>
         public float DeltaTime = 0;
+        /// <summary>
+        /// Total engine running time.
+        /// </summary>
         public TimeSpan Elapsed = new TimeSpan(0);
+        /// <summary>
+        /// Keyboard state.
+        /// </summary>
         public KeyboardState? KeyState;
+        /// <summary>
+        /// Mouse state.
+        /// </summary>
         public MouseState? MouseState;
 
         public delegate void ObjectCreateEvent(GameObject obj, int world);
+        /// <summary>
+        /// Called when object is created.
+        /// </summary>
         public event ObjectCreateEvent? OnObjectCreate;
 
         public string[] ProgramArgs = new string[0];
+
+        /// <summary>
+        /// Sets if engine should be running in headless mode. Must be set before Run().
+        /// </summary>
         public bool Headless = false;
+        /// <summary>
+        /// Idenntifies if engine is currently running.
+        /// </summary>
         public bool IsRunning = false;
 
+        /// <summary>
+        /// Default on borderless upon fullscreen.
+        /// </summary>
         public bool DefaultBorderless = true;
 
+        /// <summary>
+        /// Sets timer before user can toggle cursor visiblity and lock again.
+        /// </summary>
         private EngineTimer _cursorToggleTimer = new EngineTimer(TimeSpan.FromSeconds(1)); 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args">Console arguments from main function.</param>
         public Elimination(string[] args)
         {
             ProgramArgs = args;
@@ -49,6 +88,25 @@ namespace EliminationEngine
             RegisterSystem<NetworkManager>();
         }
 
+        /// <summary>
+        /// Removes system from list of registered systems.
+        /// </summary>
+        /// <typeparam name="EntitySystemType">EntitySystem type</typeparam>
+        public void UnregisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem
+        {
+            if (!RegisteredSystems.ContainsKey(typeof(EntitySystemType)))
+            {
+                Logger.Warn("Can not unregister " + typeof(EntitySystemType) + " system, because it doesn't exist in list of registered systems.");
+                return;
+            }
+            RegisteredSystems.Remove(typeof(EntitySystemType));
+            Logger.Info("Unregistered system " + typeof(EntitySystemType));
+        }
+
+        /// <summary>
+        /// Sets clear color. This is the color player will see when nothing is drawn on certain pixel.
+        /// </summary>
+        /// <param name="color">Desired clear color.</param>
         public void SetClearColor(Tools.Color color)
         {
             color.ConvertToFloat();
@@ -78,6 +136,10 @@ namespace EliminationEngine
             window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Crosshair;
         }
 
+        /// <summary>
+        /// Inserts gameobject into the game world.
+        /// </summary>
+        /// <param name="obj">Object to insert.</param>
         public void AddGameObject(GameObject obj)
         {
             if (window == null)
@@ -99,6 +161,10 @@ namespace EliminationEngine
             }
         }
 
+        /// <summary>
+        /// Inserts gameobject into the game world, but does not set new object ID.
+        /// </summary>
+        /// <param name="obj">Object to insert.</param>
         public void AddGameObjectNoId(GameObject obj)
         {
             if (window == null)
@@ -117,6 +183,10 @@ namespace EliminationEngine
             }
         }
 
+        /// <summary>
+        /// Removes gameobject from the game world.
+        /// </summary>
+        /// <param name="obj">Object to remove.</param>
         public void RemoveGameObject(GameObject obj)
         {
             if (window == null)
@@ -127,17 +197,26 @@ namespace EliminationEngine
             window.GameObjects.Remove(obj.Id);
         }
 
+        /// <summary>
+        /// Removes gameobject from the game world.
+        /// </summary>
+        /// <param name="id">ID of an object to remove.</param>
         public void RemoveGameObject(int id)
         {
             if (window == null) return;
             window.GameObjects.Remove(id);
         }
 
+        /// <summary>
+        /// Registers system.
+        /// </summary>
+        /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
         public void RegisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
             var system = Activator.CreateInstance(typeof(EntitySystemType), new object[] { this }) as EntitySystemType;
             Debug.Assert(system != null, "System is null after creation during registration");
             RegisteredSystems.Add(typeof(EntitySystemType), system);
+            Logger.Info("Registered system " + typeof(EntitySystemType));
         }
 
         public EntitySystem[] GetAllSystems()
@@ -145,11 +224,22 @@ namespace EliminationEngine
             return RegisteredSystems.Values.ToArray();
         }
 
+        /// <summary>
+        /// Directly accesses EntitySystem from registered list. Might return null.
+        /// </summary>
+        /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
+        /// <returns>Desired system or null if not found.</returns>
         public EntitySystemType? GetSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
             return RegisteredSystems[typeof(EntitySystemType)] as EntitySystemType;
         }
 
+        /// <summary>
+        /// Tries to get system, returns false if not found. Out variable is not null when returned true.
+        /// </summary>
+        /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
+        /// <param name="system">Desired system if found. Null otherwise.</param>
+        /// <returns>True if found, false if not.</returns>
         public bool TryGetSystem<EntitySystemType>(out EntitySystemType? system) where EntitySystemType : EntitySystem
         {
             if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys))
@@ -161,6 +251,11 @@ namespace EliminationEngine
             return false;
         }
 
+        /// <summary>
+        /// Gets objects with certain type of component attached to them.
+        /// </summary>
+        /// <typeparam name="CompType">EntityComponent type.</typeparam>
+        /// <returns>Objects with component with type of CompType.</returns>
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
             if (window == null)
@@ -171,6 +266,11 @@ namespace EliminationEngine
             return window.GetObjectsOfType<CompType>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Id of desired object.</param>
+        /// <returns>Object with certain id.</returns>
         public GameObject GetObjectById(int id)
         {
             if (window == null) return GameObject.InvalidObject;

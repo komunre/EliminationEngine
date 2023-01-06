@@ -37,7 +37,7 @@ namespace EliminationEngine.GameObjects
         }
     }
 
-    public class GameObject
+    public class GameObject : ICopyable
     {
         public static GameObject InvalidObject = new GameObject();
 
@@ -68,10 +68,21 @@ namespace EliminationEngine.GameObjects
             ObjectData.Add(JsonConvert.SerializeObject(data));
         }
 
+        // Possibly requires to detach List from reference on original object.
+        public object CreateCopy()
+        {
+            var obj = new GameObject();
+            obj.Children = this.Children;
+            obj.ObjectData = this.ObjectData;
+            obj.Components = this.Components;
+            return obj;
+        }
+
         public void UpdateQuatRot()
         {
             _rotation = EliminationMathHelper.QuaternionFromEuler(_degreeRotation);
         }
+
         public void UpdateDegreeRot()
         {
             var result = Vector3.Zero;
@@ -85,6 +96,10 @@ namespace EliminationEngine.GameObjects
 
             _degreeRotation = result;
         }
+
+        /// <summary>
+        /// Euler angles rotation. Interconnected with quaternion.
+        /// </summary>
         public Vector3 DegreeRotation
         {
             get => _degreeRotation;
@@ -94,6 +109,10 @@ namespace EliminationEngine.GameObjects
                 UpdateQuatRot();
             }
         }
+
+        /// <summary>
+        /// Quaternion rotation. Interconnected with euler.
+        /// </summary>
         public Quaternion Rotation
         {
             get => _rotation;
@@ -117,21 +136,11 @@ namespace EliminationEngine.GameObjects
 
         }
 
-        public Vector3 Forward()
-        {
-            var front = Vector3.Zero;
-
-            var rot = GlobalRotation;
-            Quaternion.ToEulerAngles(in rot, out var euler);
-
-            front.X = euler.X / 3.14f * 180;
-            front.Y = euler.Y / 3.14f * 180;
-            front.Z = euler.Z / 3.14f * 180;
-
-            return front;
-        }
-
-        /// Forward, Right, Up
+        // Forward, Right, Up
+        /// <summary>
+        /// Gets directions of an object.
+        /// </summary>
+        /// <returns>An array of directions. 0 - Forward, 1 - Right, 2 - Up</returns>
         public Vector3[] GetDirections()
         {
             var rot = DegreeRotation;
@@ -163,6 +172,7 @@ namespace EliminationEngine.GameObjects
 
             return new Vector3[] { forward, right, up };
         }
+
         public Vector3 DegreeForward()
         {
             return GetDirections()[0];
@@ -199,16 +209,6 @@ namespace EliminationEngine.GameObjects
             var rot = GlobalRotation;
 
             return rot * new Vector3(0, 0, -1);
-        }
-
-        public Vector3 Up()
-        {
-            return Vector3.Cross(Right(), Forward()).Normalized();
-        }
-
-        public Vector3 Right()
-        {
-            return Vector3.Cross(Forward(), Vector3.UnitY).Normalized();
         }
 
         public void ReRotate()
@@ -292,11 +292,22 @@ namespace EliminationEngine.GameObjects
             return comp;
         }
 
+        /// <summary>
+        /// Accesses component directly. Might return null.
+        /// </summary>
+        /// <typeparam name="CompType"></typeparam>
+        /// <returns>Desired component or null.</returns>
         public CompType? GetComponent<CompType>() where CompType : EntityComponent
         {
             return Components[typeof(CompType)] as CompType;
         }
 
+        /// <summary>
+        /// Tries to get component, returns false if not found. Out variable is not null when returned true.
+        /// </summary>
+        /// <typeparam name="CompType">Component Type</typeparam>
+        /// <param name="component">Desired component if found. Null otherwise.</param>
+        /// <returns>True if found, false if not.</returns>
         public bool TryGetComponent<CompType>([NotNullWhen(true)] out CompType? component) where CompType : EntityComponent
         {
             if (Components.TryGetValue(typeof(CompType), out var comp))
@@ -308,6 +319,11 @@ namespace EliminationEngine.GameObjects
             return false;
         }
 
+        /// <summary>
+        /// Checks if component esists in the object.
+        /// </summary>
+        /// <typeparam name="CompType">Component Type</typeparam>
+        /// <returns></returns>
         public bool HasComponent<CompType>() where CompType : EntityComponent
         {
             return Components.ContainsKey(typeof(CompType));
