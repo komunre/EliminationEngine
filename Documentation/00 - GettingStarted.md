@@ -10,9 +10,9 @@ In the new project, link to the EliminationEngine project, add `using Eliminatio
 
 Create an instance of `Elimination` class, pass `args` of type `string[]` from main method arguments. `new Elimination(args);`.
 
-Register new game system using `EliminationEngine.Elimination.RegisterSystem<EliminationEngine.GameObject.EntitySystem>()`. In short form - `Elimination.RegisterSystem<EntitySystem()`, where EntitySystem is a child of `EliminationEngine.GameObject.EntitySystem` (`EntitySystem`) class.
+Register new game system using `EliminationEngine.Elimination.RegisterSystem<EliminationEngine.GameObjects.EntitySystem>()`. In short form - `Elimination.RegisterSystem<EntitySystem()`, where EntitySystem is a child of `EliminationEngine.GameObjects.EntitySystem` (`EntitySystem`) class.
 
-Unregister engine systems using `EliminationEngine.Elimination.UnregisterSystem<EliminationEngine.GameObject.EntitySystem>()` if needed.
+Unregister engine systems using `EliminationEngine.Elimination.UnregisterSystem<EliminationEngine.GameObjects.EntitySystem>()` if needed.
 
 Set to headless if required, by setting `EliminationEngine.Elimination.Headless` to `true`.
 
@@ -25,7 +25,7 @@ Template Program:
 ```cs
 
 using EliminationEngine;
-using EliminationEngine.GameObject;
+using EliminationEngine.GameObjects;
 
 var engine = new Elimination();
 engine.RegisterSystem<YourGameSystem>();
