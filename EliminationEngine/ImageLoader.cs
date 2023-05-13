@@ -169,5 +169,53 @@ namespace EliminationEngine
 
             return tdata;
         }
+
+        public static TextureData CreateTextureFromImageData(ImageData image, ImageFilter filter, bool flip = false, bool invert = false)
+        {
+            if (flip)
+            {
+                //image.Mutate(x => x.Flip(FlipMode.Vertical));
+            }
+
+            if (invert)
+            {
+                //image.Mutate(x => x.Invert());
+            }
+
+            var data = image;
+
+            TextureMinFilter filterMin;
+            TextureMagFilter filterMag;
+
+            switch (filter)
+            {
+                default:
+                case ImageFilter.Nearest:
+                    filterMin = TextureMinFilter.Nearest;
+                    filterMag = TextureMagFilter.Nearest;
+                    break;
+                case ImageFilter.Linear:
+                    filterMin = TextureMinFilter.Linear;
+                    filterMag = TextureMagFilter.Linear;
+                    break;
+            }
+
+            var texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, texture);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.ToArray());
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filterMin);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filterMag);
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+            var tdata = new TextureData(texture);
+            tdata.ImageData = data;
+
+            return tdata;
+        }
     }
 }
