@@ -4,6 +4,7 @@ using ImGuiNET;
 using EliminationEngine.Render;
 using System.Text;
 using System.Globalization;
+using GrandEngine.FileParser;
 
 namespace EliminationEngine.GameObjects
 {
@@ -117,106 +118,7 @@ namespace EliminationEngine.GameObjects
 
         public ObjectPreset ParsePreset(string path)
         {
-            var lines = File.ReadLines(path);
-
-            var preset = new ObjectPreset();
-
-            var comps = new List<Type>();
-
-            var state = PresetParseState.START;
-            foreach (var l in lines)
-            {
-                var line = l;
-                line = line.Replace("\n", "");
-                line = line.Replace("\t", "");
-                if (line == "" || line == " ") continue;
-                if (line[0] == '*')
-                {
-                    var category = line.Substring(1);
-                    switch (category) {
-                        case "name":
-                            state = PresetParseState.NAME;
-                            break;
-                        case "model":
-                            state = PresetParseState.MODEL;
-                            break;
-                        case "components":
-                            state = PresetParseState.COMPONENTS;
-                            break;
-                        case "id":
-                            state = PresetParseState.ID;
-                            break;
-                        case "diffuse":
-                            state = PresetParseState.DIFFUSE;
-                            break;
-                        case "normal":
-                            state = PresetParseState.NORMAL;
-                            break;
-                        case "displace":
-                            state = PresetParseState.DISPLACE;
-                            break;
-                        case "depth":
-                            state = PresetParseState.DEPTH;
-                            break;
-                        case "texname":
-                            state = PresetParseState.TEXNAME;
-                            break;
-                        case "texid":
-                            state = PresetParseState.TEXID;
-                            break;
-                        default:
-                            state = PresetParseState.UNKNOWN;
-                            Logger.Warn("Unknown category. Parser is set to UNKNOWN state.");
-                            break;
-                    }
-                    continue;
-                }
-
-                switch (state)
-                {
-                    case PresetParseState.NAME:
-                        preset.Name = line;
-                        break;
-                    case PresetParseState.ID:
-                        preset.Id = int.Parse(line);
-                        break;
-                    case PresetParseState.MODEL:
-                        preset.ModelPath = line;
-                        break;
-                    case PresetParseState.DIFFUSE:
-                        preset.Texture.DiffusePath = line;
-                        break;
-                    case PresetParseState.NORMAL:
-                        preset.Texture.NormalPath = line;
-                        break;
-                    case PresetParseState.DISPLACE:
-                        preset.Texture.DisplacePath = line;
-                        break;
-                    case PresetParseState.TEXNAME:
-                        preset.Texture.Name = line;
-                        break;
-                    case PresetParseState.TEXID:
-                        preset.Texture.ID = int.Parse(line);
-                        break;
-                    case PresetParseState.DEPTH:
-                        preset.DisplaceDepth = float.Parse(line, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture);
-                        break;
-                    case PresetParseState.UNKNOWN:
-                        Logger.Warn("Line at UNKNOWN state of parser: " + line);
-                        break;
-                    case PresetParseState.COMPONENTS:
-                        var c = Type.GetType(line);
-                        if (c == null)
-                        {
-                            Logger.Warn("Unknwon component: " + line);
-                            continue;
-                        }
-                        comps.Add(c);
-                        break;
-                }
-            }
-            preset.PresetName = path;
-            preset.Components = comps.ToArray();
+            var preset = FileParser.Deserialize<ObjectPreset>(path);
             return preset;
         }
 

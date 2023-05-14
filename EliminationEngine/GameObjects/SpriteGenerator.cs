@@ -61,7 +61,7 @@ namespace EliminationEngine.GameObjects
             mesh.Indices = EngineStatics.SpriteStatics.Indices;
             mesh.TexCoords = EngineStatics.SpriteStatics.TexCoords;
 
-            mesh._tex = ImageLoader.CreateTextureFromImageData(image, filter, true).TextureID;
+            mesh._tex = ImageLoader.CreateTextureFromImageData(image, filter, true, true).TextureID;
 
             var vertShader = "Shaders/unlit.vert";
             if (onScreen)

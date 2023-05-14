@@ -174,12 +174,29 @@ namespace EliminationEngine
         {
             if (flip)
             {
-                //image.Mutate(x => x.Flip(FlipMode.Vertical));
+                List<byte> flipped = new();
+                for (int y = image.Height-1; y >= 0; y--)
+                {
+                    for (int x = 0; x < (image.Width)*4; x++)
+                    {
+                        flipped.Add(image.Pixels[(y * (image.Width*4)) + x]);
+                    }
+                }
+                image.Pixels = flipped;
             }
 
             if (invert)
             {
-                //image.Mutate(x => x.Invert());
+                List<byte> inverted = new();
+                for (int y = 0; y < image.Height; y++)
+                {
+                    for (int x = (image.Width)*4-1; x >= 0; x -= 4)
+                    {
+                        var i = (y * (image.Width * 4)) + x;
+                        inverted.AddRange(new byte[] { image.Pixels[i-3], image.Pixels[i-2], image.Pixels[i-1], image.Pixels[i] });
+                    }
+                }
+                image.Pixels = inverted;
             }
 
             var data = image;
@@ -203,7 +220,7 @@ namespace EliminationEngine
             var texture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, texture);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.ToArray());
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Pixels.ToArray());
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
