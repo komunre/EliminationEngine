@@ -30,7 +30,7 @@ namespace EliminationEngine.Systems
 
             if (!Bass.Init())
             {
-                Logger.Error("Unable to initialize bass: " + Bass.LastError);
+                Logger.Error(Loc.Get("ERROR_BASS_INIT_FAIL") + Bass.LastError);
             }
         }
 
@@ -39,7 +39,7 @@ namespace EliminationEngine.Systems
             var handle = Bass.CreateStream(StreamHelper.ReadFully(stream), 0, stream.Length, loop ? BassFlags.Loop : BassFlags.Default);
             if (handle == 0)
             {
-                Logger.Warn("Sound handle creation error: " + Bass.LastError);
+                Logger.Warn(Loc.Get("WARN_SOUND_HANDLE_CREATE_FAIL") + Bass.LastError);
                 return 0;
             }
             Handles.Add(handle);
@@ -51,7 +51,7 @@ namespace EliminationEngine.Systems
             var handle = CacheSound(stream, loop);
             if (!Bass.ChannelPlay(handle))
             {
-                Logger.Warn("No sound was played: " + Bass.LastError);
+                Logger.Warn(Loc.Get("WARN_SOUND_PLAY_FAIL") + Bass.LastError);
             }
             return handle;
         }

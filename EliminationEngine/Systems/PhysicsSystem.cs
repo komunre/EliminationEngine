@@ -54,7 +54,7 @@ namespace EliminationEngine.Systems
 
             if (InitFunc == null)
             {
-                Logger.Warn("No physics system init function declared. Physics system is disabled.");
+                Logger.Warn(Loc.Get("WARN_NO_PHYSICS_INIT"));
                 return;
             }
             InitFunc.Invoke(this);
@@ -62,7 +62,7 @@ namespace EliminationEngine.Systems
 
             if (PhysicsSimulation == null)
             {
-                Logger.Error("No simulation was created during init.");
+                Logger.Error(Loc.Get("ERROR_NO_SIMULATION_CREATED"));
             }
         }
 
@@ -128,7 +128,7 @@ namespace EliminationEngine.Systems
             var pose = bodyRef.Pose;
             if (float.IsNaN(pose.Position.X) || float.IsNaN(pose.Position.Y) || float.IsNaN(pose.Position.Z))
             {
-                Logger.Error("Simulation returned NaN as an object position! Aborting object position update to avoid render issues.");
+                Logger.Error(Loc.Get("ERROR_SIMULATION_RETURNED_NAN"));
                 return;
             }
             obj.Position = pose.Position.ToOpenTK();

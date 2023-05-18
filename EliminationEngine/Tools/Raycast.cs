@@ -163,8 +163,7 @@ namespace EliminationEngine.Tools
         {
             if (Engine.Headless)
             {
-                Logger.Warn("Headless, no need to raycast from camera");
-                return new RayHit[0];
+                Logger.Warn(Loc.Get("WARN_HEADLESS_CAMERA_RAYCAST"));
             }
             var cameras = Engine.GetObjectsOfType<CameraComponent>()?.Select(e => { if (e.Active) return e; else return null; });
             if (cameras == null) return new RayHit[] { new RayHit(false, null, 0, Vector3.Zero, Vector3.Zero) };

@@ -32,7 +32,7 @@ namespace EliminationEngine.Render
             }
             if (!WindowResized) return;
 
-            Logger.Info("Resizing");
+            Logger.Info(Loc.Get("INFO_RESIZING"));
             foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
             {
                 if (!camera.Active) continue;

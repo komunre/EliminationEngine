@@ -9,6 +9,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace EliminationEngine
 {
@@ -47,6 +48,7 @@ namespace EliminationEngine
         public event ObjectCreateEvent? OnObjectCreate;
 
         public string[] ProgramArgs = new string[0];
+        public EliminationArgs ProcessedArgs;
 
         /// <summary>
         /// Sets if engine should be running in headless mode. Must be set before Run().
@@ -67,6 +69,19 @@ namespace EliminationEngine
         /// </summary>
         private EngineTimer _cursorToggleTimer = new EngineTimer(TimeSpan.FromSeconds(1)); 
 
+
+        public class EliminationArgs
+        {
+            public int headless { get; set; }
+            public string lang { get; set; }
+
+            public EliminationArgs()
+            {
+                headless = 0;
+                lang = "en";
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -74,6 +89,14 @@ namespace EliminationEngine
         public Elimination(string[] args)
         {
             ProgramArgs = args;
+            Console.OutputEncoding = Encoding.UTF8;
+            var combined = "";
+            foreach (var arg in ProgramArgs)
+            {
+                combined += arg + " ";
+            }
+            ProcessedArgs = FileParser.Deserialize<EliminationArgs>(combined);
+            Loc.InitLoc(ProcessedArgs.lang);
             RegisterSystem<EngineStaticsInitSystem>();
             RegisterSystem<MeshSystem>();
             RegisterSystem<SoundSystem>();
@@ -96,11 +119,11 @@ namespace EliminationEngine
         {
             if (!RegisteredSystems.ContainsKey(typeof(EntitySystemType)))
             {
-                Logger.Warn("Can not unregister " + typeof(EntitySystemType) + " system, because it doesn't exist in list of registered systems.");
+                Logger.Warn(Loc.Get("WARN_UNREGISTER_FAIL_NONEXIST") + typeof(EntitySystemType));
                 return;
             }
             RegisteredSystems.Remove(typeof(EntitySystemType));
-            Logger.Info("Unregistered system " + typeof(EntitySystemType));
+            Logger.Info(Loc.Get("INFO_UNREGISTERED") + typeof(EntitySystemType));
         }
 
         /// <summary>
@@ -144,7 +167,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Warn(Loc.Get("WARN_START_BEFORE_ACCESS"));
                 return;
             }
             if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
@@ -169,7 +192,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Warn(Loc.Get("WARN_START_BEFORE_ACCESS"));
                 return;
             }
             if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
@@ -191,7 +214,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Warn(Loc.Get("WARN_START_BEFORE_ACCESS"));
                 return;
             }
             window.GameObjects.Remove(obj.Id);
@@ -216,7 +239,7 @@ namespace EliminationEngine
             var system = Activator.CreateInstance(typeof(EntitySystemType), new object[] { this }) as EntitySystemType;
             Debug.Assert(system != null, "System is null after creation during registration");
             RegisteredSystems.Add(typeof(EntitySystemType), system);
-            Logger.Info("Registered system " + typeof(EntitySystemType));
+            Logger.Info(Loc.Get("INFO_REGISTERED") + typeof(EntitySystemType));
         }
 
         public EntitySystem[] GetAllSystems()
@@ -260,7 +283,7 @@ namespace EliminationEngine
         {
             if (window == null)
             {
-                Logger.Warn("Start the engine before accessing gameobjects");
+                Logger.Warn(Loc.Get("WARN_START_BEFORE_ACCESS"));
                 return new CompType[0];
             }
             return window.GetObjectsOfType<CompType>();

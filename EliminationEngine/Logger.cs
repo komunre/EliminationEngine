@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System.Runtime.CompilerServices;
 
 namespace EliminationEngine
 {
@@ -10,6 +11,7 @@ namespace EliminationEngine
     }
     public static class Logger
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void MakeLog(LogLevel level, string message)
         {
             string prefix = "[INFO]";
@@ -28,20 +30,24 @@ namespace EliminationEngine
             Console.WriteLine(prefix + ": " + message);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void Info(string msg)
         {
             MakeLog(LogLevel.Info, msg);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void Warn(string msg)
         {
             MakeLog(LogLevel.Warn, msg);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void Error(string msg)
         {
             MakeLog(LogLevel.Error, msg);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void LogVector(Vector3 vec, string msg = "")
         {
             MakeLog(LogLevel.Info, msg + " --- " + vec.X + ":" + vec.Y + ":" + vec.Z);

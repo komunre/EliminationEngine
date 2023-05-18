@@ -105,6 +105,12 @@
     <None Update="libgcc_s_seh-1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="loc\en\log.el">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="loc\ru\log.el">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="res\cube-placeholder.glb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

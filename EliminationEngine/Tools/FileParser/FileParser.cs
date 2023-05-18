@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Collections;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
-namespace GrandEngine.FileParser
+namespace EliminationEngine.Tools
 {
     public ref struct FileParser
     {
@@ -17,6 +18,7 @@ namespace GrandEngine.FileParser
             this._reader = reader;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private object ReadObject(Type valueType)
         {
             this._reader.Read(); // consuming bracket opening
@@ -32,11 +34,13 @@ namespace GrandEngine.FileParser
             return instance;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private dynamic ReadArray(Type valueType)
         {
             this._reader.Read(); // consuming bracket opening
             var type = valueType.GetGenericArguments()[0];
-            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
+            var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(type)) as IList;
+            if (list == null) throw new Exception("Activator returned null in FileParser");
 
             while(this._reader.Peek() != ']')
             {
@@ -50,6 +54,7 @@ namespace GrandEngine.FileParser
             return list;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private string ReadString()
         {
             this._reader.Read(); // consuming quote opening
@@ -63,12 +68,14 @@ namespace GrandEngine.FileParser
             return builder.ToString();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         private object TryReadInt()
         {
             var numStr = this._reader.ReadWhile(char.IsNumber);
             return int.Parse(numStr);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining  | MethodImplOptions.AggressiveOptimization)]
         private object ReadValue(Type valueType)
         {
             this._reader.ReadWhitespace();
@@ -84,20 +91,24 @@ namespace GrandEngine.FileParser
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private bool ReadProperty(Type instanceType, object instance)
         {
+            Logger.Info("FileParser: Reading property");
             this._reader.ReadWhitespace();
             if (this._reader.Peek() == -1) return false;
 
             var name = this._reader.ReadWhile((c) => c != '=');
             if (this._reader.Read() == -1) throw new InvalidDataException("Unexpected EOF");
 
-            var prop = instanceType.GetProperty(name, BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public);
+            Logger.Info("FileParser: Getting property type");
+            var prop = instanceType.GetProperty(name, BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.NonPublic);
             if (prop == null)
             {
                 throw new InvalidDataException($"Cannot deserialize into this type! Unknown property: {name}");
             }
 
+            Logger.Info("FileParser: Reading value");
             var val = this.ReadValue(prop.PropertyType);
             prop.SetValue(instance, val);
             return true;

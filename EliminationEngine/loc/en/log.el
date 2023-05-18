@@ -1,0 +1,20 @@
+﻿local=[
+["WARN_UNREGISTER_FAIL_NONEXIST","Can not unregister system, because it doesn't exist in list of registered systems --"]
+["INFO_UNREGISTERED","Unregistered system -- "],
+["WARN_START_BEFORE_ACCESS","Start the engine before accessing gameobjects"],
+["INFO_REGISTERED","Registered system --"],
+["ERROR_HITBOX_EXISTS","Hitbox already exists on the group of meshes"],
+["ERROR_NO_NETWORK_RUNNING","NO NETWORK RUNNING"],
+["ERROR_CONNECTION_ITSELF","Can not get connection to itself"],
+["ERROR_NOT_A_SERVER","THIS IS NOT A SERVER! Can not process server-side messages."],
+["ERROR_NOT_A_CLIENT", "THIS IS NOT A CLIENT! Can not process client-side messages."],
+["WARN_UNHANDLED","Unhandled message type --"],
+["INFO_RESIZING", "Resizing."],
+["WARN_NO_PHYSICS_INIT", "No physics system init function declared. Physics system is disabled."],
+["ERROR_NO_SIMULATION_CREATED","No simulation was created during init."],
+["ERROR_SIMULATION_RETURNED_NAN","Simulation returned NaN as an object position! Aborting object position update to avoid render issues."],
+["ERROR_BASS_INIT_FAIL","Unable to initialize bass --"],
+["WARN_SOUND_HANDLE_CREATE_FAIL","Sound handle creation error --"],
+["WARN_SOUND_PLAY_FAIL","Sound play failed --"],
+["WARN_HEADLESS_CAMERA_RAYCAST","Running in headless mode, yet running raycast from camera."],
+]

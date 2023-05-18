@@ -83,7 +83,7 @@ namespace EliminationEngine.GameObjects
         {
             if (Owner.TryGetComponent<HitBox>(out var box))
             {
-                Logger.Error("Hitbox already exists on the group of meshes.");
+                Logger.Error(Loc.Get("ERROR_HITBOX_EXISTS"));
                 return;
             }
 
