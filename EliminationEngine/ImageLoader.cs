@@ -113,7 +113,7 @@ namespace EliminationEngine
 
             if (invert)
             {
-                image.Mutate(x => x.Invert());
+                image.Mutate(x => x.Flip(FlipMode.Horizontal));
             }
 
             var pixels = new List<byte>(4 * image.Width * image.Height);

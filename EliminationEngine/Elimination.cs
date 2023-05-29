@@ -252,9 +252,11 @@ namespace EliminationEngine
         /// </summary>
         /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
         /// <returns>Desired system or null if not found.</returns>
-        public EntitySystemType? GetSystem<EntitySystemType>() where EntitySystemType : EntitySystem
+        public EntitySystemType GetSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
-            return RegisteredSystems[typeof(EntitySystemType)] as EntitySystemType;
+            var sys = RegisteredSystems[typeof(EntitySystemType)] as EntitySystemType;
+            if (sys == null) throw new NullReferenceException(Loc.Get("GET_SYSTEM_FAIL") + nameof(EntitySystemType));
+            return sys;
         }
 
         /// <summary>

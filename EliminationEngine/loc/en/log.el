@@ -17,4 +17,6 @@
 ["WARN_SOUND_HANDLE_CREATE_FAIL","Sound handle creation error --"],
 ["WARN_SOUND_PLAY_FAIL","Sound play failed --"],
 ["WARN_HEADLESS_CAMERA_RAYCAST","Running in headless mode, yet running raycast from camera."],
+["GET_COMPONENT_FAIL","Failed to get component -- "],
+["GET_SYSTEM_FAIL","Failed to get system -- "],
 ]

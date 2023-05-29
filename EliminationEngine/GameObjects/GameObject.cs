@@ -297,9 +297,11 @@ namespace EliminationEngine.GameObjects
         /// </summary>
         /// <typeparam name="CompType"></typeparam>
         /// <returns>Desired component or null.</returns>
-        public CompType? GetComponent<CompType>() where CompType : EntityComponent
+        public CompType GetComponent<CompType>() where CompType : EntityComponent
         {
-            return Components[typeof(CompType)] as CompType;
+            var comp = Components[typeof(CompType)] as CompType;
+            if (comp == null) throw new NullReferenceException(Loc.Get("GET_COMPONENT_FAIL") + " ID: " + Id + ",Component: " + nameof(CompType));
+            return comp;
         }
 
         /// <summary>
