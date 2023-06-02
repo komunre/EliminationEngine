@@ -12,6 +12,8 @@ namespace EliminationEngine
     public static class Loc
     {
         private static LocProcessed Processed;
+        private static string _currentLang = "en";
+        public static string CurrentLang { get => _currentLang; }
         public static void InitLoc(string lang)
         {
             List<LocFile> files = new List<LocFile>();
@@ -20,10 +22,12 @@ namespace EliminationEngine
             }
             
             Processed = new LocProcessed(files);
+            _currentLang = lang;
         }
 
         public static string Get(string key)
         {
+            if (!Processed.local.ContainsKey(key)) return key;
             return Processed.local[key];
         }
 

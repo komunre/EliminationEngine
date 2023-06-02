@@ -67,7 +67,8 @@ namespace EliminationEngine.Render.UI
             IntPtr context = ImGui.CreateContext();
             ImGui.SetCurrentContext(context);
             var io = ImGui.GetIO();
-            io.Fonts.AddFontDefault();
+            //io.Fonts.AddFontDefault(); // Дефолт более не используется в связи с отсутствием кириллицы!
+            io.Fonts.AddFontFromFileTTF("res/Geologica.ttf", 16, null, io.Fonts.GetGlyphRangesCyrillic());
 
             io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
 

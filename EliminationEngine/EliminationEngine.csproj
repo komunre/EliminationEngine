@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="BepuPhysics" Version="2.4.0-beta9" />
-    <PackageReference Include="ImGui.NET" Version="1.87.3" />
+    <PackageReference Include="ImGui.NET" Version="1.89.5" />
     <PackageReference Include="Lidgren.Network" Version="1.0.2" />
     <PackageReference Include="ManagedBass" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
@@ -117,6 +117,9 @@
     <None Update="res\displacedef.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="res\Geologica.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="res\imgui.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -127,6 +130,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="res\normaldef.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="res\OpenSans.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="res\Plane.glb">

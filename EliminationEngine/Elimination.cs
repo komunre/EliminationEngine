@@ -5,10 +5,10 @@ using EliminationEngine.Render;
 using EliminationEngine.Render.UI;
 using EliminationEngine.Systems;
 using EliminationEngine.Tools;
+using ImGuiNET;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace EliminationEngine
@@ -140,6 +140,7 @@ namespace EliminationEngine
         public void Run()
         {
             IsRunning = true;
+            if (Loc.CurrentLang != ProcessedArgs.lang) Loc.InitLoc(ProcessedArgs.lang);
             var settings = new GameWindowSettings();
             //settings.IsMultiThreaded = true;
             var native = new NativeWindowSettings();
