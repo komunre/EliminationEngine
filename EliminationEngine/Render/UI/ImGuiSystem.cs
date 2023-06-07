@@ -48,6 +48,9 @@ namespace EliminationEngine.Render.UI
         private DebugRenderSystem _debugRender;
         private EditorSystem _editorSystem;
 
+        public ImFontPtr Geologica;
+        public ImFontPtr RedOctober;
+
         /// <summary>
         /// Constructs a new ImGuiController.
         /// </summary>
@@ -68,7 +71,8 @@ namespace EliminationEngine.Render.UI
             ImGui.SetCurrentContext(context);
             var io = ImGui.GetIO();
             //io.Fonts.AddFontDefault(); // Дефолт более не используется в связи с отсутствием кириллицы!
-            io.Fonts.AddFontFromFileTTF("res/Geologica.ttf", 16, null, io.Fonts.GetGlyphRangesCyrillic());
+            Geologica = io.Fonts.AddFontFromFileTTF("res/Geologica.ttf", 16, null, io.Fonts.GetGlyphRangesCyrillic());
+            RedOctober = io.Fonts.AddFontFromFileTTF("res/RedOctober.ttf", 16, null, io.Fonts.GetGlyphRangesCyrillic());
 
             io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
 
