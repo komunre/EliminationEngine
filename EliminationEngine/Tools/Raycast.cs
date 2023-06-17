@@ -175,26 +175,7 @@ namespace EliminationEngine.Tools
             var forward = directions[0];
             var up = directions[2];
 
-            var fovMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.FoV), (float)camera.Width / (float)camera.Height, camera.ClipNear, camera.ClipFar);
-            var lookAt = Matrix4.LookAt(camera.Owner.GlobalPosition, forward, up);
-            var viewMatrix = lookAt * (fovMatrix);
-            var mousePos = Engine.MouseState.Position;
-            var newMousePos = mousePos;
-            newMousePos.X = 2f * mousePos.X / Engine.window.Size.X - 1;
-            newMousePos.Y = 2f * mousePos.Y / Engine.window.Size.Y - 1;
-            newMousePos.Y *= -1;
-            var coords = new Vector4(newMousePos.X, newMousePos.Y, -1, 1);
-
-            fovMatrix.Invert();
-            var eyeCoords = fovMatrix * coords;
-            var eyeCoords2 = new Vector4(eyeCoords.X, eyeCoords.Y, -1, 1);
-
-            lookAt.Invert();
-
-            var rayWorld = lookAt * eyeCoords2;
-            var mouseRay = new Vector3(rayWorld.X, rayWorld.Y, rayWorld.Z);
-
-            mouseRay.Normalize();
+            var mouseRay = ScreenHelper.GetCursorWorldPos(camera, Engine.MouseState.Position, Engine.window.Size);
 
             return RaycastFromPos(camera.Owner.GlobalPosition, mouseRay);
         }
