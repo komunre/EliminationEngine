@@ -286,10 +286,23 @@ namespace EliminationEngine.GameObjects
 
         public CompType AddComponent<CompType>() where CompType : EntityComponent
         {
+            Logger.Info(Loc.Get("ADDING_COMPONENT") + typeof(CompType));
             var comp = Activator.CreateInstance(typeof(CompType), new object[] { this }) as CompType;
             Debug.Assert(comp != null, "No owner was added to component during creation");
             Components.Add(typeof(CompType), comp);
             return comp;
+        }
+
+        public void AddExistingComponent(EntityComponent comp)
+        {
+            Logger.Info(Loc.Get("ADDING_EXISTING_COMPONENT") + comp.GetType());
+            Components.Add(comp.GetType(), comp);
+        }
+
+        public void RemoveComponent<CompType>() where CompType : EntityComponent
+        {
+            Logger.Info(Loc.Get("REMOVING_COMPONENT") + typeof(CompType));
+            Components.Remove(typeof(CompType));
         }
 
         /// <summary>

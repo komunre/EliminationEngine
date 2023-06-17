@@ -105,7 +105,8 @@ namespace EliminationEngine.Tools
             var prop = instanceType.GetProperty(name, BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.NonPublic);
             if (prop == null)
             {
-                throw new InvalidDataException($"Cannot deserialize into this type! Unknown property: {name}");
+                Logger.Error($"Cannot deserialize into this type! Unknown property: {name}");
+                return false;
             }
 
             Logger.Info("FileParser: Reading value");

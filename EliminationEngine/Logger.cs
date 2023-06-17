@@ -14,6 +14,8 @@ namespace EliminationEngine
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void MakeLog(LogLevel level, string message)
         {
+            var time = DateTime.Now;
+            var timeString = "[" + time.Hour + ":" + time.Minute + ":" + time.Second + ":" + time.Millisecond + "]";
             string prefix = "[INFO]";
             switch (level)
             {
@@ -27,7 +29,7 @@ namespace EliminationEngine
                     prefix = "[ERROR]";
                     break;
             }
-            Console.WriteLine(prefix + ": " + message);
+            Console.WriteLine(timeString + " " + prefix + ": " + message);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
