@@ -86,6 +86,7 @@ namespace EliminationEngine.Tools
                 '{' => this.ReadObject(valueType),
                 '[' => this.ReadArray(valueType),
                 '}' => throw new InvalidDataException($"Unexpected closing bracket"),
+                '\'' => this.ReadString(),
                 '\"' => this.ReadString(),
                 _ => this.TryReadInt()
             };

@@ -74,12 +74,30 @@ namespace EliminationEngine
         {
             public int headless { get; set; }
             public string lang { get; set; }
+            public int networked { get; set; }
+            public int server { get; set; }
+            public string host { get; set; }
+            public int port { get; set; }
 
             public EliminationArgs()
             {
                 headless = 0;
                 lang = "en";
+                networked = 0;
+                server = 0;
+                host = "localhost";
+                port = 55784;
             }
+        }
+
+        public static ArgumentClass ParseArguments<ArgumentClass>(string[] args)
+        {
+            var combined = "";
+            foreach (var arg in args)
+            {
+                combined += arg + " ";
+            }
+            return FileParser.Deserialize<ArgumentClass>(combined);
         }
 
         /// <summary>
@@ -90,12 +108,8 @@ namespace EliminationEngine
         {
             ProgramArgs = args;
             Console.OutputEncoding = Encoding.UTF8;
-            var combined = "";
-            foreach (var arg in ProgramArgs)
-            {
-                combined += arg + " ";
-            }
-            ProcessedArgs = FileParser.Deserialize<EliminationArgs>(combined);
+            ProcessedArgs = ParseArguments<EliminationArgs>(ProgramArgs);
+            Headless = ProcessedArgs.headless == 1 ? true : false;
             Loc.InitLoc(ProcessedArgs.lang);
             RegisterSystem<EngineStaticsInitSystem>();
             RegisterSystem<MeshSystem>();

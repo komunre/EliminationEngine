@@ -26,7 +26,12 @@ namespace EliminationEngine.Network
     }
     public class NetworkManager : EntitySystem
     {
-        public static readonly Dictionary<string, string> BuiltinMessages = new Dictionary<string, string>() { { "GET_OBJ", "get-obj" }, { "RECV_OBJ", "recv-obj" }, { "GET_NBY", "get-nearby" }, { "RECV_NBY", "recv-nearby" } };
+        public static readonly Dictionary<string, string> BuiltinMessages = new Dictionary<string, string>() { 
+            { "GET_OBJ", "get-obj" }, 
+            { "RECV_OBJ", "recv-obj" }, 
+            { "GET_NBY", "get-nearby" }, 
+            { "RECV_NBY", "recv-nearby" } 
+        };
 
         public bool IsServer = false;
         public bool IsRunning = false;
@@ -99,10 +104,22 @@ namespace EliminationEngine.Network
         {
             base.OnLoad();
 
-            MessageExec.Add("get-obj", SendObject);
+            //MessageExec.Add("get-obj", SendObject); // СЕРЬЁЗНАЯ УЯЗВИМОСТЬ. Клиент НЕ ДОЛЖЕН иметь возможность запросить данные объекта с сервера. Сервер должен самостоятельно решать, если отправка данных приемлима!
             MessageExec.Add("recv-obj", ReceiveObject);
-            MessageExec.Add("get-nby", SendNearby);
+            //MessageExec.Add("get-nby", SendNearby); // СЕРЬЁЗНАЯ УЯЗВИМОСТЬ. Клиент НЕ ДОЛЖЕН иметь возможность запросить данные объекта с сервера. Сервер должен самостоятельно решать, если отправка данных приемлима!
             MessageExec.Add("recv-nby", ReceiveNearby);
+
+            if (Engine.ProcessedArgs.networked == 0) return;
+
+            if (Engine.ProcessedArgs.server == 1)
+            {
+                StartServer(Engine.ProcessedArgs.port);
+                Engine.window.MaxObjectId = 1000;
+            }
+            else
+            {
+                StartClient(Engine.ProcessedArgs.host, Engine.ProcessedArgs.port);
+            }
         }
 
         private bool ReceiveNearby(NetIncomingMessage message)
@@ -238,6 +255,28 @@ namespace EliminationEngine.Network
             return true;
         }
 
+        public void ProcessUnreadyData()
+        {
+            foreach (var item in UnprocessedData )
+            {
+                if (Engine.window.GameObjects.TryGetValue(item.Id, out var obj)) {
+                    obj.Position = item.Position;
+                    obj.DegreeRotation = item.Rotation;
+                    foreach (var comp in item.Components)
+                    {
+                        var type = comp.GetType();
+                        var objType = obj.GetType();
+                        var hasComponentMethod = objType.GetMethod("HasComponent").MakeGenericMethod(type);
+                        if (!(bool)hasComponentMethod.Invoke(obj, new object[] { comp }))
+                        {
+                            obj.AddExistingComponent(comp);
+                        }
+                    }
+                }
+            }
+            UnprocessedData.Clear();
+        }
+
         public override void OnUpdate()
         {
             base.OnUpdate();
@@ -252,6 +291,8 @@ namespace EliminationEngine.Network
             {
                 HandleClientMessags();
             }
+
+            ProcessUnreadyData();
         }
 
         public void StartServer(int port)
