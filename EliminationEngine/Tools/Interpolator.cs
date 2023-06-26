@@ -15,13 +15,13 @@ namespace EliminationEngine.Tools
             return new InterpolationProcedure(value1, value2, span);
         }
 
-        public static float InterpolateWithProceduure(InterpolationProcedure procedure, InterpolationFunction func)
+        public static float InterpolateWithProcedure(InterpolationProcedure procedure, InterpolationFunction func)
         {
-            return func(procedure.GetStartValue(), procedure.GetEndValue(), procedure.GetPercent());
+            return InterpolateWithTimer(procedure.GetStartValue(), procedure.GetEndValue(), procedure.GetTimer(), func);
         }
         public static float InterpolateWithTimer(float value1, float value2, EngineTimer timer, InterpolationFunction func)
         {
-            return func(value1, value2, timer.GetPercent());
+            return Interpolate(value1, value2, timer.GetPercent(), func);
         }
 
         public static float Interpolate(float value1, float value2, float position, InterpolationFunction func)
@@ -65,6 +65,11 @@ namespace EliminationEngine.Tools
             public float GetPercent()
             {
                 return _timer.GetPercent();
+            }
+
+            public EngineTimer GetTimer()
+            {
+                return _timer;
             }
         }
     }
