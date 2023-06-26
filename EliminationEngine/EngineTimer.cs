@@ -34,6 +34,11 @@ namespace EliminationEngine
             return false;
         }
 
+        public float GetPercent()
+        {
+            return (float)(DateTime.Now.Ticks - _startTime.Ticks) / _timeSpan.Ticks;
+        }
+
         public TimeSpan GetTimeSpan()
         {
             return _timeSpan;
