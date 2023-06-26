@@ -39,7 +39,7 @@ namespace EliminationEngine.Tools
             if (_interpolationProcedure == null) return;
             if (_interpolationProcedure.GetPercent() >= 1) return;
 
-            Interpolator.InterpolateWithProcedure(_interpolationProcedure, func);
+            CurrentValue = Interpolator.InterpolateWithProcedure(_interpolationProcedure, func);
         }
     }
 }
