@@ -44,6 +44,31 @@ namespace EliminationEngine.Render
             lightsBuffer = GL.GenBuffer();
         }
 
+        public static int GenerateTexture(Mesh mesh, int textureReference = -1)
+        {
+            if (mesh._tex != 0) return mesh._tex;
+            if (textureReference != -1)
+            {
+                mesh._tex = textureReference;
+            }
+            else if (mesh.Image == null)
+            {
+                mesh._tex = DiffusePlaceholder;
+            }
+            else
+            {
+                mesh._tex = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, mesh.Width, mesh.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, mesh.Image);
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Nearest);
+            }
+            return mesh._tex;
+        }
+
         public void LoadMeshGroup(MeshGroupComponent meshGroup)
         {
             foreach (var mesh in meshGroup.Meshes)
@@ -80,24 +105,7 @@ namespace EliminationEngine.Render
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
                 GL.EnableVertexAttribArray(0);
 
-                if (mesh._tex == 0)
-                {
-                    if (mesh.Image == null)
-                    {
-                        mesh._tex = DiffusePlaceholder;
-                    }
-                    else
-                    {
-                        mesh._tex = GL.GenTexture();
-                        GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, mesh.Width, mesh.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, mesh.Image);
-
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Nearest);
-                    }
-                }
+                GenerateTexture(mesh);
 
                 if (mesh._normalTex == 0)
                 {

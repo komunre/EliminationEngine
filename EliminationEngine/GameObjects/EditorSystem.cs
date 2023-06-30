@@ -106,7 +106,7 @@ namespace EliminationEngine.GameObjects
             var editCamObj = new GameObject();
             EditorCamera = editCamObj.AddComponent<CameraComponent>();
             var light = editCamObj.AddComponent<LightComponent>();
-            light.Diffuse = 0.005f;
+            light.Diffuse = 0.5f;
 
             if (!Directory.Exists("res/presets/")) return;
             

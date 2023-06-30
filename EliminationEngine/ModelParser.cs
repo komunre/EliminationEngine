@@ -1,13 +1,17 @@
 ﻿using EliminationEngine.GameObjects;
+using EliminationEngine.Render;
 using SharpGLTF.Schema2;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace EliminationEngine
 {
     public static class ModelHelper
     {
+        public static Dictionary<byte[], int> LoadedTextures = new();
         public class MeshData
         {
             public List<float> Vertices = new();
@@ -99,7 +103,20 @@ namespace EliminationEngine
                     var image = (Image<Rgba32>)SixLabors.ImageSharp.Image.Load(mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Open());
                     renderMesh.Width = image.Width;
                     renderMesh.Height = image.Height;
-                    renderMesh.Image = ImageLoader.LoadImageData(image).Pixels.ToArray();
+                    var pixelData = ImageLoader.LoadImageData(image).Pixels.ToArray();
+                    foreach (var key in LoadedTextures.Keys)
+                    {
+                        if (key.SequenceEqual(pixelData))
+                        {
+                            renderMesh._tex = LoadedTextures[key];
+                        }
+                    }
+                    if (renderMesh._tex == 0) {
+                        renderMesh.Image = pixelData;
+                        var reference = MeshSystem.GenerateTexture(renderMesh);
+                        LoadedTextures.Add(pixelData, reference);
+                    }
+                    pixelData = null;
                 }
                 else
                 {
