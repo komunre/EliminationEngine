@@ -56,9 +56,9 @@ namespace EliminationEngine.Physics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool ConfigureContactManifold<TManifold>(int workerIndex, CollidablePair pair, ref TManifold manifold, out PairMaterialProperties pairMaterial) where TManifold : unmanaged, IContactManifold<TManifold>
         {
-            pairMaterial.FrictionCoefficient = 1.0f;
-            pairMaterial.MaximumRecoveryVelocity = 2.0f;
-            pairMaterial.SpringSettings = new SpringSettings(1, 1);
+            pairMaterial.FrictionCoefficient = 120000000000000000000000000000.0f;
+            pairMaterial.MaximumRecoveryVelocity = 24.0f;
+            pairMaterial.SpringSettings = new SpringSettings(1, 10);
             return true;
         }
 

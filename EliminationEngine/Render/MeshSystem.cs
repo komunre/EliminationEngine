@@ -1,4 +1,5 @@
-﻿using EliminationEngine.GameObjects;
+﻿using BepuPhysics.Collidables;
+using EliminationEngine.GameObjects;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SixLabors.ImageSharp.PixelFormats;
@@ -181,6 +182,7 @@ namespace EliminationEngine.Render
             {
                 foreach (var mesh in meshGroup.Meshes)
                 {
+                    if (!mesh.IsVisible) continue;
                     if (mesh.Vertices == null) continue;
                     if (mesh.Indices == null) continue;
                     if (mesh._shader == null) continue;
@@ -210,12 +212,16 @@ namespace EliminationEngine.Render
                             mesh._shader.SetInt("pointLights[" + counter + "].directional", light.Directional ? 1 : 0);
                             mesh._shader.SetVector3("pointLights[" + counter + "].direction", light.Owner.GetDirections()[0]);
                             mesh._shader.SetFloat("pointLights[" + counter + "].cutoff", (float)MathHelper.Cos(MathHelper.DegreesToRadians(light.DirectionalCutoffAngle)));
+                            mesh._shader.SetFloat("pointLights[" + counter + "].distanceFactor", light.DistanceFactor);
+                            mesh._shader.SetFloat("pointLights[" + counter + "].maxBrightness", light.MaxBrightness);
+                            mesh._shader.SetFloat("pointLights[" + counter + "].constantDiffuse", light.ConstantDiffuse);
                             counter++;
                         }
                     }
                     mesh._shader.SetInt("lightsNum", counter);
 
                     mesh._shader.SetFloat("heightScale", mesh.DisplaceValue);
+                    mesh._shader.SetFloat("zeroHeight", mesh.DisplaceZeroHeight);
 
                     var col = meshGroup.Owner.BaseColor;
                     mesh._shader.SetVector3("addColor", new Vector3(col.R, col.G, col.B));

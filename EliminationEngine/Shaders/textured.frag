@@ -20,6 +20,7 @@ uniform vec3 worldPos;
 uniform vec3 cameraForward;
 
 uniform float heightScale;
+uniform float zeroHeight;
 
 layout(binding=0) uniform sampler2D texture0;
 layout(binding=1) uniform sampler2D normal0;
@@ -28,12 +29,15 @@ layout(binding=2) uniform sampler2D displacement0;
 struct PointLight {
     vec3 pos;
     float constant;
+    float constantDiffuse;
     float linear;
     float quadratic;
     float ambient;
     float shine;
     vec3 diffuse;
     int directional;
+    float distanceFactor;
+    float maxBrightness;
     vec3 direction;
     float cutoff;
 };
@@ -48,7 +52,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 lightDir = normalize(lightpos - fragPos);
     float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
     float distance    = length(lightpos - fragPos);
-    float attenuation = light.linear / distance;
+    float attenuation = light.linear / (distance * light.distanceFactor);
     vec3 diffuse = light.diffuse * diff;
     diffuse = diffuse * attenuation;
     if (light.directional == 1) {
@@ -58,7 +62,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         }
         diffuse *= theta;
     }
-    return (diffuse + (vec3(1, 1, 1) * light.constant));
+    diffuse.xyz = clamp(diffuse.xyz, 0.0, 1.0);
+    diffuse = diffuse * light.maxBrightness;
+    return diffuse + (vec3(1, 1, 1) * light.constant);
 } 
 
 const float numLayers = 32.0f;
@@ -85,19 +91,19 @@ void main()
     vec2 deltaUVs = S / numLayers;
     
     vec2 UVs = texCoord;
-    float currentDepthMapValue = 1.0f - texture(displacement0, UVs).r;
+    float currentDepthMapValue =zeroHeight - texture(displacement0, UVs).r;
 
     // loop until hit
     while (currentDepth < currentDepthMapValue) {
         UVs -= deltaUVs;
-        currentDepthMapValue = 1.0f - texture(displacement0, UVs).r;
+        currentDepthMapValue = zeroHeight - texture(displacement0, UVs).r;
         currentDepth += layerDepth;
     }
 
     // average out (interpolate)
     vec2 prevTexCoords = UVs + deltaUVs;
     float afterDepth = currentDepthMapValue - currentDepth;
-    float beforeDepth = 1.0f - texture(displacement0, prevTexCoords).r - currentDepth + layerDepth;
+    float beforeDepth = zeroHeight - texture(displacement0, prevTexCoords).r - currentDepth + layerDepth;
     float weight = afterDepth / (afterDepth - beforeDepth);
     UVs = prevTexCoords * weight + UVs * (1.0f - weight);
 

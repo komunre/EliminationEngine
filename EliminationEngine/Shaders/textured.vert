@@ -9,6 +9,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 uniform vec3 worldPos;
+uniform float heightScale;
 
 out DATA
 {

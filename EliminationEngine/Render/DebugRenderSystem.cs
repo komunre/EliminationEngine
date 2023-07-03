@@ -1,3 +1,5 @@
+using EliminationEngine.Extensions;
+using EliminationEngine.Systems;
 using EliminationEngine.Tools;
 using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
@@ -31,6 +33,8 @@ namespace EliminationEngine.GameObjects
         private ModelParser.GLTFData _placeholder;
         public Vector3 PlaceHolderScale = Vector3.One;
 
+        private PhysicsSystem _physicsSystem;
+
         public DebugRenderSystem(Elimination e) : base(e)
         {
             RunsWhilePaused = true;
@@ -43,22 +47,28 @@ namespace EliminationEngine.GameObjects
             _placeholder = ModelParser.ParseGLTFExternal("res/cube-placeholder.glb");
         }
 
+        public override void PostLoad()
+        {
+            base.PostLoad();
+            _physicsSystem = Engine.GetSystem<PhysicsSystem>();
+        }
+
         public override void OnUpdate()
         {
             base.OnUpdate();
 
-            /*if (_lastKnownActive != DebugActive)
+            if (_lastKnownActive != DebugActive)
             {
                 if (_lastKnownActive == false)
                 {
-                    GenDebugData();
+                    //GenDebugData();
                 }
                 else
                 {
-                    ClearDebugData();
+                    //ClearDebugData();
                 }
                 _lastKnownActive = DebugActive;
-            }*/
+            }
         }
 
         public override void OnDraw()
@@ -119,13 +129,13 @@ namespace EliminationEngine.GameObjects
             }
             ImGui.End();
 
-            /*foreach (var line in _lines)
+            foreach (var line in _lines)
             {
                 GL.BindVertexArray(_vertexArr);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, line.Buffer);
 
                 GL.DrawArrays(PrimitiveType.Lines, 0, 2); // TODO: Change to DrawElements, related to next TODO
-            }*/
+            }
         }
 
         // TODO: Change it to render by triangles, so create triangles and etc
@@ -160,7 +170,21 @@ namespace EliminationEngine.GameObjects
                 }
             }
 
-            foreach (var line in _lines)
+            foreach (var physicsObject in _physicsSystem.ObjectBodies)
+            {
+                var bodyRef = _physicsSystem.PhysicsSimulation.Bodies.GetBodyReference(physicsObject.Value);
+                var box = bodyRef.BoundingBox;
+
+                var boxObj = new GameObject();
+                ModelHelper.AddGLTFMeshToObject(_placeholder, ref boxObj);
+                boxObj.Parent = physicsObject.Key;
+                boxObj.Position = Vector3.Zero;
+                boxObj.Scale = (box.Max - box.Min).ToOpenTK();
+                Engine.AddGameObject(boxObj);
+                _debugObjects.Add(boxObj);
+            }
+
+            /*foreach (var line in _lines)
             {
                 if (line.Positions.Length < 6) break;
                 var lineObj = new GameObject();
@@ -174,7 +198,7 @@ namespace EliminationEngine.GameObjects
                 lineObj.Position = differ;
                 lineObj.Scale = new Vector3(Math.Abs(direction.X), Math.Abs(direction.Y), Math.Abs(direction.Z)) * 100f;
                 Engine.AddGameObject(lineObj);
-            }
+            }*/
         }
 
         public void ClearDebugData()
