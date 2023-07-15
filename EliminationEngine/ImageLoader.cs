@@ -23,32 +23,8 @@ namespace EliminationEngine
 
     public class ImageLoader
     {
-        public static ImageData LoadTexture(string path)
-        {
-            Image<Rgba32> image = Image.Load<Rgba32>(path);
-
-            image.Mutate(x => x.Flip(FlipMode.Vertical));
-
-            var pixels = new List<byte>(4 * image.Width * image.Height);
-
-            for (var y = 0; y < image.Height; y++)
-            {
-                var row = image.GetPixelRowSpan(y);
-
-                for (var x = 0; x < image.Width; x++)
-                {
-                    pixels.Add(row[x].R);
-                    pixels.Add(row[x].G);
-                    pixels.Add(row[x].B);
-                }
-            }
-
-            var data = new ImageData();
-            data.Width = image.Width;
-            data.Height = image.Height;
-            data.Pixels = pixels;
-            return data;
-        }
+        // REMOVED DEPRECATED METHOD LoadTexture(string path).
+        // USE LoadImageData(string path, bool flip = false) OR LoadImageData(Image<Rgba32> image, bool flip = false) INSTEAD.
 
         public static Image<Rgba32> MakeColorTransparent(Image<Rgba32> image, Rgba32 color)
         {
@@ -97,6 +73,11 @@ namespace EliminationEngine
             data.Height = image.Height;
             data.Pixels = pixels;
             return data;
+        }
+
+        public static ImageData LoadImageData(string path, bool flip = false)
+        {
+            return LoadImageData(Image.Load<Rgba32>(path), flip);
         }
 
         public static TextureData CreateTextureFromImage(string imagePath, ImageFilter filter, bool flip = false, bool invert = false)

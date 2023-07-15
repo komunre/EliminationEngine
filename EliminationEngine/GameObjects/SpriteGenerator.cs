@@ -11,44 +11,24 @@ namespace EliminationEngine.GameObjects
         {
         }
 
-        public static void AddMeshToObject(GameObject gameObject, Image<Rgba32> image, ImageFilter filter)
+        public static void AddMeshToObject(GameObject gameObject, Image<Rgba32> image, ImageFilter filter, bool unlit = true)
         {
             var generator = gameObject.AddComponent<SpriteGenerator>();
-            generator.GenerateMesh(image, filter, false);
+            generator.GenerateMesh(image, filter, false, unlit);
         }
 
-        public static void AddMeshToObject(GameObject gameObject, ImageData image, ImageFilter filter)
+        public static void AddMeshToObject(GameObject gameObject, ImageData image, ImageFilter filter, bool unlit = true)
         {
             var generator = gameObject.AddComponent<SpriteGenerator>();
-            generator.GenerateMesh(image, filter, false);
+            generator.GenerateMesh(image, filter, false, unlit);
         }
 
-        public void GenerateMesh(Image<Rgba32> image, ImageFilter filter, bool onScreen = false)
+        public void GenerateMesh(Image<Rgba32> image, ImageFilter filter, bool onScreen = false, bool unlit = true)
         {
-            MeshGroupComponent? meshGroup = null;
-            if (!Owner.TryGetComponent<MeshGroupComponent>(out meshGroup))
-            {
-                meshGroup = Owner.AddComponent<MeshGroupComponent>();
-            }
-
-            var mesh = new Mesh();
-            mesh.Vertices = EngineStatics.SpriteStatics.Vertices;
-            mesh.Indices = EngineStatics.SpriteStatics.Indices;
-            mesh.TexCoords = EngineStatics.SpriteStatics.TexCoords;
-
-            mesh._tex = ImageLoader.CreateTextureFromImage(image, filter, true, true).TextureID;
-
-            var vertShader = "Shaders/unlit.vert";
-            if (onScreen)
-            {
-                vertShader = "Shaders/onscreen.vert";
-            }
-            mesh._shader = new Shader(vertShader, "Shaders/text.frag");
-
-            meshGroup.Meshes.Add(mesh);
+            GenerateMesh(ImageLoader.LoadImageData(image), filter, onScreen, unlit);
         }
 
-        public void GenerateMesh(ImageData image, ImageFilter filter, bool onScreen = false)
+        public void GenerateMesh(ImageData image, ImageFilter filter, bool onScreen = false, bool unlit = true)
         {
             MeshGroupComponent? meshGroup = null;
             if (!Owner.TryGetComponent<MeshGroupComponent>(out meshGroup))
@@ -63,12 +43,19 @@ namespace EliminationEngine.GameObjects
 
             mesh._tex = ImageLoader.CreateTextureFromImageData(image, filter, true, true).TextureID;
 
-            var vertShader = "Shaders/unlit.vert";
-            if (onScreen)
+            if (unlit)
             {
-                vertShader = "Shaders/onscreen.vert";
+                var vertShader = "Shaders/unlit.vert";
+                if (onScreen)
+                {
+                    vertShader = "Shaders/onscreen.vert";
+                }
+                mesh._shader = new Shader(vertShader, "Shaders/text.frag");
             }
-            mesh._shader = new Shader(vertShader, "Shaders/text.frag");
+            else
+            {
+                mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
+            }
 
             meshGroup.Meshes.Add(mesh);
         }
