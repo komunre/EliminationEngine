@@ -1,5 +1,7 @@
-﻿using System;
+﻿using EliminationEngine.Extensions;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +34,12 @@ namespace EliminationEngine.Tools
         public static float LinearInterpolation(float value1, float value2, float position)
         {
             return value2 * ((value2 - value1) * position);
+        }
+        
+        public static float CubicEaseInOutInterpolation(float value1, float value2, float position)
+        {
+            float value = position < 0.5 ? 4 * position * position * position : 1 - (float)Math.Pow(-2 * position + 2, 3) / 2;
+            return value.Map(0, 1, value1, value2);
         }
 
         public class InterpolationProcedure

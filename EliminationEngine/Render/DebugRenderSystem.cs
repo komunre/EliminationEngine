@@ -61,6 +61,24 @@ namespace EliminationEngine.GameObjects
             }*/
         }
 
+        public void ProcessFields(Type type, object sys)
+        {
+            var fieldInfo = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
+            foreach (var field in fieldInfo)
+            {
+                var value = field.GetValue(sys);
+                if (value is not System.ValueType)
+                {
+                    if (ImGui.CollapsingHeader(field.Name))
+                    {
+                        ProcessFields(field.FieldType, value);
+                    }
+                }
+                var text = value != null ? value.ToString() : "null";
+                ImGui.Text(field.Name + ": " + text);
+            }
+        }
+
         public override void OnDraw()
         {
             base.OnDraw();
@@ -107,13 +125,7 @@ namespace EliminationEngine.GameObjects
                     var type = sys.GetType();
                     if (ImGui.CollapsingHeader(type.Name))
                     {
-                        var fieldInfo = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
-                        foreach (var field in fieldInfo)
-                        {
-                            var value = field.GetValue(sys);
-                            var text = value != null ? value.ToString() : "null";
-                            ImGui.Text(field.Name + ": " + text);
-                        }
+                        ProcessFields(type, sys);
                     }
                 }
             }

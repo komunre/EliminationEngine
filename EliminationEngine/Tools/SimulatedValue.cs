@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,8 +9,24 @@ namespace EliminationEngine.Tools
 {
     public class SimulatedValue
     {
-        public float CurrentValue;
-        public float DesiredValue;
+        private float _currentValue;
+        private float _desiredValue;
+
+        public float CurrentValue { get; set; }
+        public float DesiredValue
+        {
+            get => _desiredValue; set
+            {
+                _desiredValue = value;
+                if (DesiredValueChanged != null)
+                {
+                    DesiredValueChanged.Invoke(value);
+                }
+            }
+        }
+            
+
+        public event Action<float> DesiredValueChanged;
 
         private Interpolator.InterpolationProcedure? _interpolationProcedure = null;
 
@@ -29,6 +46,12 @@ namespace EliminationEngine.Tools
             CurrentValue = current;
         }
 
+        public void SetDesiredWithInterpolation(float value, TimeSpan span)
+        {
+            _desiredValue = value;
+            InitiateInterpolation(span);
+        }
+
         public void InitiateInterpolation(TimeSpan span)
         {
             _interpolationProcedure = new Interpolator.InterpolationProcedure(CurrentValue, DesiredValue, span);
@@ -40,6 +63,11 @@ namespace EliminationEngine.Tools
             if (_interpolationProcedure.GetPercent() >= 1) return;
 
             CurrentValue = Interpolator.InterpolateWithProcedure(_interpolationProcedure, func);
+        }
+
+        public Interpolator.InterpolationProcedure GetInterpolationProcedure()
+        {
+            return _interpolationProcedure;
         }
     }
 }
