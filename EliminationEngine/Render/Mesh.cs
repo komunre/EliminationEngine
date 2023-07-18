@@ -12,6 +12,7 @@ namespace EliminationEngine.Render
         public uint[]? FlippedIndices { get; set; }
         public float[]? TexCoords { get; set; }
         public float[]? Normals { get; set; }
+        public bool IsVisible = true;
         public int _buffer = 0;
         public int _fullBuffer = 0;
         public int _vertexArr = 0;
@@ -34,5 +35,6 @@ namespace EliminationEngine.Render
         public Vector3 OffsetPosition = Vector3.Zero;
         public string MaterialName = "placeholder";
         public float DisplaceValue = 0.03f;
+        public float DisplaceZeroHeight = 1.0f;
     }
 }

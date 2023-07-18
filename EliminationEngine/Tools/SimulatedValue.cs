@@ -55,6 +55,7 @@ namespace EliminationEngine.Tools
         public void InitiateInterpolation(TimeSpan span)
         {
             _interpolationProcedure = new Interpolator.InterpolationProcedure(CurrentValue, DesiredValue, span);
+            Logger.Info("curr: " + CurrentValue + " - desired: " + DesiredValue + " - span: " + span.TotalSeconds);
         }
 
         public void UpdateInterpolation(Interpolator.InterpolationFunction func)
@@ -63,6 +64,12 @@ namespace EliminationEngine.Tools
             if (_interpolationProcedure.GetPercent() >= 1) return;
 
             CurrentValue = Interpolator.InterpolateWithProcedure(_interpolationProcedure, func);
+        }
+
+        public float GetInterpolationPercent()
+        {
+            if (_interpolationProcedure == null) return 1;
+            return _interpolationProcedure.GetPercent();
         }
 
         public Interpolator.InterpolationProcedure GetInterpolationProcedure()

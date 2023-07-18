@@ -1,4 +1,5 @@
-﻿using EliminationEngine.GameObjects;
+﻿using BepuPhysics.Collidables;
+using EliminationEngine.GameObjects;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SixLabors.ImageSharp.PixelFormats;
@@ -7,6 +8,8 @@ namespace EliminationEngine.Render
 {
     public class MeshSystem : EntitySystem
     {
+        public static CameraComponent? ActiveCamera;
+
         protected int lightsBuffer = 0;
 
         public bool ForceWiremode = false;
@@ -42,6 +45,31 @@ namespace EliminationEngine.Render
             //}
 
             lightsBuffer = GL.GenBuffer();
+        }
+
+        public static int GenerateTexture(Mesh mesh, int textureReference = -1)
+        {
+            if (mesh._tex != 0) return mesh._tex;
+            if (textureReference != -1)
+            {
+                mesh._tex = textureReference;
+            }
+            else if (mesh.Image == null)
+            {
+                mesh._tex = DiffusePlaceholder;
+            }
+            else
+            {
+                mesh._tex = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, mesh.Width, mesh.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, mesh.Image);
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Nearest);
+            }
+            return mesh._tex;
         }
 
         public void LoadMeshGroup(MeshGroupComponent meshGroup)
@@ -80,24 +108,7 @@ namespace EliminationEngine.Render
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
                 GL.EnableVertexAttribArray(0);
 
-                if (mesh._tex == 0)
-                {
-                    if (mesh.Image == null)
-                    {
-                        mesh._tex = DiffusePlaceholder;
-                    }
-                    else
-                    {
-                        mesh._tex = GL.GenTexture();
-                        GL.BindTexture(TextureTarget.Texture2D, mesh._tex);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, mesh.Width, mesh.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, mesh.Image);
-
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Nearest);
-                    }
-                }
+                GenerateTexture(mesh);
 
                 if (mesh._normalTex == 0)
                 {
@@ -173,6 +184,7 @@ namespace EliminationEngine.Render
             {
                 foreach (var mesh in meshGroup.Meshes)
                 {
+                    if (!mesh.IsVisible) continue;
                     if (mesh.Vertices == null) continue;
                     if (mesh.Indices == null) continue;
                     if (mesh._shader == null) continue;
@@ -202,12 +214,16 @@ namespace EliminationEngine.Render
                             mesh._shader.SetInt("pointLights[" + counter + "].directional", light.Directional ? 1 : 0);
                             mesh._shader.SetVector3("pointLights[" + counter + "].direction", light.Owner.GetDirections()[0]);
                             mesh._shader.SetFloat("pointLights[" + counter + "].cutoff", (float)MathHelper.Cos(MathHelper.DegreesToRadians(light.DirectionalCutoffAngle)));
+                            mesh._shader.SetFloat("pointLights[" + counter + "].distanceFactor", light.DistanceFactor);
+                            mesh._shader.SetFloat("pointLights[" + counter + "].maxBrightness", light.MaxBrightness);
+                            mesh._shader.SetFloat("pointLights[" + counter + "].constantDiffuse", light.ConstantDiffuse);
                             counter++;
                         }
                     }
                     mesh._shader.SetInt("lightsNum", counter);
 
                     mesh._shader.SetFloat("heightScale", mesh.DisplaceValue);
+                    mesh._shader.SetFloat("zeroHeight", mesh.DisplaceZeroHeight);
 
                     var col = meshGroup.Owner.BaseColor;
                     mesh._shader.SetVector3("addColor", new Vector3(col.R, col.G, col.B));
@@ -244,25 +260,34 @@ namespace EliminationEngine.Render
 
             if (camera.Active)
             {
+                ActiveCamera = camera;
+
                 // Direct Copy
                 //GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, camera.GetFrameBuffer());
                 //GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                 //GL.BlitFramebuffer(0, 0, camera.Width, camera.Height, 0, 0, activeCamera.Width, activeCamera.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
 
                 // Object draw
-                GL.ActiveTexture(TextureUnit.Texture0);
-                GL.Disable(EnableCap.DepthTest);
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());
-                camera.CameraShader.Use();
-                camera.CameraShader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
-                GL.BindBuffer(BufferTarget.ArrayBuffer, EngineStatics.CameraStatics.VertexBuffer);
-                GL.BindTexture(TextureTarget.Texture2D, camera.GetTexture());
-                GL.BindVertexArray(EngineStatics.CameraStatics.VertexArray);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, EngineStatics.CameraStatics.IndicesBuffer);
-                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
-                GL.Enable(EnableCap.DepthTest);
+                RenderToScreen(camera);
             }
+        }
+
+        // <!!!>
+        // COMPATIBILITY ISSUE:  MULTIPLE ENGINE INSTANCES INCOMPATIBLE
+        public static void RenderToScreen(CameraComponent camera)
+        {
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.Disable(EnableCap.DepthTest);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());
+            camera.CameraShader.Use();
+            camera.CameraShader.SetFloat("time", 1.0f / ((float)(Elimination.GlobalEngine.Elapsed.Ticks % 150)));
+            GL.BindBuffer(BufferTarget.ArrayBuffer, EngineStatics.CameraStatics.VertexBuffer);
+            GL.BindTexture(TextureTarget.Texture2D, camera.GetTexture());
+            GL.BindVertexArray(EngineStatics.CameraStatics.VertexArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EngineStatics.CameraStatics.IndicesBuffer);
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+            GL.Enable(EnableCap.DepthTest);
         }
 
         public override void OnDraw()

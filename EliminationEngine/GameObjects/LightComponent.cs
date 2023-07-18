@@ -9,6 +9,7 @@ namespace EliminationEngine.GameObjects
 
         }
         public float Constant = 0;
+        public float ConstantDiffuse = 0;
         public float Diffuse = 0.1f;
         public float Qudratic = 0;
         public Color Color = new Color(255, 255, 255, 255);
@@ -16,5 +17,7 @@ namespace EliminationEngine.GameObjects
         public List<string> IgnoredLayers = new();
         public bool Directional = false;
         public float DirectionalCutoffAngle = 15;
+        public float DistanceFactor = 1.0f;
+        public float MaxBrightness = 1.0f;
     }
 }

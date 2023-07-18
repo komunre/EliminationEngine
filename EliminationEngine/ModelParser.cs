@@ -1,13 +1,17 @@
 ﻿using EliminationEngine.GameObjects;
+using EliminationEngine.Render;
 using SharpGLTF.Schema2;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace EliminationEngine
 {
     public static class ModelHelper
     {
+        public static Dictionary<byte[], int> LoadedTextures = new();
         public class MeshData
         {
             public List<float> Vertices = new();
@@ -35,6 +39,22 @@ namespace EliminationEngine
             }
 
             return data;
+        }
+
+        public static float[] FlipVertices(float[] verts, uint[] indices)
+        {
+            var index = 0;
+            var verticesFullFlipped = new float[verts.Count()];
+
+            for (var i = 0; i < indices.Count() - 3; i += 3)
+            {
+                var indice = (int)indices.ElementAt(i);
+                verticesFullFlipped[index] = verts[indice + 2];
+                verticesFullFlipped[index + 1] = verts[indice + 1];
+                verticesFullFlipped[index + 2] = verts[indice];
+                index += 3;
+            }
+            return verticesFullFlipped;
         }
 
         public static void PostParseMeshes(ref MeshGroupComponent meshGroup, List<ModelParser.GLTFData.MeshData> meshes)
@@ -99,21 +119,24 @@ namespace EliminationEngine
                     var image = (Image<Rgba32>)SixLabors.ImageSharp.Image.Load(mesh.Mat.Channels.ElementAt(0).Texture.PrimaryImage.Content.Open());
                     renderMesh.Width = image.Width;
                     renderMesh.Height = image.Height;
-                    renderMesh.Image = ImageLoader.LoadImageData(image).Pixels.ToArray();
+                    var pixelData = ImageLoader.LoadImageData(image).Pixels.ToArray();
+                    foreach (var key in LoadedTextures.Keys)
+                    {
+                        if (key.SequenceEqual(pixelData))
+                        {
+                            renderMesh._tex = LoadedTextures[key];
+                        }
+                    }
+                    if (renderMesh._tex == 0) {
+                        renderMesh.Image = pixelData;
+                        var reference = MeshSystem.GenerateTexture(renderMesh);
+                        LoadedTextures.Add(pixelData, reference);
+                    }
+                    pixelData = null;
                 }
                 else
                 {
-                    var image = new Image<Rgba32>(32, 32);
-                    for (var i = 0; i < image.Height; i++)
-                    {
-                        for (var j = 0; j < image.Width; j++)
-                        {
-                            image[j, i] = new Rgba32(251, 72, 196);
-                        }
-                    }
-                    renderMesh.Width = image.Width;
-                    renderMesh.Height = image.Height;
-                    renderMesh.Image = ImageLoader.LoadImageData(image).Pixels.ToArray();
+                    renderMesh._tex = MeshSystem.DiffusePlaceholder;
                 }
                 renderMesh.Vertices = vertsData.ToArray();
                 renderMesh.VerticesFull = verticesFull.ToArray();

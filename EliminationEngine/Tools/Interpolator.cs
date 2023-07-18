@@ -33,7 +33,7 @@ namespace EliminationEngine.Tools
 
         public static float LinearInterpolation(float value1, float value2, float position)
         {
-            return value2 * ((value2 - value1) * position);
+            return value1 + ((value2 - value1) * position);
         }
         
         public static float CubicEaseInOutInterpolation(float value1, float value2, float position)

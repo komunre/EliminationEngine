@@ -94,6 +94,8 @@ namespace EliminationEngine.GameObjects
         public Dictionary<int, TexturePresetLoaded> LoadedTextures = new();
         private Dictionary<GameObject, ObjectPreset> AddedPresets = new();
 
+        public bool PassControls = false;
+
         public EditorSystem(Elimination e) : base(e)
         {
             RunsWhilePaused = true;
@@ -106,7 +108,7 @@ namespace EliminationEngine.GameObjects
             var editCamObj = new GameObject();
             EditorCamera = editCamObj.AddComponent<CameraComponent>();
             var light = editCamObj.AddComponent<LightComponent>();
-            light.Diffuse = 0.005f;
+            light.Diffuse = 0.5f;
 
             if (!Directory.Exists("res/presets/")) return;
             
@@ -148,6 +150,7 @@ namespace EliminationEngine.GameObjects
             if (!EditorActive) return;
 
             ImGui.Begin("Editor");
+            ImGui.Checkbox("Pass Controls", ref PassControls);
             ImGui.InputText("Scene path", ref CurrentMapPath, 2000);
             if (ImGui.Button("Save scene"))
             {
@@ -252,7 +255,7 @@ namespace EliminationEngine.GameObjects
                 }
             }
 
-            if (!EditorActive) return;
+            if (!EditorActive || PassControls) return;
 
             var moveVector = Vector3.Zero;
 

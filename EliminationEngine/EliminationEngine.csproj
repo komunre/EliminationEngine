@@ -114,6 +114,9 @@
     <None Update="res\cube-placeholder.glb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="res\DevTex.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="res\displacedef.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

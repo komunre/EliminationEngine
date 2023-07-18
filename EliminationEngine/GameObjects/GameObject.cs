@@ -63,6 +63,11 @@ namespace EliminationEngine.GameObjects
         private Vector3 _degreeRotation = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
 
+        public bool LockVisualPosition = false;
+        public bool LockVisualRotation = false;
+        public bool LockPhysicsRotation = false;
+        public bool LockPhysicsPosition = false;
+
         public void AddObjectData(object data)
         {
             ObjectData.Add(JsonConvert.SerializeObject(data));
@@ -105,6 +110,14 @@ namespace EliminationEngine.GameObjects
             get => _degreeRotation;
             set
             {
+                while (value.Y > 360)
+                {
+                    value.Y -= 360;
+                }
+                while (value.Y < 0)
+                {
+                    value.Y += 360;
+                }
                 _degreeRotation = value;
                 UpdateQuatRot();
             }
@@ -312,6 +325,11 @@ namespace EliminationEngine.GameObjects
         /// <returns>Desired component or null.</returns>
         public CompType GetComponent<CompType>() where CompType : EntityComponent
         {
+            if (!Components.ContainsKey(typeof(CompType))) {
+                Logger.Error(Loc.Get("GET_COMPONENT_FAIL") + "ID: " + Id + ", Component: " + nameof(CompType));
+                Logger.Error(Loc.Get("RETURN_INVALID_COMPONENT"));
+                return Activator.CreateInstance<CompType>();
+            }
             var comp = Components[typeof(CompType)] as CompType;
             if (comp == null) throw new NullReferenceException(Loc.Get("GET_COMPONENT_FAIL") + " ID: " + Id + ",Component: " + nameof(CompType));
             return comp;
