@@ -15,6 +15,8 @@ namespace EliminationEngine
 {
     public class Elimination
     {
+        public static Elimination GlobalEngine;
+
         public string Title { get; set; } = "Elimination";
         /// <summary>
         /// Window of an engine. Direct access is not recommended.
@@ -106,6 +108,7 @@ namespace EliminationEngine
         /// <param name="args">Console arguments from main function.</param>
         public Elimination(string[] args)
         {
+            if (GlobalEngine == null) GlobalEngine = this;
             ProgramArgs = args;
             Console.OutputEncoding = Encoding.UTF8;
             ProcessedArgs = ParseArguments<EliminationArgs>(ProgramArgs);

@@ -8,6 +8,8 @@ namespace EliminationEngine.Render
 {
     public class MeshSystem : EntitySystem
     {
+        public static CameraComponent? ActiveCamera;
+
         protected int lightsBuffer = 0;
 
         public bool ForceWiremode = false;
@@ -258,25 +260,34 @@ namespace EliminationEngine.Render
 
             if (camera.Active)
             {
+                ActiveCamera = camera;
+
                 // Direct Copy
                 //GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, camera.GetFrameBuffer());
                 //GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                 //GL.BlitFramebuffer(0, 0, camera.Width, camera.Height, 0, 0, activeCamera.Width, activeCamera.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
 
                 // Object draw
-                GL.ActiveTexture(TextureUnit.Texture0);
-                GL.Disable(EnableCap.DepthTest);
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());
-                camera.CameraShader.Use();
-                camera.CameraShader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
-                GL.BindBuffer(BufferTarget.ArrayBuffer, EngineStatics.CameraStatics.VertexBuffer);
-                GL.BindTexture(TextureTarget.Texture2D, camera.GetTexture());
-                GL.BindVertexArray(EngineStatics.CameraStatics.VertexArray);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, EngineStatics.CameraStatics.IndicesBuffer);
-                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
-                GL.Enable(EnableCap.DepthTest);
+                RenderToScreen(camera);
             }
+        }
+
+        // <!!!>
+        // COMPATIBILITY ISSUE:  MULTIPLE ENGINE INSTANCES INCOMPATIBLE
+        public static void RenderToScreen(CameraComponent camera)
+        {
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.Disable(EnableCap.DepthTest);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, camera.GetRBO());
+            camera.CameraShader.Use();
+            camera.CameraShader.SetFloat("time", 1.0f / ((float)(Elimination.GlobalEngine.Elapsed.Ticks % 150)));
+            GL.BindBuffer(BufferTarget.ArrayBuffer, EngineStatics.CameraStatics.VertexBuffer);
+            GL.BindTexture(TextureTarget.Texture2D, camera.GetTexture());
+            GL.BindVertexArray(EngineStatics.CameraStatics.VertexArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EngineStatics.CameraStatics.IndicesBuffer);
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+            GL.Enable(EnableCap.DepthTest);
         }
 
         public override void OnDraw()

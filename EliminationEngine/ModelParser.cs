@@ -41,6 +41,22 @@ namespace EliminationEngine
             return data;
         }
 
+        public static float[] FlipVertices(float[] verts, uint[] indices)
+        {
+            var index = 0;
+            var verticesFullFlipped = new float[verts.Count()];
+
+            for (var i = 0; i < indices.Count() - 3; i += 3)
+            {
+                var indice = (int)indices.ElementAt(i);
+                verticesFullFlipped[index] = verts[indice + 2];
+                verticesFullFlipped[index + 1] = verts[indice + 1];
+                verticesFullFlipped[index + 2] = verts[indice];
+                index += 3;
+            }
+            return verticesFullFlipped;
+        }
+
         public static void PostParseMeshes(ref MeshGroupComponent meshGroup, List<ModelParser.GLTFData.MeshData> meshes)
         {
             foreach (var mesh in meshes)

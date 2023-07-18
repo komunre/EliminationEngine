@@ -325,6 +325,11 @@ namespace EliminationEngine.GameObjects
         /// <returns>Desired component or null.</returns>
         public CompType GetComponent<CompType>() where CompType : EntityComponent
         {
+            if (!Components.ContainsKey(typeof(CompType))) {
+                Logger.Error(Loc.Get("GET_COMPONENT_FAIL") + "ID: " + Id + ", Component: " + nameof(CompType));
+                Logger.Error(Loc.Get("RETURN_INVALID_COMPONENT"));
+                return Activator.CreateInstance<CompType>();
+            }
             var comp = Components[typeof(CompType)] as CompType;
             if (comp == null) throw new NullReferenceException(Loc.Get("GET_COMPONENT_FAIL") + " ID: " + Id + ",Component: " + nameof(CompType));
             return comp;

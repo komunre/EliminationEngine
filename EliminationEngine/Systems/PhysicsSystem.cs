@@ -128,7 +128,17 @@ namespace EliminationEngine.Systems
             var handle = PhysicsSimulation.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(obj.GlobalPosition.ToNumerics(), obj.Rotation.ToNumerics()), inertia, new CollidableDescription(meshIndex), new BodyActivityDescription(0.001f)));
             ObjectBodies.Add(obj, handle);
             return handle;
-            
+        }
+
+        public BodyHandle AddCapsuleObject(GameObject obj, float radius, float length, float mass)
+        {
+            if (!Initialized) return new BodyHandle(-1);
+            var capsule = new Capsule(radius, length);
+            var meshIndex = PhysicsSimulation.Shapes.Add(capsule);
+            var inertia = capsule.ComputeInertia(mass);
+            var handle = PhysicsSimulation.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(obj.GlobalPosition.ToNumerics(), obj.Rotation.ToNumerics()), inertia, new CollidableDescription(meshIndex), new BodyActivityDescription(0.001f)));
+            ObjectBodies.Add(obj, handle);
+            return handle;
         }
 
         public BodyHandle AddKinematicObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh)
