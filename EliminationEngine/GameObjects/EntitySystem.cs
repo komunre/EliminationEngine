@@ -31,6 +31,16 @@ namespace EliminationEngine.GameObjects
 
         }
 
+        public virtual void OnObjectAdded(GameObject obj)
+        {
+
+        }
+
+        public virtual void OnWindowResize(ResizeEventArgs args)
+        {
+
+        }
+
         public virtual void OnTextInput(TextInputEventArgs e)
         {
 

@@ -2,19 +2,24 @@
 using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
 using BepuPhysics.Constraints;
+using BepuPhysics.Trees;
 using BepuUtilities;
 using BepuUtilities.Memory;
 using EliminationEngine.Extensions;
 using EliminationEngine.GameObjects;
 using EliminationEngine.Physics;
+using EliminationEngine.Tools;
 using EliminationEngine.Tools.Physics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace EliminationEngine.Systems
 {
     public class PhysicsSystem : EntitySystem
     {
+        public static PhysicsSystem? InstanceSelf;
+
         public Simulation? PhysicsSimulation;
         public BufferPool Pool = new BufferPool();
 
@@ -40,6 +45,7 @@ namespace EliminationEngine.Systems
         public float CurrentTimeStep = 0.01f;
 
         public Dictionary<GameObject, BodyHandle> ObjectBodies = new();
+        public Dictionary<GameObject, StaticHandle> StaticBodies = new();
 
         public static void DefaultPhysicsInit(PhysicsSystem sys)
         {
@@ -66,6 +72,8 @@ namespace EliminationEngine.Systems
             {
                 Logger.Error(Loc.Get("ERROR_NO_SIMULATION_CREATED"));
             }
+
+            InstanceSelf = this;
         }
 
         public override void PostLoad()
@@ -155,6 +163,7 @@ namespace EliminationEngine.Systems
             if (!Initialized) return new StaticHandle(-1);
             var meshIndex = PhysicsSimulation.Shapes.Add(mesh);
             var handle = PhysicsSimulation.Statics.Add(new StaticDescription(new RigidPose(obj.GlobalPosition.ToNumerics(), obj.Rotation.ToNumerics()), new CollidableDescription(meshIndex)));
+            StaticBodies.Add(obj, handle);
             return handle;
         }
 
@@ -185,6 +194,23 @@ namespace EliminationEngine.Systems
         public void AddFixedDistanceConstraint(BodyHandle handle1, BodyHandle handle2, float distance)
         {
             AddDistanceConstraint(handle1, handle2, 0, distance, 0.01f, 1);
+        }
+
+        public void RemoveObject(GameObject obj)
+        {
+            if (!Initialized) return;
+            if (ObjectBodies.ContainsKey(obj))
+            {
+                var handle = ObjectBodies[obj];
+                PhysicsSimulation.Bodies.Remove(handle);
+                ObjectBodies.Remove(obj);
+            }
+            else if (StaticBodies.ContainsKey(obj))
+            {
+                var handle = StaticBodies[obj];
+                PhysicsSimulation.Statics.Remove(handle);
+                StaticBodies.Remove(obj);
+            }
         }
 
         public void UpdateObjectFromSimulationInfo(BodyHandle handle, GameObject obj)
@@ -273,9 +299,58 @@ namespace EliminationEngine.Systems
             }
         }
 
+        public RayHit[] RaycastFromPos(OpenTK.Mathematics.Vector3 pos, OpenTK.Mathematics.Vector3 dir, float maxDist = 1000, uint maxHits = 2)
+        {
+            DefaultRayHitHandler.LastResultData = new List<RayHit>();
+            var handler = new DefaultRayHitHandler();
+            PhysicsSimulation.RayCast(pos.ToNumerics(), dir.ToNumerics(), maxDist, ref handler);
+            var array = new RayHit[DefaultRayHitHandler.LastResultData.Count];
+            DefaultRayHitHandler.LastResultData.CopyTo(array);
+            DefaultRayHitHandler.LastResultData = null;
+            return array;
+        }
+
         public BodyHandle GetObjectHandle(GameObject obj)
         {
             return ObjectBodies[obj];
+        }
+
+        public GameObject GetObjectFromHandle(BodyHandle handle)
+        {
+            return ObjectBodies.Where((pair) => pair.Value == handle).FirstOrDefault().Key;
+        }
+
+        public class DefaultRayHitHandler : IRayHitHandler
+        {
+
+            public static List<RayHit>? LastResultData = null;
+
+            public bool AllowTest(CollidableReference collidable)
+            {
+                return true;
+            }
+
+            public bool AllowTest(CollidableReference collidable, int childIndex)
+            {
+                return true;
+            }
+
+            public void OnRayHit(in RayData ray, ref float maximumT, float t, in Vector3 normal, CollidableReference collidable, int childIndex)
+            {
+                GameObject? hitObject;
+                Logger.Info(Loc.Get("COLLIDABLE_MOBILITY") + collidable.Mobility.ToString());
+                if (collidable.Mobility == CollidableMobility.Dynamic)
+                {
+                    hitObject = InstanceSelf.GetObjectFromHandle(collidable.BodyHandle);
+                }
+                else
+                {
+                    hitObject = InstanceSelf.StaticBodies.Where(pair => pair.Value == collidable.StaticHandle).FirstOrDefault().Key;
+                }
+                Logger.Info(Loc.Get("RAYCAST_OBJECT_HIT_ID") + hitObject.Id);
+                var hit = new RayHit(true, hitObject, t, ray.Origin.ToOpenTK(), (ray.Origin + ray.Direction * t).ToOpenTK(), ray.Direction.ToOpenTK());
+                LastResultData.Add(hit);
+            }
         }
     }
 }

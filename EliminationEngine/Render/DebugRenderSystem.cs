@@ -116,13 +116,7 @@ namespace EliminationEngine.GameObjects
                             var type = comp.GetType();
                             if (ImGui.CollapsingHeader(type.Name))
                             {
-                                var fieldInfo = type.GetFields();
-                                foreach (var field in fieldInfo)
-                                {
-                                    var value = field.GetValue(comp);
-                                    var text = value != null ? value.ToString() : "null";
-                                    ImGui.Text(field.Name + ": " + text);
-                                }
+                                ProcessFields(type, comp);
                             }
                         }
                     }

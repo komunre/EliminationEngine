@@ -11,16 +11,16 @@ namespace EliminationEngine.GameObjects
         {
         }
 
-        public static void AddMeshToObject(GameObject gameObject, Image<Rgba32> image, ImageFilter filter, bool unlit = true)
+        public static void AddMeshToObject(GameObject gameObject, Image<Rgba32> image, ImageFilter filter, bool unlit = true, bool onscreen = false)
         {
             var generator = gameObject.AddComponent<SpriteGenerator>();
-            generator.GenerateMesh(image, filter, false, unlit);
+            generator.GenerateMesh(image, filter, onscreen, unlit);
         }
 
-        public static void AddMeshToObject(GameObject gameObject, ImageData image, ImageFilter filter, bool unlit = true)
+        public static void AddMeshToObject(GameObject gameObject, ImageData image, ImageFilter filter, bool unlit = true, bool onscreen = false)
         {
             var generator = gameObject.AddComponent<SpriteGenerator>();
-            generator.GenerateMesh(image, filter, false, unlit);
+            generator.GenerateMesh(image, filter, onscreen, unlit);
         }
 
         public void GenerateMesh(Image<Rgba32> image, ImageFilter filter, bool onScreen = false, bool unlit = true)

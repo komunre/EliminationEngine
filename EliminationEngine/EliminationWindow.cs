@@ -147,6 +147,11 @@ namespace EliminationEngine
 
             Engine.GetSystem<CameraResizeSystem>().WindowResized = true;
             Engine.GetSystem<ImGuiSystem>().WindowResized();
+
+            foreach (var system in Engine.GetAllSystems())
+            {
+                system.OnWindowResize(e);
+            }
         }
 
         protected override void OnTextInput(TextInputEventArgs e)

@@ -12,7 +12,7 @@ namespace EliminationEngine.Render
 
         protected int lightsBuffer = 0;
 
-        public bool ForceWiremode = false;
+        public static bool ForceWiremode = false;
 
         public static int DiffusePlaceholder = 0;
         public static int NormalPlaceholder = 0;
@@ -29,7 +29,7 @@ namespace EliminationEngine.Render
         {
             base.OnLoad();
 
-            DiffusePlaceholder = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/missing.png"), ImageFilter.Nearest, false, false).TextureID;
+            DiffusePlaceholder = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/UV-placeholder.png"), ImageFilter.Nearest, false, false).TextureID;
             NormalPlaceholder = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/normaldef.png"), ImageFilter.Linear, false, false).TextureID;
             DisplacementPlaceholer = ImageLoader.CreateTextureFromImage(SixLabors.ImageSharp.Image.Load<Rgba32>("res/displacedef.png"), ImageFilter.Linear, false, false).TextureID;
         }
@@ -137,7 +137,7 @@ namespace EliminationEngine.Render
             }
         }
 
-        public void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera)
+        public static void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera)
         {
             shader.Use();
             var trans = Matrix4.CreateTranslation(position + positionOffset);
@@ -159,15 +159,15 @@ namespace EliminationEngine.Render
             var lookAt = Matrix4.LookAt(cameraPos, forward, up);
             shader.SetMatrix4("viewMatrix", lookAt);
             shader.SetMatrix4("projectionMatrix", fovMatrix);
-            shader.SetMatrix4("mvpMatrix", (matrix * trans * scale) * lookAt * fovMatrix);
+            shader.SetMatrix4("mvpMatrix", (scale * matrix * trans) * lookAt * fovMatrix);
             shader.SetMatrix4("modelMatrix", matrix * trans * scale);
             shader.SetVector3("viewPos", cameraPos);
             shader.SetVector3("cameraForwar", camera.Owner.GetDirections()[0]);
             shader.SetVector3("worldPos", position);
-            shader.SetFloat("time", 1.0f / ((float)(Engine.Elapsed.Ticks % 150)));
+            shader.SetFloat("time", 1.0f / ((float)(Elimination.GlobalEngine.Elapsed.Ticks % 150)));
         }
 
-        private void RenderEverything(CameraComponent camera)
+        public static void RenderEverything(CameraComponent camera)
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
 
@@ -176,9 +176,9 @@ namespace EliminationEngine.Render
             var forward = directions[0] + camera.Owner.Position;
             var up = directions[2];
 
-            var lights = Engine.GetObjectsOfType<LightComponent>();
+            var lights = Elimination.GlobalEngine.GetObjectsOfType<LightComponent>();
 
-            var meshGroups = Engine.GetObjectsOfType<MeshGroupComponent>();
+            var meshGroups = Elimination.GlobalEngine.GetObjectsOfType<MeshGroupComponent>();
             if (meshGroups == null) return;
             foreach (var meshGroup in meshGroups)
             {

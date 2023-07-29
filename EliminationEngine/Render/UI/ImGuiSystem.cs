@@ -256,7 +256,7 @@ void main()
                 var renderSystem = Engine.GetSystem<MeshSystem>();
                 ImGui.Begin("DEBUG MENU");
                 ImGui.Text("FPS: " + 1 / Engine.DeltaTime);
-                ImGui.Checkbox("Wiremode", ref renderSystem.ForceWiremode);
+                ImGui.Checkbox("Wiremode", ref MeshSystem.ForceWiremode);
                 ImGui.Checkbox("Editor", ref _editorSystem.EditorActive);
                 ImGui.Checkbox("Debug render", ref _debugRender.DebugActive);
                 ImGui.End();

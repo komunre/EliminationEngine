@@ -44,10 +44,6 @@ namespace EliminationEngine
         public MouseState? MouseState;
 
         public delegate void ObjectCreateEvent(GameObject obj, int world);
-        /// <summary>
-        /// Called when object is created.
-        /// </summary>
-        public event ObjectCreateEvent? OnObjectCreate;
 
         public string[] ProgramArgs = new string[0];
         public EliminationArgs ProcessedArgs;
@@ -181,7 +177,7 @@ namespace EliminationEngine
         /// Inserts gameobject into the game world.
         /// </summary>
         /// <param name="obj">Object to insert.</param>
-        public void AddGameObject(GameObject obj)
+        public void AddGameObject(GameObject obj, bool addId = true)
         {
             if (window == null)
             {
@@ -193,34 +189,12 @@ namespace EliminationEngine
                 var meshSys = GetSystem<MeshSystem>();
                 meshSys?.LoadMeshGroup(comp);
             }
-            obj.Id = window.MaxObjectId;
+            if (addId) obj.Id = window.MaxObjectId;
             window.GameObjects.Add(window.MaxObjectId, obj);
             window.MaxObjectId++;
-            if (OnObjectCreate != null)
+            foreach (var system in GetAllSystems())
             {
-                OnObjectCreate.Invoke(obj, window.CurrentWorld);
-            }
-        }
-
-        /// <summary>
-        /// Inserts gameobject into the game world, but does not set new object ID.
-        /// </summary>
-        /// <param name="obj">Object to insert.</param>
-        public void AddGameObjectNoId(GameObject obj)
-        {
-            if (window == null)
-            {
-                Logger.Warn(Loc.Get("WARN_START_BEFORE_ACCESS"));
-                return;
-            }
-            if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
-            {
-                var meshSys = GetSystem<MeshSystem>();
-                meshSys?.LoadMeshGroup(comp);
-            }
-            if (OnObjectCreate != null)
-            {
-                OnObjectCreate.Invoke(obj, window.CurrentWorld);
+                system.OnObjectAdded(obj);
             }
         }
 
@@ -235,6 +209,10 @@ namespace EliminationEngine
                 Logger.Warn(Loc.Get("WARN_START_BEFORE_ACCESS"));
                 return;
             }
+            if (TryGetSystem<PhysicsSystem>(out var physics))
+            {
+                physics.RemoveObject(obj);
+            }
             window.GameObjects.Remove(obj.Id);
         }
 
@@ -245,6 +223,16 @@ namespace EliminationEngine
         public void RemoveGameObject(int id)
         {
             if (window == null) return;
+            if (TryGetSystem<PhysicsSystem>(out var physics))
+            {
+                var obj = window.GameObjects.ElementAt(id).Value;
+                // This is a bit problematic
+                if (obj.Id != id)
+                {
+                    obj = window.GameObjects.Where((k) => k.Value.Id == id).First().Value;
+                }
+                physics.RemoveObject(obj);
+            }
             window.GameObjects.Remove(id);
         }
 

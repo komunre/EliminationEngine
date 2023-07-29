@@ -158,27 +158,27 @@ namespace EliminationEngine.GameObjects
         {
             var rot = DegreeRotation;
 
-            /*var forward = new Vector3();
-            forward.X = (float)Math.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)Math.Cos(MathHelper.DegreesToRadians(rot.X));
-            forward.Y = (float)Math.Sin(MathHelper.DegreesToRadians(rot.X));
-            forward.Z = (float)Math.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)Math.Sin(MathHelper.DegreesToRadians(rot.X));
-            forward = Vector3.Normalize(forward);*/
-
-            /*var x = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.X));
-            var y = (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));
-            var z = (float)MathHelper.Sin(MathHelper.DegreesToRadians(rot.Y)) * (float)MathHelper.Cos(MathHelper.DegreesToRadians(rot.X));*/
-
-            /*var x = EliminationMathHelper.DegreeCos(rot.Y) * EliminationMathHelper.DegreeCos(rot.X);
-            var y = EliminationMathHelper.DegreeSin(rot.X) * EliminationMathHelper.DegreeCos(rot.X);
-            var z = (EliminationMathHelper.DegreeSin(rot.Y) * EliminationMathHelper.DegreeCos(rot.X));*/
-
             var x = EliminationMathHelper.DegreeRadCos(rot.X) * EliminationMathHelper.DegreeRadCos(rot.Y);
             var y = EliminationMathHelper.DegreeRadSin(rot.X);
             var z = EliminationMathHelper.DegreeRadCos(rot.X) * EliminationMathHelper.DegreeRadSin(rot.Y);
 
             var forward = new Vector3(x, y, z).Normalized();
 
-            //var forward = _rotation * new Vector3(1, 0, 0);
+            var right = Vector3.Cross(forward, Vector3.UnitY).Normalized();
+            var up = Vector3.Cross(right, forward).Normalized();
+
+            return new Vector3[] { forward, right, up };
+        }
+
+        public Vector3[] GetGlobalDirections()
+        {
+            var rot = GlobalDegreeRotation;
+
+            var x = EliminationMathHelper.DegreeRadCos(rot.X) * EliminationMathHelper.DegreeRadCos(rot.Y);
+            var y = EliminationMathHelper.DegreeRadSin(rot.X);
+            var z = EliminationMathHelper.DegreeRadCos(rot.X) * EliminationMathHelper.DegreeRadSin(rot.Y);
+
+            var forward = new Vector3(x, y, z).Normalized();
 
             var right = Vector3.Cross(forward, Vector3.UnitY).Normalized();
             var up = Vector3.Cross(right, forward).Normalized();
@@ -326,9 +326,9 @@ namespace EliminationEngine.GameObjects
         public CompType GetComponent<CompType>() where CompType : EntityComponent
         {
             if (!Components.ContainsKey(typeof(CompType))) {
-                Logger.Error(Loc.Get("GET_COMPONENT_FAIL") + "ID: " + Id + ", Component: " + nameof(CompType));
+                Logger.Error(Loc.Get("GET_COMPONENT_FAIL") + "ID: " + Id + ", Component: " + typeof(CompType));
                 Logger.Error(Loc.Get("RETURN_INVALID_COMPONENT"));
-                return Activator.CreateInstance<CompType>();
+                return (CompType)Activator.CreateInstance(typeof(CompType), this);
             }
             var comp = Components[typeof(CompType)] as CompType;
             if (comp == null) throw new NullReferenceException(Loc.Get("GET_COMPONENT_FAIL") + " ID: " + Id + ",Component: " + nameof(CompType));

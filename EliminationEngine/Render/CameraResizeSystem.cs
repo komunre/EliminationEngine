@@ -1,5 +1,6 @@
 using EliminationEngine.GameObjects;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 
 namespace EliminationEngine.Render
 {
@@ -7,7 +8,7 @@ namespace EliminationEngine.Render
     {
         public bool WindowResized = false;
         protected bool ResizeBlocked = false;
-        protected EngineTimer timer = new EngineTimer(TimeSpan.FromMilliseconds(2500));
+        protected EngineTimer timer = new EngineTimer(TimeSpan.FromMilliseconds(500));
 
         public CameraResizeSystem(Elimination e) : base(e)
         {
@@ -19,18 +20,12 @@ namespace EliminationEngine.Render
             timer.ResetTimer(span);
         }
 
-        public override void OnUpdate()
+        public override void OnWindowResize(ResizeEventArgs args)
         {
-            base.OnUpdate();
-
-            if (Engine.window == null) return;
-
-            if (ResizeBlocked)
+            while (!timer.TestTimer())
             {
-                if (!timer.TestTimer()) return;
-                ResizeBlocked = false;
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
-            if (!WindowResized) return;
 
             Logger.Info(Loc.Get("INFO_RESIZING"));
             foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())

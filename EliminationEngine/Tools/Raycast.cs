@@ -11,14 +11,16 @@ namespace EliminationEngine.Tools
         public float Distance = 0;
         public Vector3 StartPos = Vector3.Zero;
         public Vector3 EndPos = Vector3.Zero;
+        public Vector3 Direction = Vector3.Zero;
 
-        public RayHit(bool hit, GameObject? obj, float dist, Vector3 start, Vector3 end)
+        public RayHit(bool hit, GameObject? obj, float dist, Vector3 start, Vector3 end, Vector3 direction)
         {
             Hit = hit;
             HitObject = obj;
             Distance = dist;
             StartPos = start;
             EndPos = end;
+            Direction = direction;
         }
     }
     public class Raycast : EntitySystem
@@ -34,7 +36,7 @@ namespace EliminationEngine.Tools
         }
 
 
-        public RayHit[] RaycastFromPos(Vector3 pos, Vector3 dir, float maxDist = 1000, uint maxHits = 2)
+        /*public RayHit[] RaycastFromPos(Vector3 pos, Vector3 dir, float maxDist = 1000, uint maxHits = 2)
         {
             var debugRender = Engine.GetSystem<DebugRenderSystem>();
             if (debugRender.DebugActive)
@@ -178,6 +180,6 @@ namespace EliminationEngine.Tools
             var mouseRay = ScreenHelper.GetCursorWorldPos(camera, Engine.MouseState.Position, Engine.window.Size);
 
             return RaycastFromPos(camera.Owner.GlobalPosition, mouseRay);
-        }
+        }*/
     }
 }

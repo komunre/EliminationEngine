@@ -19,4 +19,6 @@
 ["WARN_HEADLESS_CAMERA_RAYCAST","Running in headless mode, yet running raycast from camera."],
 ["GET_COMPONENT_FAIL","Failed to get component -- "],
 ["GET_SYSTEM_FAIL","Failed to get system -- "],
+["COLLIDABLE_MOBILITY","Collidable mobility: "],
+["RAYCAST_OBJECT_HIT_ID","Object ID hit by ray: "],
 ]
