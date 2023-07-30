@@ -3,12 +3,15 @@ using EliminationEngine.GameObjects;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Runtime.CompilerServices;
 
 namespace EliminationEngine.Render
 {
     public class MeshSystem : EntitySystem
     {
         public static CameraComponent? ActiveCamera;
+        public static Shader TexturedShader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
+        public static Shader? CurrentShader;
 
         protected int lightsBuffer = 0;
 
@@ -19,6 +22,8 @@ namespace EliminationEngine.Render
         public static int DisplacementPlaceholer = 0;
 
         public static Shader DefaultTexturedShader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
+
+        public static bool LightsAdded = true;
 
         public MeshSystem(Elimination e) : base(e)
         {
@@ -47,6 +52,7 @@ namespace EliminationEngine.Render
             lightsBuffer = GL.GenBuffer();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static int GenerateTexture(Mesh mesh, int textureReference = -1)
         {
             if (mesh._tex != 0) return mesh._tex;
@@ -72,6 +78,7 @@ namespace EliminationEngine.Render
             return mesh._tex;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void LoadMeshGroup(MeshGroupComponent meshGroup)
         {
             foreach (var mesh in meshGroup.Meshes)
@@ -84,14 +91,7 @@ namespace EliminationEngine.Render
 
                 if (mesh._shader == null)
                 {
-                    if (mesh.OverrideShader)
-                    {
-                        mesh._shader = new Shader(mesh.ShaderVertPath, mesh.ShaderFragPath);
-                    }
-                    else
-                    {
-                        mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
-                    }
+                    mesh._shader = TexturedShader;
                 }
 
                 GL.BindVertexArray(mesh._vertexArr);
@@ -137,12 +137,28 @@ namespace EliminationEngine.Render
             }
         }
 
-        public static void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera)
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera, UpdateInfo updateInfo)
         {
-            shader.Use();
-            var trans = Matrix4.CreateTranslation(position + positionOffset);
-            var matrix = Matrix4.CreateFromQuaternion(rotation);
-            var scale = Matrix4.CreateScale(Scale);
+            if (CurrentShader != shader)
+            {
+                shader.Use();
+            }
+            Matrix4 trans;
+            Matrix4 matrix;
+            Matrix4 scale;
+            if (updateInfo.RequiresUpdate)
+            {
+                trans = Matrix4.CreateTranslation(position + positionOffset);
+                matrix = Matrix4.CreateFromQuaternion(rotation);
+                scale = Matrix4.CreateScale(Scale);
+            }
+            else
+            {
+                trans = updateInfo.TransformationMatrix;
+                matrix = updateInfo.RotationMatrix;
+                scale = updateInfo.ScaleMatrix;
+            }
             Matrix4 fovMatrix;
             if (camera.Perspective)
             {
@@ -160,13 +176,51 @@ namespace EliminationEngine.Render
             shader.SetMatrix4("viewMatrix", lookAt);
             shader.SetMatrix4("projectionMatrix", fovMatrix);
             shader.SetMatrix4("mvpMatrix", (scale * matrix * trans) * lookAt * fovMatrix);
-            shader.SetMatrix4("modelMatrix", matrix * trans * scale);
+            if (updateInfo.RequiresUpdate) shader.SetMatrix4("modelMatrix", matrix * trans * scale);
             shader.SetVector3("viewPos", cameraPos);
-            shader.SetVector3("cameraForwar", camera.Owner.GetDirections()[0]);
+            //shader.SetVector3("cameraForward", camera.Owner.GetDirections()[0]);
             shader.SetVector3("worldPos", position);
-            shader.SetFloat("time", 1.0f / ((float)(Elimination.GlobalEngine.Elapsed.Ticks % 150)));
+            //shader.SetFloat("time", 1.0f / ((float)(Elimination.GlobalEngine.Elapsed.Ticks % 150)));
+            updateInfo.RequiresUpdate = false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static void SendLightData(Mesh mesh)
+        {
+            Logger.Info(Loc.Get("ADDING_LIGHT_INFORMATION"));
+
+            var lights = Elimination.GlobalEngine.GetObjectsOfType<LightComponent>();
+
+            if (lights == null) return;
+
+            var counter = 0;
+            for (var i = 0; i < lights.Length; i++)
+            {
+                var light = lights[i];
+                /*if (light.IgnoredLayers.Any(x => meshGroup.Owner.Layers.Contains(x)))
+                {
+                    continue;
+                }*/
+                if (counter >= 20) break;
+                mesh._shader.SetVector3("pointLights[" + counter + "].pos", light.Owner.GlobalPosition);
+                mesh._shader.SetFloat("pointLights[" + counter + "].constant", light.Constant);
+                mesh._shader.SetFloat("pointLights[" + counter + "].linear", light.Diffuse);
+                mesh._shader.SetFloat("pointLights[" + counter + "].quadratic", light.Qudratic);
+                mesh._shader.SetVector3("pointLights[" + counter + "].diffuse", new Vector3(light.Color.R, light.Color.G, light.Color.B));
+                mesh._shader.SetInt("pointLights[" + counter + "].directional", light.Directional ? 1 : 0);
+                mesh._shader.SetVector3("pointLights[" + counter + "].direction", light.Owner.GetDirections()[0]);
+                mesh._shader.SetFloat("pointLights[" + counter + "].cutoff", (float)MathHelper.Cos(MathHelper.DegreesToRadians(light.DirectionalCutoffAngle)));
+                mesh._shader.SetFloat("pointLights[" + counter + "].distanceFactor", light.DistanceFactor);
+                mesh._shader.SetFloat("pointLights[" + counter + "].maxBrightness", light.MaxBrightness);
+                mesh._shader.SetFloat("pointLights[" + counter + "].constantDiffuse", light.ConstantDiffuse);
+                counter++;
+            }
+            mesh._shader.SetInt("lightsNum", counter);
+
+            Logger.Info(Loc.Get("ADDED_LIGHTS_COUNT") + counter);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void RenderEverything(CameraComponent camera)
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
@@ -176,12 +230,15 @@ namespace EliminationEngine.Render
             var forward = directions[0] + camera.Owner.Position;
             var up = directions[2];
 
-            var lights = Elimination.GlobalEngine.GetObjectsOfType<LightComponent>();
-
             var meshGroups = Elimination.GlobalEngine.GetObjectsOfType<MeshGroupComponent>();
             if (meshGroups == null) return;
             foreach (var meshGroup in meshGroups)
             {
+                var ownerObject = meshGroup.Owner;
+                if (ownerObject.ObjectUpdateInfo.LastPosition != ownerObject.Position || ownerObject.ObjectUpdateInfo.LastRotation != ownerObject.Rotation || ownerObject.ObjectUpdateInfo.LastScale != ownerObject.Scale)
+                {
+                    ownerObject.ObjectUpdateInfo.RequiresUpdate = true;
+                }
                 foreach (var mesh in meshGroup.Meshes)
                 {
                     if (!mesh.IsVisible) continue;
@@ -189,38 +246,9 @@ namespace EliminationEngine.Render
                     if (mesh.Indices == null) continue;
                     if (mesh._shader == null) continue;
 
-                    CreateShaderData(mesh._shader, meshGroup.Owner.GlobalPosition, mesh.OffsetPosition, meshGroup.Owner.GlobalRotation, meshGroup.Owner.GlobalScale, camera);
+                    CreateShaderData(mesh._shader, meshGroup.Owner.GlobalPosition, mesh.OffsetPosition, meshGroup.Owner.GlobalRotation, meshGroup.Owner.GlobalScale, camera, meshGroup.Owner.ObjectUpdateInfo);
 
-                    var counter = 0;
-                    if (lights != null && lights.Length > 0)
-                    {
-                        for (var i = 0; i < lights.Length; i++)
-                        {
-                            var light = lights[i];
-                            if ((light.Owner.GlobalPosition - meshGroup.Owner.GlobalPosition).Length > light.MaxAffectDstance)
-                            {
-                                continue;
-                            }
-                            if (light.IgnoredLayers.Any(x => meshGroup.Owner.Layers.Contains(x)))
-                            {
-                                continue;
-                            }
-                            if (counter >= 20) break;
-                            mesh._shader.SetVector3("pointLights[" + counter + "].pos", light.Owner.GlobalPosition);
-                            mesh._shader.SetFloat("pointLights[" + counter + "].constant", light.Constant);
-                            mesh._shader.SetFloat("pointLights[" + counter + "].linear", light.Diffuse);
-                            mesh._shader.SetFloat("pointLights[" + counter + "].quadratic", light.Qudratic);
-                            mesh._shader.SetVector3("pointLights[" + counter + "].diffuse", new Vector3(light.Color.R, light.Color.G, light.Color.B));
-                            mesh._shader.SetInt("pointLights[" + counter + "].directional", light.Directional ? 1 : 0);
-                            mesh._shader.SetVector3("pointLights[" + counter + "].direction", light.Owner.GetDirections()[0]);
-                            mesh._shader.SetFloat("pointLights[" + counter + "].cutoff", (float)MathHelper.Cos(MathHelper.DegreesToRadians(light.DirectionalCutoffAngle)));
-                            mesh._shader.SetFloat("pointLights[" + counter + "].distanceFactor", light.DistanceFactor);
-                            mesh._shader.SetFloat("pointLights[" + counter + "].maxBrightness", light.MaxBrightness);
-                            mesh._shader.SetFloat("pointLights[" + counter + "].constantDiffuse", light.ConstantDiffuse);
-                            counter++;
-                        }
-                    }
-                    mesh._shader.SetInt("lightsNum", counter);
+                    if (LightsAdded) SendLightData(mesh);
 
                     mesh._shader.SetFloat("heightScale", mesh.DisplaceValue);
                     mesh._shader.SetFloat("zeroHeight", mesh.DisplaceZeroHeight);
@@ -272,8 +300,7 @@ namespace EliminationEngine.Render
             }
         }
 
-        // <!!!>
-        // COMPATIBILITY ISSUE:  MULTIPLE ENGINE INSTANCES INCOMPATIBLE
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static void RenderToScreen(CameraComponent camera)
         {
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -290,6 +317,7 @@ namespace EliminationEngine.Render
             GL.Enable(EnableCap.DepthTest);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public override void OnDraw()
         {
             base.OnUpdate();
@@ -298,7 +326,10 @@ namespace EliminationEngine.Render
             {
                 if (!camera.RenderToTexture) continue;
 
-                RenderEverything(camera);
+                //new Thread(new ThreadStart(() =>
+                //{
+                    RenderEverything(camera);
+                //}));
             }
 
             foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
@@ -307,6 +338,8 @@ namespace EliminationEngine.Render
 
                 RenderEverything(camera);
             }
+
+            LightsAdded = false;
         }
 
 
@@ -315,6 +348,7 @@ namespace EliminationEngine.Render
         /// </summary>
         /// <param name="texture">Texture data itself.</param>
         /// <param name="over">Override shaders. Recommended to use camera.vert as vertex shader.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void ModifyTexture(TextureData texture, Shader over)
         {
             if (texture.ImageData == null) return; // due to need in knowing width and height.
@@ -337,6 +371,12 @@ namespace EliminationEngine.Render
             // cleanup
             GL.Enable(EnableCap.DepthTest);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public override void OnObjectAdded(GameObject obj)
+        {
+            if (obj.HasComponent<LightComponent>()) LightsAdded = true;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using EliminationEngine.Render;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace EliminationEngine
@@ -6,6 +7,8 @@ namespace EliminationEngine
     public class Shader
     {
         public readonly int Handle;
+
+        private Dictionary<string, int> UniformLocations = new();
 
         public Shader(string vertPath, string fragPath, string geomPath = "null")
         {
@@ -80,6 +83,7 @@ namespace EliminationEngine
         public void Use()
         {
             GL.UseProgram(Handle);
+            MeshSystem.CurrentShader = this;
         }
 
         private int GetAttribLocation(string attribName)
@@ -89,7 +93,8 @@ namespace EliminationEngine
 
         private int GetUniformLocation(string name)
         {
-            return GL.GetUniformLocation(Handle, name);
+            if (!UniformLocations.ContainsKey(name)) UniformLocations.Add(name, GL.GetUniformLocation(Handle, name));
+            return UniformLocations[name];
         }
 
         // Uniform setters
@@ -108,7 +113,6 @@ namespace EliminationEngine
         /// <param name="data">The data to set</param>
         public void SetInt(string name, int data)
         {
-            GL.UseProgram(Handle);
             GL.Uniform1(GetUniformLocation(name), data);
         }
 
@@ -119,7 +123,6 @@ namespace EliminationEngine
         /// <param name="data">The data to set</param>
         public void SetFloat(string name, float data)
         {
-            GL.UseProgram(Handle);
             GL.Uniform1(GetUniformLocation(name), data);
         }
 
@@ -135,7 +138,6 @@ namespace EliminationEngine
         /// </remarks>
         public void SetMatrix4(string name, Matrix4 data)
         {
-            GL.UseProgram(Handle);
             GL.UniformMatrix4(GetUniformLocation(name), true, ref data);
         }
 
@@ -146,14 +148,12 @@ namespace EliminationEngine
         /// <param name="data">The data to set</param>
         public void SetVector3(string name, Vector3 data)
         {
-            GL.UseProgram(Handle);
             GL.Uniform3(GetUniformLocation(name), data);
             //GL.Uniform3(_uniformLocations[name], data);
         }
 
         public void SetFloatUniform(string name, float[] data)
         {
-            GL.UseProgram(Handle);
             GL.Uniform3(GetUniformLocation(name), data.Length, data);
         }
     }

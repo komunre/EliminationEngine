@@ -42,7 +42,7 @@ struct PointLight {
     float cutoff;
 };
 
-#define NR_POINT_LIGHTS 20 
+#define NR_POINT_LIGHTS 20
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform int lightsNum = 0;
 

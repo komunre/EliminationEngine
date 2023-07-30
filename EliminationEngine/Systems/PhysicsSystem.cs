@@ -79,13 +79,14 @@ namespace EliminationEngine.Systems
         public override void PostLoad()
         {
             base.PostLoad();
-            
+
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void OnUpdate()
         {
             base.OnUpdate();
-            
+
             if (!Initialized)
             {
                 return;
@@ -101,22 +102,27 @@ namespace EliminationEngine.Systems
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void OnDraw()
         {
             base.OnDraw();
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public OpenTK.Mathematics.Vector3 GetObjectVelocity(GameObject obj)
         {
             return GetObjectVelocity(GetObjectHandle(obj));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public OpenTK.Mathematics.Vector3 GetObjectVelocity(BodyHandle handle)
         {
             return PhysicsSimulation.Bodies.GetBodyReference(handle).Velocity.Linear.ToOpenTK();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle AddPhysicsObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh, float mass)
         {
             if (!Initialized) return new BodyHandle(-1);
@@ -127,6 +133,7 @@ namespace EliminationEngine.Systems
             return handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle AddBoxObject(GameObject obj, float width, float height, float length, float mass)
         {
             if (!Initialized) return new BodyHandle(-1);
@@ -138,6 +145,18 @@ namespace EliminationEngine.Systems
             return handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public StaticHandle AddStaticBoxObject(GameObject obj, float width, float height, float length)
+        {
+            if (!Initialized) return new StaticHandle(-1);
+            var box = new Box(width, height, length);
+            var meshIndex = PhysicsSimulation.Shapes.Add(box);
+            var handle = PhysicsSimulation.Statics.Add(new StaticDescription(new RigidPose(obj.GlobalPosition.ToNumerics() + new Vector3(width/2, height/2, length/3), obj.Rotation.ToNumerics()), new CollidableDescription(meshIndex)));
+            StaticBodies.Add(obj, handle);
+            return handle;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle AddCapsuleObject(GameObject obj, float radius, float length, float mass)
         {
             if (!Initialized) return new BodyHandle(-1);
@@ -149,6 +168,7 @@ namespace EliminationEngine.Systems
             return handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle AddKinematicObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh)
         {
             if (!Initialized) return new BodyHandle(-1);
@@ -158,6 +178,7 @@ namespace EliminationEngine.Systems
             return handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public StaticHandle AddStaticObject(GameObject obj, BepuPhysics.Collidables.Mesh mesh)
         {
             if (!Initialized) return new StaticHandle(-1);
@@ -167,12 +188,14 @@ namespace EliminationEngine.Systems
             return handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle AddPhysicsObject(GameObject obj, Render.Mesh mesh, float mass)
         {
             if (!Initialized) return new BodyHandle(-1);
             return AddPhysicsObject(obj, EliminationMeshToBepuMesh.Convert(mesh, PhysicsSimulation.BufferPool), mass);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle AddKinematicObject(GameObject obj, Render.Mesh mesh)
         {
 
@@ -180,22 +203,26 @@ namespace EliminationEngine.Systems
             return AddKinematicObject(obj, EliminationMeshToBepuMesh.Convert(mesh, PhysicsSimulation.BufferPool));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public StaticHandle AddStaticObject(GameObject obj, Render.Mesh mesh)
         {
             if (!Initialized) return new StaticHandle(-1);
             return AddStaticObject(obj, EliminationMeshToBepuMesh.Convert(mesh, PhysicsSimulation.BufferPool));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddDistanceConstraint(BodyHandle handle1, BodyHandle handle2, float minDist, float maxDist, float springFreq, float springDamp)
         {
             PhysicsSimulation.Solver.Add(handle1, handle2, new DistanceLimit(Vector3.Zero, Vector3.Zero, minDist, maxDist, new SpringSettings(springFreq, springDamp)));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddFixedDistanceConstraint(BodyHandle handle1, BodyHandle handle2, float distance)
         {
             AddDistanceConstraint(handle1, handle2, 0, distance, 0.01f, 1);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveObject(GameObject obj)
         {
             if (!Initialized) return;
@@ -213,6 +240,7 @@ namespace EliminationEngine.Systems
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UpdateObjectFromSimulationInfo(BodyHandle handle, GameObject obj)
         {
             if (!Initialized) return;
@@ -232,6 +260,7 @@ namespace EliminationEngine.Systems
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UpdateObjectFromSimulationInfo(GameObject obj)
         {
             if (!Initialized) return;
@@ -241,6 +270,7 @@ namespace EliminationEngine.Systems
             obj.Rotation = pose.Orientation.ToOpenTK();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OverrideObjectPoseWithValues(BodyHandle handle, Vector3 position, Quaternion orientation)
         {
             if (!Initialized) return;
@@ -251,6 +281,7 @@ namespace EliminationEngine.Systems
             bodyRef.Pose = pose;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OverrideObjectPose(BodyHandle handle, GameObject obj)
         {
             if (!Initialized) return;
@@ -261,6 +292,7 @@ namespace EliminationEngine.Systems
             bodyRef.Pose = pose;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddObjectVelocity(BodyHandle handle, Vector3 velocity)
         {
             if (!Initialized) return;
@@ -270,6 +302,7 @@ namespace EliminationEngine.Systems
             bodyRef.Velocity.Linear += velocity * CurrentTimeStep;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void LimitObjectVelocity(BodyHandle handle, float horizontalLimit, float verticalLimit)
         {
             if (!Initialized) return;
@@ -285,6 +318,7 @@ namespace EliminationEngine.Systems
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void LimitObjectVelocity(BodyHandle handle, float limit)
         {
             if (!Initialized) return;
@@ -299,6 +333,7 @@ namespace EliminationEngine.Systems
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RayHit[] RaycastFromPos(OpenTK.Mathematics.Vector3 pos, OpenTK.Mathematics.Vector3 dir, float maxDist = 1000, uint maxHits = 2)
         {
             DefaultRayHitHandler.LastResultData = new List<RayHit>();
@@ -310,11 +345,13 @@ namespace EliminationEngine.Systems
             return array;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BodyHandle GetObjectHandle(GameObject obj)
         {
             return ObjectBodies[obj];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public GameObject GetObjectFromHandle(BodyHandle handle)
         {
             return ObjectBodies.Where((pair) => pair.Value == handle).FirstOrDefault().Key;
@@ -325,16 +362,19 @@ namespace EliminationEngine.Systems
 
             public static List<RayHit>? LastResultData = null;
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool AllowTest(CollidableReference collidable)
             {
                 return true;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool AllowTest(CollidableReference collidable, int childIndex)
             {
                 return true;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void OnRayHit(in RayData ray, ref float maximumT, float t, in Vector3 normal, CollidableReference collidable, int childIndex)
             {
                 GameObject? hitObject;

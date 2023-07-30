@@ -37,9 +37,29 @@ namespace EliminationEngine.GameObjects
         }
     }
 
+    public struct UpdateInfo
+    {
+        public Vector3 LastPosition;
+        public Quaternion LastRotation;
+        public Vector3 LastScale;
+
+        public Matrix4 TransformationMatrix;
+        public Matrix4 RotationMatrix;
+        public Matrix4 ScaleMatrix;
+
+        public bool RequiresUpdate = true;
+
+        public UpdateInfo()
+        {
+
+        }
+    }
+
     public class GameObject : ICopyable
     {
         public static GameObject InvalidObject = new GameObject();
+
+        public UpdateInfo ObjectUpdateInfo;
 
         public int Id = -1;
         public string Name = "Default";

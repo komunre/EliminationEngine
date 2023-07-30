@@ -9,6 +9,7 @@ using ImGuiNET;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace EliminationEngine
@@ -29,7 +30,7 @@ namespace EliminationEngine
         /// <summary>
         /// Seconds past last frame.
         /// </summary>
-        public float DeltaTime = 0;
+        public float DeltaTime = 0.000000000000000001f;
         /// <summary>
         /// Total engine running time.
         /// </summary>
@@ -88,6 +89,7 @@ namespace EliminationEngine
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static ArgumentClass ParseArguments<ArgumentClass>(string[] args)
         {
             var combined = "";
@@ -128,6 +130,7 @@ namespace EliminationEngine
         /// Removes system from list of registered systems.
         /// </summary>
         /// <typeparam name="EntitySystemType">EntitySystem type</typeparam>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void UnregisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
             if (!RegisteredSystems.ContainsKey(typeof(EntitySystemType)))
@@ -143,6 +146,7 @@ namespace EliminationEngine
         /// Sets clear color. This is the color player will see when nothing is drawn on certain pixel.
         /// </summary>
         /// <param name="color">Desired clear color.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void SetClearColor(Tools.Color color)
         {
             color.ConvertToFloat();
@@ -150,6 +154,7 @@ namespace EliminationEngine
             window.SetWindowClearColor();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void Run()
         {
             IsRunning = true;
@@ -177,6 +182,7 @@ namespace EliminationEngine
         /// Inserts gameobject into the game world.
         /// </summary>
         /// <param name="obj">Object to insert.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void AddGameObject(GameObject obj, bool addId = true)
         {
             if (window == null)
@@ -187,7 +193,7 @@ namespace EliminationEngine
             if (obj.TryGetComponent<MeshGroupComponent>(out var comp))
             {
                 var meshSys = GetSystem<MeshSystem>();
-                meshSys?.LoadMeshGroup(comp);
+                if (comp.Meshes.Count > 0 && comp.Meshes[0]._buffer == 0) meshSys?.LoadMeshGroup(comp);
             }
             if (addId) obj.Id = window.MaxObjectId;
             window.GameObjects.Add(window.MaxObjectId, obj);
@@ -202,6 +208,7 @@ namespace EliminationEngine
         /// Removes gameobject from the game world.
         /// </summary>
         /// <param name="obj">Object to remove.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void RemoveGameObject(GameObject obj)
         {
             if (window == null)
@@ -220,6 +227,7 @@ namespace EliminationEngine
         /// Removes gameobject from the game world.
         /// </summary>
         /// <param name="id">ID of an object to remove.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void RemoveGameObject(int id)
         {
             if (window == null) return;
@@ -240,6 +248,7 @@ namespace EliminationEngine
         /// Registers system.
         /// </summary>
         /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public void RegisterSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
             var system = Activator.CreateInstance(typeof(EntitySystemType), new object[] { this }) as EntitySystemType;
@@ -248,6 +257,7 @@ namespace EliminationEngine
             Logger.Info(Loc.Get("INFO_REGISTERED") + typeof(EntitySystemType));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public EntitySystem[] GetAllSystems()
         {
             return RegisteredSystems.Values.ToArray();
@@ -258,6 +268,7 @@ namespace EliminationEngine
         /// </summary>
         /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
         /// <returns>Desired system or null if not found.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public EntitySystemType GetSystem<EntitySystemType>() where EntitySystemType : EntitySystem
         {
             var sys = RegisteredSystems[typeof(EntitySystemType)] as EntitySystemType;
@@ -271,6 +282,7 @@ namespace EliminationEngine
         /// <typeparam name="EntitySystemType">EntitySystem type.</typeparam>
         /// <param name="system">Desired system if found. Null otherwise.</param>
         /// <returns>True if found, false if not.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public bool TryGetSystem<EntitySystemType>(out EntitySystemType? system) where EntitySystemType : EntitySystem
         {
             if (RegisteredSystems.TryGetValue(typeof(EntitySystemType), out var sys))
@@ -287,6 +299,7 @@ namespace EliminationEngine
         /// </summary>
         /// <typeparam name="CompType">EntityComponent type.</typeparam>
         /// <returns>Objects with component with type of CompType.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
             if (window == null)
@@ -302,12 +315,14 @@ namespace EliminationEngine
         /// </summary>
         /// <param name="id">Id of desired object.</param>
         /// <returns>Object with certain id.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public GameObject GetObjectById(int id)
         {
             if (window == null) return GameObject.InvalidObject;
             return window.GameObjects[id];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddChildTo(GameObject parent, GameObject child)
         {
             child.Parent = parent;
@@ -315,6 +330,7 @@ namespace EliminationEngine
             AddGameObject(child);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void LockCursor()
         {
             if (window == null) return;
@@ -322,6 +338,7 @@ namespace EliminationEngine
             window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Empty;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UnlockCursor()
         {
             if (window == null) return;
@@ -330,6 +347,7 @@ namespace EliminationEngine
             window.Cursor = OpenTK.Windowing.Common.Input.MouseCursor.Crosshair;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ToggleCursor()
         {
             if (window == null) return;
@@ -348,12 +366,14 @@ namespace EliminationEngine
             _cursorToggleTimer.ResetTimer();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool GetCursorLockState()
         {
             if (window == null) return false;
             return window.CursorGrabbed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void StopEngine()
         {
             IsRunning = false;
@@ -361,6 +381,7 @@ namespace EliminationEngine
             window.Close();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public GameObject[] GetAllObjects()
         {
             if (window == null) return new GameObject[0];
@@ -383,6 +404,7 @@ namespace EliminationEngine
             window.RemoveWorld(world);
         }*/
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ToggleFullscreen()
         {
             if (window.WindowBorder == OpenTK.Windowing.Common.WindowBorder.Hidden)
@@ -400,6 +422,7 @@ namespace EliminationEngine
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnterBorderless()
         {
             if (window == null) return;
@@ -409,6 +432,7 @@ namespace EliminationEngine
             window.Size = new OpenTK.Mathematics.Vector2i(monitor.HorizontalResolution, monitor.VerticalResolution);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnterFullscreen()
         {
             if (DefaultBorderless)
@@ -421,6 +445,7 @@ namespace EliminationEngine
             window.WindowState = OpenTK.Windowing.Common.WindowState.Fullscreen;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnterNormal()
         {
             if (window == null) return;

@@ -7,6 +7,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace EliminationEngine
 {
@@ -49,6 +50,7 @@ namespace EliminationEngine
             GameObjects.Clear();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public CompType[] GetObjectsOfType<CompType>() where CompType : EntityComponent
         {
             var compsList = new List<CompType>();
@@ -65,11 +67,13 @@ namespace EliminationEngine
             return compsList.ToArray();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetWindowClearColor()
         {
             GL.ClearColor(ClearColor.R, ClearColor.G, ClearColor.B, ClearColor.A);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         protected override void OnLoad()
         {
             base.OnLoad();
@@ -94,6 +98,8 @@ namespace EliminationEngine
                 system.PostLoad();
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             stopwatch.Start();
@@ -108,6 +114,7 @@ namespace EliminationEngine
             base.OnUpdateFrame(args);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);
@@ -139,6 +146,7 @@ namespace EliminationEngine
             stopwatch.Reset();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
@@ -154,6 +162,7 @@ namespace EliminationEngine
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override void OnTextInput(TextInputEventArgs e)
         {
             base.OnTextInput(e);

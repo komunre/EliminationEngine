@@ -18,7 +18,7 @@ namespace EliminationEngine.Tools
             this._reader = reader;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private object ReadObject(Type valueType)
         {
             this._reader.Read(); // consuming bracket opening
@@ -34,7 +34,7 @@ namespace EliminationEngine.Tools
             return instance;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private dynamic ReadArray(Type valueType)
         {
             this._reader.Read(); // consuming bracket opening
@@ -54,7 +54,7 @@ namespace EliminationEngine.Tools
             return list;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private string ReadString()
         {
             this._reader.Read(); // consuming quote opening
@@ -92,7 +92,7 @@ namespace EliminationEngine.Tools
             };
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private bool ReadProperty(Type instanceType, object instance)
         {
             Logger.Info("FileParser: Reading property");

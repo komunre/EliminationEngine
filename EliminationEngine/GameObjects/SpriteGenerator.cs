@@ -54,7 +54,7 @@ namespace EliminationEngine.GameObjects
             }
             else
             {
-                mesh._shader = new Shader("Shaders/textured.vert", "Shaders/textured.frag", "Shaders/textured.geom");
+                mesh._shader = MeshSystem.TexturedShader;
             }
 
             meshGroup.Meshes.Add(mesh);
