@@ -137,8 +137,14 @@ namespace EliminationEngine.Render
             }
         }
 
+        public struct CameraTranslationData
+        {
+            public Vector3 Position;
+            public Vector3[] Directions;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        public static void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera, UpdateInfo updateInfo)
+        public static void CreateShaderData(Shader shader, Vector3 position, Vector3 positionOffset, Quaternion rotation, Vector3 Scale, CameraComponent camera, UpdateInfo updateInfo, CameraTranslationData translation)
         {
             if (CurrentShader != shader)
             {
@@ -168,16 +174,14 @@ namespace EliminationEngine.Render
             {
                 fovMatrix = Matrix4.CreateOrthographic(camera.OrthoWidth, camera.OrthoHeight, camera.ClipNear, camera.ClipFar);
             }
-            var cameraPos = camera.Owner.GlobalPosition;
-            var directions = camera.Owner.GetDirections();
-            var forward = cameraPos + directions[0];
-            var up = directions[2];
-            var lookAt = Matrix4.LookAt(cameraPos, forward, up);
+            
+            var lookAt = Matrix4.LookAt(translation.Position, translation.Directions[0] + translation.Position, translation.Directions[2]);
+            var model = scale * matrix * trans;
             shader.SetMatrix4("viewMatrix", lookAt);
             shader.SetMatrix4("projectionMatrix", fovMatrix);
-            shader.SetMatrix4("mvpMatrix", (scale * matrix * trans) * lookAt * fovMatrix);
-            if (updateInfo.RequiresUpdate) shader.SetMatrix4("modelMatrix", matrix * trans * scale);
-            shader.SetVector3("viewPos", cameraPos);
+            shader.SetMatrix4("mvpMatrix", (model) * lookAt * fovMatrix);
+            if (updateInfo.RequiresUpdate) shader.SetMatrix4("modelMatrix", model);
+            shader.SetVector3("viewPos", translation.Position);
             //shader.SetVector3("cameraForward", camera.Owner.GetDirections()[0]);
             shader.SetVector3("worldPos", position);
             //shader.SetFloat("time", 1.0f / ((float)(Elimination.GlobalEngine.Elapsed.Ticks % 150)));
@@ -225,10 +229,9 @@ namespace EliminationEngine.Render
         {
             GL.Viewport(0, 0, camera.Width, camera.Height);
 
-            var cameraPos = camera.Owner.Position;
-            var directions = camera.Owner.GetDirections();
-            var forward = directions[0] + camera.Owner.Position;
-            var up = directions[2];
+            var camTransData = new CameraTranslationData();
+            camTransData.Position = camera.Owner.GlobalPosition;
+            camTransData.Directions = camera.Owner.GetDirections();
 
             var meshGroups = Elimination.GlobalEngine.GetObjectsOfType<MeshGroupComponent>();
             if (meshGroups == null) return;
@@ -246,7 +249,7 @@ namespace EliminationEngine.Render
                     if (mesh.Indices == null) continue;
                     if (mesh._shader == null) continue;
 
-                    CreateShaderData(mesh._shader, meshGroup.Owner.GlobalPosition, mesh.OffsetPosition, meshGroup.Owner.GlobalRotation, meshGroup.Owner.GlobalScale, camera, meshGroup.Owner.ObjectUpdateInfo);
+                    CreateShaderData(mesh._shader, meshGroup.Owner.GlobalPosition, mesh.OffsetPosition, meshGroup.Owner.GlobalRotation, meshGroup.Owner.GlobalScale, camera, meshGroup.Owner.ObjectUpdateInfo, camTransData);
 
                     if (LightsAdded) SendLightData(mesh);
 
