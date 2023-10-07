@@ -51,5 +51,10 @@ namespace EliminationEngine
 
             return mat;
         }
+
+        public static Vector2 CirclePosition(Vector2 center, float radius, float t)
+        {
+            return new Vector2(radius * (float)Math.Cos(t) + center.X, radius * (float)Math.Sin(t) + center.Y);
+        }
     }
 }

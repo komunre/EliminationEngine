@@ -40,34 +40,54 @@ namespace EliminationEngine
                 0.0f, 1.0f,
         };
 
+        public float[] Normals = new float[4 * 3];
+
         public int VertexArray = 0;
         public int VertexBuffer = 0;
         public int IndicesBuffer = 0;
         public int TexCoordBuffer = 0;
+        public int NormalsBuffer = 0;
         public Shader Shader = new Shader("Shaders/unlit.vert", "Shaders/text.frag");
 
         public void Init()
         {
+            var v1 = Vertices[1] - Vertices[3];
+            var v2 = Vertices[0] - Vertices[2];
+            var n = v1 * v2;
+            for (int i = 0; i < 4; i++)
+            {
+                Normals[i * 3] = n;
+                Normals[i * 3 + 1] = n;
+                Normals[i * 3 + 2] = n;
+            }
+
             VertexBuffer = GL.GenBuffer();
             VertexArray = GL.GenVertexArray();
             IndicesBuffer = GL.GenBuffer();
+            NormalsBuffer = GL.GenBuffer();
+            TexCoordBuffer = GL.GenBuffer();
 
             GL.BindVertexArray(VertexArray);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBuffer);
             GL.BufferData(BufferTarget.ArrayBuffer, 4 * 3 * sizeof(float), Vertices, BufferUsageHint.StaticDraw);
 
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, IndicesBuffer);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, 6 * 2 * sizeof(uint), Indices, BufferUsageHint.StaticDraw);
+
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, IndicesBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, 6 * sizeof(uint), Indices, BufferUsageHint.StaticDraw);
-
-            TexCoordBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, TexCoordBuffer);
             GL.BufferData(BufferTarget.ArrayBuffer, 4 * 2 * sizeof(float), TexCoords, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
             GL.EnableVertexAttribArray(1);
+
+            /*GL.BindBuffer(BufferTarget.ArrayBuffer, NormalsBuffer);
+            GL.BufferData(BufferTarget.ArrayBuffer, 4 * 3 * sizeof(float), Normals, BufferUsageHint.StaticDraw);
+
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(2);*/
         }
     }
 

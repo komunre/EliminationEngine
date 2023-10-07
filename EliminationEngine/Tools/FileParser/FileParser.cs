@@ -71,7 +71,7 @@ namespace EliminationEngine.Tools
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         private object TryReadInt()
         {
-            var numStr = this._reader.ReadWhile(char.IsNumber);
+            var numStr = this._reader.ReadWhile((c) => { return char.IsNumber(c) || c == '-'; });
             return int.Parse(numStr);
         }
 
@@ -101,6 +101,7 @@ namespace EliminationEngine.Tools
 
             var name = this._reader.ReadWhile((c) => c != '=');
             if (this._reader.Read() == -1) throw new InvalidDataException("Unexpected EOF");
+            Logger.Info("FileParser: Property name: " + name);
 
             Logger.Info("FileParser: Getting property type");
             var prop = instanceType.GetProperty(name, BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.NonPublic);
@@ -112,6 +113,7 @@ namespace EliminationEngine.Tools
 
             Logger.Info("FileParser: Reading value");
             var val = this.ReadValue(prop.PropertyType);
+            Logger.Info("FileParser: Value read: " + val.ToString());
             prop.SetValue(instance, val);
             return true;
         }
