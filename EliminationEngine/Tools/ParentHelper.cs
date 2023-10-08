@@ -40,7 +40,7 @@ namespace EliminationEngine.Tools
             var result = obj.Scale;
             if (obj.Parent != null)
             {
-                result += GetAddedScale(obj.Parent);
+                result *= GetAddedScale(obj.Parent);
             }
             return result;
         }
