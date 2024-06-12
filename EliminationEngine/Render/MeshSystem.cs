@@ -245,8 +245,8 @@ namespace EliminationEngine.Render
                 foreach (var mesh in meshGroup.Meshes)
                 {
                     if (!mesh.IsVisible) continue;
-                    if (mesh.Vertices == null) continue;
-                    if (mesh.Indices == null) continue;
+                    if (mesh._buffer == 0) continue;
+                    if (mesh._indicesBuffer == 0) continue;
                     if (mesh._shader == null) continue;
 
                     CreateShaderData(mesh._shader, meshGroup.Owner.GlobalPosition, mesh.OffsetPosition, meshGroup.Owner.GlobalRotation, meshGroup.Owner.GlobalScale, camera, meshGroup.Owner.ObjectUpdateInfo, camTransData);

@@ -5,6 +5,7 @@ using SixLabors.ImageSharp.Processing;
 
 using OpenTK.Graphics.OpenGL4;
 using EliminationEngine.Render;
+using System.Security.Cryptography;
 
 namespace EliminationEngine
 {
@@ -13,6 +14,7 @@ namespace EliminationEngine
         public int Width = 0;
         public int Height = 0;
         public List<byte> Pixels = new();
+        public byte[]? Hash;
     }
 
     public enum ImageFilter
@@ -72,6 +74,12 @@ namespace EliminationEngine
             data.Width = image.Width;
             data.Height = image.Height;
             data.Pixels = pixels;
+            byte[] s = new byte[data.Pixels.Count];
+            for (var i = 0; i < data.Pixels.Count; i++)
+            {
+                s[i] = (byte)data.Pixels[i];
+            }
+            data.Hash = SHA256.HashData(s);
             return data;
         }
 

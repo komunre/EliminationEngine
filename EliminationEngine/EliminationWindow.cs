@@ -102,48 +102,64 @@ namespace EliminationEngine
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
-            stopwatch.Start();
-
-            Engine.KeyState = KeyboardState;
-
-            foreach (var system in Engine.RegisteredSystems.Values)
+            try
             {
-                system.OnUpdate();
-            }
+                stopwatch.Start();
 
-            base.OnUpdateFrame(args);
+                Engine.KeyState = KeyboardState;
+
+                foreach (var system in Engine.RegisteredSystems.Values)
+                {
+                    system.OnUpdate();
+                }
+
+                base.OnUpdateFrame(args);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("[!!!] EXCEPTION IN UPDATE: \n=---------------------=");
+                Logger.Error(ex.Message);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            base.OnRenderFrame(args);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
+            try
             {
-                camera.BindFrameBuffer();
+                base.OnRenderFrame(args);
+
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            }
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
-            foreach (var system in Engine.RegisteredSystems.Values)
+                foreach (var camera in Engine.GetObjectsOfType<CameraComponent>())
+                {
+                    camera.BindFrameBuffer();
+                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                }
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
+                foreach (var system in Engine.RegisteredSystems.Values)
+                {
+                    system.OnDraw();
+                }
+
+                Engine.GetSystem<ImGuiSystem>().Render();
+
+
+                SwapBuffers();
+
+                stopwatch.Stop();
+
+                Engine.Elapsed = Engine.Elapsed.Add(stopwatch.Elapsed);
+                Engine.DeltaTime = (float)stopwatch.Elapsed.TotalMilliseconds / 1000f;
+
+                stopwatch.Reset();
+            }
+            catch (Exception ex)
             {
-                system.OnDraw();
+                Logger.Error("[!!!] EXCEPTION IN RENDER: \n=---------------------=");
+                Logger.Error(ex.Message);
             }
-
-            Engine.GetSystem<ImGuiSystem>().Render();
-
-
-            SwapBuffers();
-
-            stopwatch.Stop();
-
-            Engine.Elapsed = Engine.Elapsed.Add(stopwatch.Elapsed);
-            Engine.DeltaTime = (float)stopwatch.Elapsed.TotalMilliseconds / 1000f;
-
-            stopwatch.Reset();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

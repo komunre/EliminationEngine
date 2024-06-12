@@ -7,6 +7,10 @@ namespace EliminationEngine.GameObjects
 {
     public class SpriteGenerator : EntityComponent
     {
+        public static Dictionary<byte[], int> LoadedTextures = new();
+        public static Shader UnlitShader = new Shader("Shaders/unlit.vert", "Shaders/text.frag");
+        public static Shader OnScreenShader = new Shader("Shaders/onscreen.vert", "Shaders/text.frag");
+
         public SpriteGenerator(GameObject owner) : base(owner)
         {
         }
@@ -28,6 +32,11 @@ namespace EliminationEngine.GameObjects
             GenerateMesh(ImageLoader.LoadImageData(image), filter, onScreen, unlit);
         }
 
+        public void RegisterSprite(ImageData image, ImageFilter filter, bool onScreen = false, bool unlit = true)
+        {
+
+        }
+
         public void GenerateMesh(ImageData image, ImageFilter filter, bool onScreen = false, bool unlit = true)
         {
             MeshGroupComponent? meshGroup = null;
@@ -37,20 +46,33 @@ namespace EliminationEngine.GameObjects
             }
 
             var mesh = new Mesh();
-            mesh.Vertices = EngineStatics.SpriteStatics.Vertices;
+            mesh._vertexArr = EngineStatics.SpriteStatics.VertexArray;
+            mesh._buffer = EngineStatics.SpriteStatics.VertexBuffer;
+            mesh._indicesBuffer = EngineStatics.SpriteStatics.IndicesBuffer;
+            mesh._texCoordBuffer = EngineStatics.SpriteStatics.TexCoordBuffer;
+            //mesh.Vertices = EngineStatics.SpriteStatics.Vertices;
             mesh.Indices = EngineStatics.SpriteStatics.Indices;
-            mesh.TexCoords = EngineStatics.SpriteStatics.TexCoords;
+            //mesh.TexCoords = EngineStatics.SpriteStatics.TexCoords;
 
-            mesh._tex = ImageLoader.CreateTextureFromImageData(image, filter, true, true).TextureID;
+            foreach (var k in LoadedTextures.Keys)
+            {
+                if (k.SequenceEqual(image.Hash))
+                {
+                    mesh._tex = LoadedTextures[k];
+                }
+            }
+            if (mesh._tex == 0) {
+                mesh._tex = ImageLoader.CreateTextureFromImageData(image, filter, true, true).TextureID;
+                LoadedTextures.Add(image.Hash, mesh._tex);
+            }
 
             if (unlit)
             {
-                var vertShader = "Shaders/unlit.vert";
-                if (onScreen)
-                {
-                    vertShader = "Shaders/onscreen.vert";
-                }
-                mesh._shader = new Shader(vertShader, "Shaders/text.frag");
+                mesh._shader = UnlitShader;
+            }
+            else if ((unlit && onScreen) || onScreen)
+            {
+                mesh._shader = OnScreenShader;
             }
             else
             {
